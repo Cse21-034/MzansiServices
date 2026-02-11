@@ -148,7 +148,7 @@ const LocationSearchInput: FC<LocationSearchInputProps> = ({
                     Popular Cities
                   </h3>
                   <div className="grid grid-cols-2 gap-2">
-                    {["Gaborone", "Francistown", "Maun", "Molepolole"].map((city) => (
+                    {["Windhoek", "Walvis Bay", "Swakopmund", "Oshakati"].map((city) => (
                       <button
                         key={city}
                         onClick={() => {

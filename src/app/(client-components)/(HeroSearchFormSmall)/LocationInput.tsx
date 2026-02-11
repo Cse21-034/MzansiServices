@@ -37,23 +37,23 @@ const LocationInput: FC<LocationInputProps> = ({
 
   // Namibia location suggestions
   const popularLocations = [
-    "Gaborone",
-    "Francistown",
-    "Maun",
-    "Molepolole",
-    "Selebi-Phikwe",
-    "Serowe",
-    "Kanye",
-    "Mochudi",
-    "Lobatse",
-    "Palapye"
+    "Windhoek",
+    "Walvis Bay",
+    "Swakopmund",
+    "Oshakati",
+    "Rundu",
+    "Katima Mulilo",
+    "Otjiwarongo",
+    "Keetmanshoop",
+    "Rehoboth",
+    "Okahandja"
   ];
   const recentLocations = [
-    "Gaborone CBD",
-    "Airport Junction",
-    "Fairgrounds",
-    "Tlokweng",
-    "Broadhurst"
+    "Windhoek CBD",
+    "Windhoek Airport",
+    "Katutura",
+    "Eros",
+    "Khomas"
   ];
 
   useEffect(() => {
@@ -155,7 +155,7 @@ const LocationInput: FC<LocationInputProps> = ({
           </div>
         ) : (
           <div className="px-4 sm:px-6 py-4 text-neutral-500 dark:text-neutral-400">
-            No locations found for "{value}". Try searching for "Gaborone", "Francistown", "Maun", etc.
+            No locations found for "{value}". Try searching for "Windhoek", "Walvis Bay", "Swakopmund", etc.
           </div>
         )}
       </>
