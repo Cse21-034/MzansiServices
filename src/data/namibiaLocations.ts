@@ -79,7 +79,7 @@ export const NAMIBIA_LOCATIONS = [
   "Namib-Naukluft Park",
   "Etosha National Park",
   "Popa Falls",
-  "Mahango",
+  "Mahango" 
   "Ngepi",
   "Cape Cross",
   "Spitzkoppe",
