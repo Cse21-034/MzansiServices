@@ -11,7 +11,7 @@ export const NAMIBIA_LOCATIONS = [
   "Omusati",
   "Oshana" ,
   "Oshikoto",
-  "Otjozondjupa",
+  "Otjozondjupa" ,
   "Zambezi" ,
   "Windhoek",
   "Walvis Bay",
