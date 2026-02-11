@@ -9,7 +9,7 @@ export const NAMIBIA_LOCATIONS = [
   "Ohangwena",
   "Omaheke",
   "Omusati",
-  "Oshana",
+  "Oshana" ,
   "Oshikoto",
   "Otjozondjupa",
   "Zambezi" ,
