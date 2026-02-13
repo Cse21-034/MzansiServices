@@ -89,7 +89,7 @@ const SectionClaimListing: FC<SectionClaimListingProps> = ({
         <button
           onClick={handleClaimClick}
           disabled={isSending}
-          className="mt-8 px-8 py-3 bg-yellow-500 hover:bg-yellow-600 disabled:opacity-50 text-white font-medium rounded-full transition-colors"
+          className="mt-8 px-8 py-3 bg-burgundy-600 hover:bg-burgundy-800 disabled:opacity-50 text-white font-medium rounded-full transition-colors"
         >
           {isSending ? "Redirecting..." : "Claim Your Listing Now"}
         </button>
