@@ -10,7 +10,7 @@ export interface PricingPackageProps {
 const DEMO_PACKAGES: PackageType[] = [
   {
     id: "1",
-    name: "MORETLWA PACKAGE",
+    name: "Wild horses",
     description: "Perfect for getting started with essential business tools",
     features: [
       "✓ Free listing (name, contacts, category, location)",
@@ -27,7 +27,7 @@ const DEMO_PACKAGES: PackageType[] = [
   },
   {
     id: "2",
-    name: "MORETOLOGA PACKAGE",
+    name: "Desert elephants",
     popular: true,
     description: "Enhanced digital presence with social media integration",
     features: [
@@ -48,7 +48,7 @@ const DEMO_PACKAGES: PackageType[] = [
   },
   {
     id: "3", 
-    name: "MOWANA PACKAGE",
+    name: "Desert lions",
     description: "Complete enterprise solution with advanced features",
     features: [
       "✓ Everything in MORETOLOGA, plus:",
