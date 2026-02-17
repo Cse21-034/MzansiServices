@@ -26,5 +26,5 @@ export default async function BusinessRedirectPage({
     redirect("/listings");
   }
 
-  redirect(`/(listing-detail)/listing-stay-detail/${business.slug}`);
+  redirect(`/listing-stay-detail/${business.slug}`);
 }
