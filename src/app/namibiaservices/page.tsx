@@ -17,6 +17,8 @@ type Business = {
   viewCount?: number;
   averageRating?: number;
   createdAt?: string;
+  membershipStatus?: "NONE" | "ACTIVE" | "EXPIRED" | "PENDING" | "REJECTED";
+  membershipType?: string | null;
 };
 import { 
   BuildingStorefrontIcon,
@@ -46,6 +48,7 @@ import ButtonSecondary from "@/shared/ButtonSecondary";
 import Badge from "@/shared/Badge";
 import AdminNav from "@/components/AdminNav";
 import { MembershipApprovalPanel } from "@/components/MembershipApprovalPanel";
+import { MembershipBadge } from "@/components/MembershipBadge";
 import { useSession } from "next-auth/react";
 
 export interface AdminDashboardPageProps {}
@@ -456,10 +459,16 @@ const AdminDashboardPage: FC<AdminDashboardPageProps> = ({}) => {
                             <BuildingStorefrontIcon className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                           </div>
                           <div>
-                            <div className="font-medium text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+                            <div className="font-medium text-neutral-900 dark:text-neutral-100 flex items-center gap-2 flex-wrap">
                               {business.name}
                               {business.verified && (
                                 <Badge name="Verified" color="green" className="ml-2" />
+                              )}
+                              {business.membershipStatus && business.membershipStatus !== "NONE" && (
+                                <MembershipBadge
+                                  status={business.membershipStatus}
+                                  membershipType={business.membershipType}
+                                />
                               )}
                               <button
                                 className="ml-2 p-1 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700"

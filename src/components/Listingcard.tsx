@@ -1,6 +1,7 @@
 import React from "react";
 import { MapPin, Star } from "lucide-react";
 import Link from "next/link";
+import { MembershipBadge } from "./MembershipBadge";
 
 interface ListingCardProps {
   data: any;
@@ -27,6 +28,12 @@ const ListingCard: React.FC<ListingCardProps> = ({ data, viewMode }) => {
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-sm text-neutral-500">by {data.business.name}</span>
+                {data.business.membershipStatus && data.business.membershipStatus !== "NONE" && (
+                  <MembershipBadge
+                    status={data.business.membershipStatus}
+                    membershipType={data.business.membershipType}
+                  />
+                )}
               </div>
               
               <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
@@ -76,6 +83,14 @@ const ListingCard: React.FC<ListingCardProps> = ({ data, viewMode }) => {
           alt={data.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
+        {data.business.membershipStatus && data.business.membershipStatus !== "NONE" && (
+          <div className="absolute top-2 right-2">
+            <MembershipBadge
+              status={data.business.membershipStatus}
+              membershipType={data.business.membershipType}
+            />
+          </div>
+        )}
       </div>
 
       {/* Content */}
