@@ -181,7 +181,7 @@ export const categories: CategoryType[] = [
   },
   {
     name: 'Transport & Logistics',
-    image: '/images/categories/bank.jpg',
+    image: '/images/categories/transport and logistics.jpg',
     subcategories: [
       'Freight Services',
       'Courier Services',
@@ -202,7 +202,7 @@ export const categories: CategoryType[] = [
   },
   {
     name: 'Retail & Wholesale',
-    image: '/images/categories/bank.jpg',
+    image: '/images/categories/retail & wholesale.png',
     subcategories: [
       'Supermarkets',
       'Clothing Stores',
@@ -221,7 +221,7 @@ export const categories: CategoryType[] = [
   },
   {
     name: 'Food & Beverage',
-    image: '/images/categories/bank.jpg',
+    image: '/images/categories/food and beverages.jpg',
     subcategories: [
       'Restaurants',
       'Fast Food Outlets',
@@ -239,7 +239,7 @@ export const categories: CategoryType[] = [
   },
   {
     name: 'Professional Services',
-    image: '/images/categories/bank.jpg',
+    image: '/images/categories/professional services.png',
     subcategories: [
       'Legal Services',
       'Accounting Firms',
@@ -261,7 +261,7 @@ export const categories: CategoryType[] = [
   },
   {
     name: 'Automotive Services',
-    image: '/images/categories/bank.jpg',
+    image: '/images/categories/automotive services.png',
     subcategories: [
       'Car Dealerships',
       'Auto Repair Shops',
@@ -280,7 +280,7 @@ export const categories: CategoryType[] = [
   },
   {
     name: 'Creative & Media',
-    image: '/images/categories/bank.jpg',
+    image: '/images/categories/creative and media.jpg',
     subcategories: [
       'Advertising Agencies',
       'Graphic Design',
@@ -298,7 +298,7 @@ export const categories: CategoryType[] = [
   },
   {
     name: 'Energy & Utilities',
-    image: '/images/categories/bank.jpg',
+    image: '/images/categories/energy and utilities.png',
     subcategories: [
       'Solar Energy',
       'Electrical Contractors',
@@ -316,7 +316,7 @@ export const categories: CategoryType[] = [
   },
   {
     name: 'Security Services',
-    image: '/images/categories/bank.jpg',
+    image: '/images/categories/security services.png',
     subcategories: [
       'Security Companies',
       'Alarm Systems',
@@ -334,7 +334,7 @@ export const categories: CategoryType[] = [
   },
   {
     name: 'Beauty & Personal Care',
-    image: '/images/categories/bank.jpg',
+    image: '/images/categories/beauty and personal care.jpg',
     subcategories: [
       'Hair Salons',
       'Beauty Spas',
@@ -355,7 +355,7 @@ export const categories: CategoryType[] = [
   },
   {
     name: 'Events & Entertainment',
-    image: '/images/categories/bank.jpg',
+    image: '/images/categories/events and entertainment.png',
     subcategories: [
       'Cinemas & Theaters',
       'Sports Facilities',
@@ -377,7 +377,7 @@ export const categories: CategoryType[] = [
   },
   {
     name: 'Repairs & Maintenance',
-    image: '/images/categories/bank.jpg',
+    image: '/images/categories/repairs and maintenance.jpg',
     subcategories: [
       'Car Mechanics',
       'Appliance Repair',
@@ -395,7 +395,7 @@ export const categories: CategoryType[] = [
   },
   {
     name: 'Telecommunications',
-    image: '/images/categories/bank.jpg',
+    image: '/images/categories/telecomms.jpg',
     subcategories: [
       'Mobile Network Operators',
       'Internet Service Providers',
@@ -413,7 +413,7 @@ export const categories: CategoryType[] = [
   },
   {
     name: 'Mining & Resources',
-    image: '/images/categories/bank.jpg',
+    image: '/images/categories/mining img.png',
     subcategories: [
       'Mining Companies',
       'Mineral Exploration',
@@ -431,7 +431,7 @@ export const categories: CategoryType[] = [
   },
   {
     name: 'Aviation & Aerospace',
-    image: '/images/categories/bank.jpg',
+    image: '/images/categories/aviation.jpg',
     subcategories: [
       'Airlines',
       'Aviation Training',
@@ -449,7 +449,7 @@ export const categories: CategoryType[] = [
   },
   {
     name: 'Marine Services',
-    image: '/images/categories/bank.jpg',
+    image: '/images/categories/marine services.png',
     subcategories: [
       'Marine Transport',
       'Boat Services',
@@ -467,7 +467,7 @@ export const categories: CategoryType[] = [
   },
   {
     name: 'Non-Profit & Community',
-    image: '/images/categories/bank.jpg',
+    image: '/images/categories/non profit.jpg',
     subcategories: [
       'Charitable Organizations',
       'Community Development',
