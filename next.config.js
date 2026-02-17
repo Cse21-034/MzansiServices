@@ -48,10 +48,16 @@ const nextConfig = {
         port: "",
         pathname: "/**",
       },
-      // Add your Supabase domain
+      // Supabase domains for business and other images
       {
         protocol: "https",
         hostname: "olxfihpifzfziukutcaq.supabase.co",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "fvmazhbawgqwtopxysnn.supabase.co",
         port: "",
         pathname: "/**",
       },
