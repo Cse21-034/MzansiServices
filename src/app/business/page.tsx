@@ -12,6 +12,7 @@ import Label from "@/components/Label";
 import Badge from "@/shared/Badge";
 import Modal from "@/shared/Modal";
 import BusinessNav from "@/components/BusinessNav";
+import { MembershipUploadForm } from "@/components/MembershipUploadForm";
 const defaultBusinessImage = "/images/namibia-logo/squarelogo.PNG";
 import {
   BuildingStorefrontIcon,
@@ -117,6 +118,14 @@ interface BusinessData {
     close?: string;
   }[];
   services: string[];
+  // Membership fields
+  membershipCardImage?: string | null;
+  membershipNumber?: string | null;
+  membershipStatus?: "NONE" | "ACTIVE" | "EXPIRED" | "PENDING" | "REJECTED";
+  membershipType?: string | null;
+  membershipExpiryDate?: string | null;
+  membershipProvider?: string | null;
+  membershipUploadedAt?: string | null;
 }
 
 export interface BusinessDashboardPageProps { }
@@ -849,8 +858,7 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
                 { id: 'overview', name: 'Overview', icon: ChartBarIcon },
                 { id: 'profile', name: 'Profile', icon: BuildingStorefrontIcon },
                 { id: 'products', name: 'Products & Listings', icon: DocumentTextIcon },
-                { id: 'promotions', name: 'Promotions', icon: SparklesIcon },
-                { id: 'analytics', name: 'Analytics', icon: EyeIcon },
+                { id: 'promotions', name: 'Promotions', icon: SparklesIcon },                { id: 'membership', name: 'Membership', icon: CheckCircleIcon },                { id: 'analytics', name: 'Analytics', icon: EyeIcon },
                 { id: 'branches', name: 'Branches', icon: BuildingOfficeIcon }
               ].map((tab) => (
                 <button
@@ -893,6 +901,24 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
                 </ButtonSecondary>
               </div>
             </div>
+          )}
+          {activeTab === 'membership' && businessData && (
+            <MembershipUploadForm
+              businessId={businessData.id || ''}
+              currentMembership={{
+                membershipCardImage: businessData.membershipCardImage || null,
+                membershipNumber: businessData.membershipNumber || null,
+                membershipStatus: businessData.membershipStatus || 'NONE',
+                membershipType: businessData.membershipType || null,
+                membershipExpiryDate: businessData.membershipExpiryDate ? new Date(businessData.membershipExpiryDate) : null,
+                membershipProvider: businessData.membershipProvider || null,
+                membershipUploadedAt: businessData.membershipUploadedAt ? new Date(businessData.membershipUploadedAt) : null,
+              }}
+              onSuccess={() => {
+                // Refresh business data after successful upload
+                fetchBusinessData();
+              }}
+            />
           )}
           {activeTab === 'analytics' && (
             <div className="text-center py-12">

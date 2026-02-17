@@ -155,6 +155,15 @@ model Business {
   listings        Listing[]
   promotions      Promotion[]
   
+  // Membership fields
+  membershipCardImage String?     @map("membership_card_image")
+  membershipNumber    String?     @unique @map("membership_number")
+  membershipStatus    MembershipStatus @default(NONE) @map("membership_status")
+  membershipType      String?     @map("membership_type")
+  membershipExpiryDate DateTime?   @map("membership_expiry_date")
+  membershipProvider  String?     @map("membership_provider")
+  membershipUploadedAt DateTime?   @map("membership_uploaded_at")
+  
   @@map("businesses")
 }
 
@@ -363,4 +372,12 @@ enum NotificationType {
   BOOKING
   SYSTEM
   PROMOTIONAL
+}
+
+enum MembershipStatus {
+  NONE
+  ACTIVE
+  EXPIRED
+  PENDING
+  REJECTED
 }

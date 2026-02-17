@@ -18,6 +18,7 @@ import Input from "@/shared/Input";
 import LikeSaveBtns from "@/components/LikeSaveBtns";
 import Image from "next/image";
 import { usePathname, useRouter, useParams } from "next/navigation";
+import { MembershipSection } from "@/components/MembershipSection";
 const logoMobile = "/images/namibia-logo/squarelogo.PNG";
 import { Amenities_demos, PHOTOS } from "../constant";
 import { Route } from "next";
@@ -77,6 +78,14 @@ interface BusinessDataType {
   }[];
   createdAt: string;
   updatedAt: string;
+  // Membership fields
+  membershipCardImage?: string | null;
+  membershipNumber?: string | null;
+  membershipStatus?: "NONE" | "ACTIVE" | "EXPIRED" | "PENDING" | "REJECTED";
+  membershipType?: string | null;
+  membershipExpiryDate?: string | null;
+  membershipProvider?: string | null;
+  membershipUploadedAt?: string | null;
 }
 
 // Geocoding function using Nominatim
@@ -794,6 +803,15 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
         {/* CONTENT */}
         <div className="w-full lg:w-3/5 xl:w-2/3 space-y-8 lg:space-y-10 lg:pr-10">
           {renderSection1()}
+          <MembershipSection
+            cardImage={business.membershipCardImage || undefined}
+            membershipNumber={business.membershipNumber || undefined}
+            membershipType={business.membershipType || undefined}
+            membershipProvider={business.membershipProvider || undefined}
+            expiryDate={business.membershipExpiryDate ? new Date(business.membershipExpiryDate) : undefined}
+            status={business.membershipStatus || "NONE"}
+            uploadedAt={business.membershipUploadedAt ? new Date(business.membershipUploadedAt) : undefined}
+          />
           {renderSection2()}
           {renderSection3()}
           {renderSection4()}
