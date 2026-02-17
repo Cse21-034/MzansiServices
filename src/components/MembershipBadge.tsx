@@ -3,7 +3,7 @@ import { MembershipStatus } from "@prisma/client";
 
 interface MembershipBadgeProps {
   status: MembershipStatus;
-  membershipType?: string;
+  membershipType?: string | null;
   expiryDate?: Date;
 }
 
