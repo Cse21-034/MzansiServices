@@ -45,6 +45,7 @@ import ButtonPrimary from "@/shared/ButtonPrimary";
 import ButtonSecondary from "@/shared/ButtonSecondary";
 import Badge from "@/shared/Badge";
 import AdminNav from "@/components/AdminNav";
+import { MembershipApprovalPanel } from "@/components/MembershipApprovalPanel";
 import { useSession } from "next-auth/react";
 
 export interface AdminDashboardPageProps {}
@@ -625,6 +626,7 @@ const AdminDashboardPage: FC<AdminDashboardPageProps> = ({}) => {
                 { id: 'overview', name: 'Overview', icon: ChartBarIcon },
                 { id: 'businesses', name: 'Businesses', icon: BuildingStorefrontIcon },
                 { id: 'users', name: 'Users', icon: UsersIcon },
+                { id: 'memberships', name: 'Memberships', icon: CheckCircleIcon },
                 { id: 'categories', name: 'Categories', icon: MapPinIcon },
                 { id: 'reports', name: 'Reports', icon: ChartBarIcon },
                 { id: 'settings', name: 'Settings', icon: Cog6ToothIconSolid }
@@ -651,6 +653,7 @@ const AdminDashboardPage: FC<AdminDashboardPageProps> = ({}) => {
           {activeTab === 'overview' && renderOverviewTab()}
           {activeTab === 'businesses' && renderBusinessesTab()}
           {activeTab === 'users' && renderUsersTab()}
+          {activeTab === 'memberships' && <MembershipApprovalPanel initialStatus="PENDING" />}
           {activeTab === 'categories' && renderCategoriesTab()}
           {(activeTab === 'reports' || activeTab === 'settings') && (
             <div className="text-center py-12">
