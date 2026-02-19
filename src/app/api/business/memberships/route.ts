@@ -86,7 +86,7 @@ export async function POST(req: Request) {
     // Check if membership number already exists for this business
     const existingMembership = await prisma.businessMembership.findUnique({
       where: {
-        business_id_membership_number: {
+        businessId_membershipNumber: {
           businessId,
           membershipNumber,
         },
