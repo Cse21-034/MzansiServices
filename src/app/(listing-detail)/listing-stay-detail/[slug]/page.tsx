@@ -19,6 +19,7 @@ import LikeSaveBtns from "@/components/LikeSaveBtns";
 import Image from "next/image";
 import { usePathname, useRouter, useParams } from "next/navigation";
 import { MembershipSection } from "@/components/MembershipSection";
+import MembershipsDisplay from "@/components/MembershipsDisplay";
 const logoMobile = "/images/namibia-logo/squarelogo.PNG";
 import { Amenities_demos, PHOTOS } from "../constant";
 import { Route } from "next";
@@ -86,6 +87,17 @@ interface BusinessDataType {
   membershipExpiryDate?: string | null;
   membershipProvider?: string | null;
   membershipUploadedAt?: string | null;
+  // Multiple memberships
+  memberships?: Array<{
+    id: string;
+    issuerName: string;
+    membershipNumber: string;
+    membershipType?: string;
+    cardImage?: string;
+    expiryDate?: string;
+    status: "NONE" | "ACTIVE" | "EXPIRED" | "PENDING" | "REJECTED";
+    uploadedAt: string;
+  }>;
 }
 
 // Geocoding function using Nominatim
@@ -117,6 +129,7 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reviews, setReviews] = useState<BusinessDataType['reviews']>([]);
+  const [memberships, setMemberships] = useState<BusinessDataType['memberships']>([]);
 
   const thisPathname = usePathname();
   const router = useRouter();
@@ -148,6 +161,19 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
           }
           setBusiness(fetchedBusiness);
           setReviews(fetchedBusiness.reviews);
+
+          // Fetch memberships
+          try {
+            const membershipsRes = await fetch(
+              `/api/business/memberships?businessId=${fetchedBusiness.id}`
+            );
+            if (membershipsRes.ok) {
+              const membershipsData = await membershipsRes.json();
+              setMemberships(membershipsData);
+            }
+          } catch (err) {
+            console.error('Error fetching memberships:', err);
+          }
         } else {
           throw new Error('Business data not available');
         }
@@ -812,6 +838,9 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
             status={business.membershipStatus || "NONE"}
             uploadedAt={business.membershipUploadedAt ? new Date(business.membershipUploadedAt) : undefined}
           />
+          {memberships && memberships.length > 0 && (
+            <MembershipsDisplay memberships={memberships} />
+          )}
           {renderSection2()}
           {renderSection3()}
           {renderSection4()}

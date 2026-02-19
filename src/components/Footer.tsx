@@ -79,12 +79,12 @@ const Footer: React.FC = () => {
             </div>
             <div className="text-sm">
               <a 
-                href="https://toporapula.vercel.app/" 
+                href="https://lmosimanyana.co.bw" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-neutral-600 dark:text-neutral-400 hover:text-burgundy-600 dark:hover:text-burgundy-600 transition-colors duration-200 font-medium"
               >
-                Developed by TLR
+                Developed by Lmosimanyana
               </a>
             </div>
           </div>

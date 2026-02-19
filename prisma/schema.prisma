@@ -154,8 +154,9 @@ model Business {
   bookings        Booking[]
   listings        Listing[]
   promotions      Promotion[]
+  memberships     BusinessMembership[]
   
-  // Membership fields
+  // Membership fields (kept for backward compatibility)
   membershipCardImage String?     @map("membership_card_image")
   membershipNumber    String?     @unique @map("membership_number")
   membershipStatus    MembershipStatus @default(NONE) @map("membership_status")
@@ -165,6 +166,25 @@ model Business {
   membershipUploadedAt DateTime?   @map("membership_uploaded_at")
   
   @@map("businesses")
+}
+
+model BusinessMembership {
+  id              String   @id @default(cuid())
+  businessId      String   @map("business_id")
+  issuerName      String   @map("issuer_name")
+  membershipNumber String  @map("membership_number")
+  membershipType  String?  @map("membership_type")
+  cardImage       String?  @map("card_image")
+  expiryDate      DateTime? @map("expiry_date")
+  status          MembershipStatus @default(PENDING) @map("status")
+  uploadedAt      DateTime @default(now()) @map("uploaded_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  
+  business        Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  @@unique([businessId, membershipNumber])
+  @@map("business_memberships")
 }
 
 model Listing {
