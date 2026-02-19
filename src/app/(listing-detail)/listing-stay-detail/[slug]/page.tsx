@@ -18,7 +18,6 @@ import Input from "@/shared/Input";
 import LikeSaveBtns from "@/components/LikeSaveBtns";
 import Image from "next/image";
 import { usePathname, useRouter, useParams } from "next/navigation";
-import { MembershipSection } from "@/components/MembershipSection";
 import MembershipsDisplay from "@/components/MembershipsDisplay";
 const logoMobile = "/images/namibia-logo/squarelogo.PNG";
 import { Amenities_demos, PHOTOS } from "../constant";
@@ -829,15 +828,6 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
         {/* CONTENT */}
         <div className="w-full lg:w-3/5 xl:w-2/3 space-y-8 lg:space-y-10 lg:pr-10">
           {renderSection1()}
-          <MembershipSection
-            cardImage={business.membershipCardImage || undefined}
-            membershipNumber={business.membershipNumber || undefined}
-            membershipType={business.membershipType || undefined}
-            membershipProvider={business.membershipProvider || undefined}
-            expiryDate={business.membershipExpiryDate ? new Date(business.membershipExpiryDate) : undefined}
-            status={business.membershipStatus || "NONE"}
-            uploadedAt={business.membershipUploadedAt ? new Date(business.membershipUploadedAt) : undefined}
-          />
           {memberships && memberships.length > 0 && (
             <MembershipsDisplay memberships={memberships} />
           )}
