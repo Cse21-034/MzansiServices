@@ -65,7 +65,7 @@ const Footer: React.FC = () => {
               <Logo />
             </div>
             <div className="col-span-2 flex items-center md:col-span-3 lg:mt-4">
-              <SocialsList1 className="flex items-center space-x-3 lg:space-x-0 lg:flex-col lg:space-y-2.5 lg:items-start" />
+              <SocialsList1 className="flex items-center gap-4 lg:gap-3 lg:flex-row" />
             </div>
           </div>
           {widgetMenus.map(renderWidgetMenuItem)}
@@ -75,17 +75,12 @@ const Footer: React.FC = () => {
         <div className="container border-t border-neutral-200 dark:border-neutral-800 mt-12 pt-8">
           <div className="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
             <div className="text-sm text-neutral-600 dark:text-neutral-400">
-              <p>&copy; {new Date().getFullYear()} Namibia Services . All rights reserved.</p>
+              <p>&copy; {new Date().getFullYear()} Namibia Services. All rights reserved.</p>
             </div>
             <div className="text-sm">
-              <a 
-                href="https://lmosimanyana.co.bw" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-neutral-600 dark:text-neutral-400 hover:text-burgundy-600 dark:hover:text-burgundy-600 transition-colors duration-200 font-medium"
-              >
-                Developed by Lmosimanyana
-              </a>
+              <p className="text-neutral-600 dark:text-neutral-400 font-medium">
+                Developed by SolidCare Services
+              </p>
             </div>
           </div>
         </div>
