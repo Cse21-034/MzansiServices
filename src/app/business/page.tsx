@@ -12,7 +12,6 @@ import Label from "@/components/Label";
 import Badge from "@/shared/Badge";
 import Modal from "@/shared/Modal";
 import BusinessNav from "@/components/BusinessNav";
-import { MembershipUploadForm } from "@/components/MembershipUploadForm";
 import MembershipsList from "@/components/MembershipsList";
 const defaultBusinessImage = "/images/namibia-logo/squarelogo.PNG";
 import {
