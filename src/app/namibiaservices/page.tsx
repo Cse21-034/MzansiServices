@@ -48,7 +48,6 @@ import ButtonSecondary from "@/shared/ButtonSecondary";
 import Badge from "@/shared/Badge";
 import AdminNav from "@/components/AdminNav";
 import { MembershipApprovalPanel } from "@/components/MembershipApprovalPanel";
-import { MembershipBadge } from "@/components/MembershipBadge";
 import { useSession } from "next-auth/react";
 
 export interface AdminDashboardPageProps {}
@@ -463,12 +462,6 @@ const AdminDashboardPage: FC<AdminDashboardPageProps> = ({}) => {
                               {business.name}
                               {business.verified && (
                                 <Badge name="Verified" color="green" className="ml-2" />
-                              )}
-                              {business.membershipStatus && business.membershipStatus !== "NONE" && (
-                                <MembershipBadge
-                                  status={business.membershipStatus}
-                                  membershipType={business.membershipType}
-                                />
                               )}
                               <button
                                 className="ml-2 p-1 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700"

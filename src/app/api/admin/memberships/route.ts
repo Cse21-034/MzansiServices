@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 
-// GET - Fetch all pending memberships (admin only)
+// GET - Fetch all memberships by status (admin only)
 export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,34 +14,51 @@ export async function GET(req: Request) {
     const url = new URL(req.url);
     const status = url.searchParams.get("status") || "PENDING";
 
-    const memberships = await prisma.business.findMany({
+    // Fetch from the new BusinessMembership model
+    const businessMemberships = await prisma.businessMembership.findMany({
       where: {
-        membershipStatus: status as any,
+        status: status as any,
       },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
-        city: true,
-        membershipCardImage: true,
-        membershipNumber: true,
-        membershipStatus: true,
-        membershipType: true,
-        membershipExpiryDate: true,
-        membershipProvider: true,
-        membershipUploadedAt: true,
-        owner: {
+      include: {
+        business: {
           select: {
+            id: true,
             name: true,
             email: true,
+            phone: true,
+            city: true,
+            owner: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
           },
         },
       },
       orderBy: {
-        membershipUploadedAt: "desc",
+        uploadedAt: "desc",
       },
     });
+
+    // Transform to match expected format
+    const memberships = businessMemberships.map((m) => ({
+      id: m.id,
+      name: m.business.name,
+      email: m.business.email,
+      phone: m.business.phone,
+      city: m.business.city,
+      membershipCardImage: m.cardImage,
+      membershipNumber: m.membershipNumber,
+      membershipStatus: m.status,
+      membershipType: m.membershipType,
+      membershipExpiryDate: m.expiryDate,
+      membershipProvider: m.issuerName,
+      membershipUploadedAt: m.uploadedAt,
+      owner: m.business.owner,
+      businessId: m.businessId,
+      membershipId: m.id,
+    }));
 
     return NextResponse.json({ memberships });
   } catch (error) {
@@ -61,11 +78,14 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { businessId, status, notes } = await req.json();
+    const { businessId, membershipId, status, notes } = await req.json();
 
-    if (!businessId || !status) {
+    // Support both membershipId (new system) and businessId (old system)
+    const id = membershipId || businessId;
+
+    if (!id || !status) {
       return NextResponse.json(
-        { error: "Business ID and status are required" },
+        { error: "Membership ID and status are required" },
         { status: 400 }
       );
     }
@@ -77,6 +97,29 @@ export async function PUT(req: Request) {
       );
     }
 
+    // Try to update BusinessMembership first (new system)
+    if (membershipId) {
+      const updatedMembership = await prisma.businessMembership.update({
+        where: { id: membershipId },
+        data: { status: status as any },
+        include: {
+          business: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      });
+
+      return NextResponse.json({
+        id: updatedMembership.id,
+        name: updatedMembership.business.name,
+        membershipStatus: updatedMembership.status,
+      });
+    }
+
+    // Fall back to updating Business model (old system) if only businessId provided
     const updatedBusiness = await prisma.business.update({
       where: { id: businessId },
       data: {

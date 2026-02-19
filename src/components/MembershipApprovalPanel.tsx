@@ -53,21 +53,21 @@ export const MembershipApprovalPanel: React.FC<MembershipApprovalProps> = ({
     }
   };
 
-  const handleApprove = async (businessId: string) => {
-    setApproving(businessId);
+  const handleApprove = async (membershipId: string) => {
+    setApproving(membershipId);
     try {
       const response = await fetch("/api/admin/memberships", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          businessId,
+          membershipId,
           status: "ACTIVE",
         }),
       });
 
       if (response.ok) {
         setMemberships(
-          memberships.filter((m) => m.id !== businessId)
+          memberships.filter((m) => m.id !== membershipId)
         );
         setSelectedMembership(null);
       }
@@ -78,21 +78,21 @@ export const MembershipApprovalPanel: React.FC<MembershipApprovalProps> = ({
     }
   };
 
-  const handleReject = async (businessId: string) => {
-    setApproving(businessId);
+  const handleReject = async (membershipId: string) => {
+    setApproving(membershipId);
     try {
       const response = await fetch("/api/admin/memberships", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          businessId,
+          membershipId,
           status: "REJECTED",
         }),
       });
 
       if (response.ok) {
         setMemberships(
-          memberships.filter((m) => m.id !== businessId)
+          memberships.filter((m) => m.id !== membershipId)
         );
         setSelectedMembership(null);
       }
