@@ -86,6 +86,8 @@ export async function PUT(req: Request) {
       email,
       website,
       address,
+      city,
+      country,
       establishedYear,
       employees,
       businessHours,
@@ -173,6 +175,8 @@ export async function PUT(req: Request) {
       email,
       website,
       address: sanitizedAddress, // Use sanitized address
+      city: city || "Windhoek", // Update city field
+      country: country || "Namibia", // Update country field
       establishedYear: establishedYear ? parseInt(establishedYear) : null,
       employees,
       services: body.services || [],

@@ -359,6 +359,8 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
         category: { name: businessData.category },
         subcategory: { name: businessData.subcategory },
         address: fullAddress, // Use the newly constructed address
+        city: cityStr, // Send city separately
+        country: countryStr, // Send country separately
         businessHours: businessData.businessHours,
         services: businessData.services,
       };
