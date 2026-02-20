@@ -73,7 +73,7 @@ export async function geocodeAddress(
 export function getDefaultCoordinates(city: string): { latitude: number; longitude: number } {
     const coordinates: { [key: string]: { latitude: number; longitude: number } } = {
         // Major cities
-        'gaborone': { latitude: -24.6282, longitude: 25.9231 },
+        'windhoek': { latitude: -22.5597, longitude: 17.0832 },
         'francistown': { latitude: -21.1700, longitude: 27.5086 },
         'maun': { latitude: -19.9833, longitude: 23.4167 },
         'kasane': { latitude: -17.8167, longitude: 25.1500 },
@@ -101,9 +101,9 @@ export function getDefaultCoordinates(city: string): { latitude: number; longitu
         return coordinates[cityKey];
     }
 
-    // Default to Gaborone if city not found
-    console.warn(`⚠️ No coordinates found for "${city}", defaulting to Gaborone`);
-    return coordinates['gaborone'];
+    // Default to Windhoek if city not found
+    console.warn(`⚠️ No coordinates found for "${city}", defaulting to Windhoek`);
+    return coordinates['windhoek'];
 }
 
 /**

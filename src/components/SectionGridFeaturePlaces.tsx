@@ -277,8 +277,8 @@ const SectionGridFeaturePlaces: FC<SectionGridFeaturePlacesProps> = ({
       saleOff: null,
       isAds: business.featured || false,
       map: {
-        lat: business.latitude || -24.6282, // Default to Gaborone coordinates
-        lng: business.longitude || 25.9231,
+        lat: business.latitude || -22.5597, // Default to Windhoek coordinates
+        lng: business.longitude || 17.0832,
       },
     };
   };

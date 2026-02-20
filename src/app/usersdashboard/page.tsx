@@ -38,7 +38,7 @@ const mockReviews = [
     date: "2024-01-15",
     likes: 12,
     businessCategory: "Logistics",
-    businessLocation: "Gaborone"
+    businessLocation: "Windhoek"
   },
   {
     id: 2,
@@ -48,7 +48,7 @@ const mockReviews = [
     date: "2024-01-08",
     likes: 5,
     businessCategory: "Technology",
-    businessLocation: "Francistown"
+    businessLocation: "Walvis Bay"
   },
   {
     id: 3,
@@ -58,7 +58,7 @@ const mockReviews = [
     date: "2023-12-20",
     likes: 3,
     businessCategory: "Hospitality",
-    businessLocation: "Gaborone"
+    businessLocation: "Windhoek"
   }
 ];
 
@@ -67,7 +67,7 @@ const mockFavorites = [
     id: 1,
     business: "Sprint Couriers & Logistics",
     category: "Logistics & Courier",
-    location: "Gaborone",
+    location: "Windhoek",
     rating: 4.8,
     reviews: 127,
     isOpen: true,
@@ -77,7 +77,7 @@ const mockFavorites = [
     id: 2,
     business: "Fresh Farms Namibia",
     category: "Agriculture",
-    location: "Palapye",
+    location: "Rundu",
     rating: 4.2,
     reviews: 45,
     isOpen: true,
@@ -87,7 +87,7 @@ const mockFavorites = [
     id: 3,
     business: "BuildPro Construction",
     category: "Construction",
-    location: "Gaborone",
+    location: "Windhoek",
     rating: 3.8,
     reviews: 23,
     isOpen: false,

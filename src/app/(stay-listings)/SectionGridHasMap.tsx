@@ -346,7 +346,7 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
       const totalLng = validBusinesses.reduce((sum, b) => sum + b.longitude!, 0);
       return [totalLat / validBusinesses.length, totalLng / validBusinesses.length];
     }
-    return [-24.6282, 25.9231]; // Default to Gaborone if no valid business coordinates
+    return [-22.5597, 17.0832]; // Default to Windhoek if no valid business coordinates
   };
 
   // Get display count for current category

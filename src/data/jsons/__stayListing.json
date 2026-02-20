@@ -152,7 +152,7 @@
     "commentCount": 134,
     "viewCount": 3670,
     "like": true,
-    "address": "Game City Mall, Gaborone",
+    "address": "Game City Mall, Windhoek",
     "reviewStart": 4.4,
     "reviewCount": 678,
     "category": "Property Development",
@@ -163,12 +163,12 @@
     "map": { "lat": -24.6745, "lng": 25.9534 }
   },
   {
-    "id": "bw_008",
+    "id": "na_008",
     "authorId": 8,
     "date": "October 20, 2025",
     "href": "/listing-stay-detail",
     "listingCategoryId": 8,
-    "title": "Botswana Telecommunications Corporation",
+    "title": "Namibia Telecommunications Corporation",
     "featuredImage": "https://images.pexels.com/photos/2881229/pexels-photo-2881229.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
     "galleryImgs": [
       "https://images.pexels.com/photos/4065876/pexels-photo-4065876.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
@@ -179,7 +179,7 @@
     "commentCount": 456,
     "viewCount": 8920,
     "like": true,
-    "address": "Plot 74358, Western Industrial, Gaborone",
+    "address": "Plot 74358, Western Industrial, Windhoek",
     "reviewStart": 4.1,
     "reviewCount": 2134,
     "category": "Telecommunications",
@@ -187,10 +187,10 @@
     "established": "1980",
     "saleOff": null,
     "isAds": true,
-    "map": { "lat": -24.6389, "lng": 25.9012 }
+    "map": { "lat": -22.5597, "lng": 17.0832 }
   },
   {
-    "id": "bw_009",
+    "id": "na_009",
     "authorId": 9,
     "date": "October 20, 2025",
     "href": "/listing-stay-detail",
@@ -206,7 +206,7 @@
     "commentCount": 42,
     "viewCount": 980,
     "like": true,
-    "address": "Plot 50370, Fairgrounds Office Park, Gaborone",
+    "address": "Plot 50370, Fairgrounds Office Park, Windhoek",
     "reviewStart": 4.9,
     "reviewCount": 87,
     "category": "IT Services & Software",
@@ -214,15 +214,15 @@
     "established": "2019",
     "saleOff": null,
     "isAds": null,
-    "map": { "lat": -24.6498, "lng": 25.9156 }
+    "map": { "lat": -22.5597, "lng": 17.0832 }
   },
   {
-    "id": "bw_010",
+    "id": "na_010",
     "authorId": 10,
     "date": "October 20, 2025",
     "href": "/listing-stay-detail",
     "listingCategoryId": 10,
-    "title": "BIHL - Botswana Insurance Holdings",
+    "title": "NIHL - Namibia Insurance Holdings",
     "featuredImage": "https://images.pexels.com/photos/6863332/pexels-photo-6863332.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
     "galleryImgs": [
       "https://images.pexels.com/photos/6863514/pexels-photo-6863514.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
@@ -233,7 +233,7 @@
     "commentCount": 167,
     "viewCount": 4230,
     "like": true,
-    "address": "BIHL Tower, Plot 50371, Fairgrounds, Gaborone",
+    "address": "NIHL Tower, Plot 50371, Fairgrounds, Windhoek",
     "reviewStart": 4.2,
     "reviewCount": 834,
     "category": "Financial Services",
@@ -241,10 +241,10 @@
     "established": "1975",
     "saleOff": null,
     "isAds": true,
-    "map": { "lat": -24.6467, "lng": 25.9178 }
+    "map": { "lat": -22.5597, "lng": 17.0832 }
   },
   {
-    "id": "bw_011",
+    "id": "na_011",
     "authorId": 11,
     "date": "October 20, 2025",
     "href": "/listing-stay-detail",
@@ -260,7 +260,7 @@
     "commentCount": 35,
     "viewCount": 720,
     "like": true,
-    "address": "Innovation Hub, Gaborone",
+    "address": "Innovation Hub, Windhoek",
     "reviewStart": 4.7,
     "reviewCount": 56,
     "category": "Software Development",
@@ -268,10 +268,10 @@
     "established": "2020",
     "saleOff": "-25% Launch Offer",
     "isAds": null,
-    "map": { "lat": -24.6423, "lng": 25.9234 }
+    "map": { "lat": -22.5597, "lng": 17.0832 }
   },
   {
-    "id": "bw_012",
+    "id": "na_012",
     "authorId": 12,
     "date": "October 20, 2025",
     "href": "/listing-stay-detail",
@@ -287,7 +287,7 @@
     "commentCount": 223,
     "viewCount": 5670,
     "like": true,
-    "address": "Plot 22, Khama Crescent, The Mall, Gaborone",
+    "address": "Plot 22, Khama Crescent, The Mall, Windhoek",
     "reviewStart": 4.0,
     "reviewCount": 1567,
     "category": "Banking & Finance",
@@ -295,10 +295,10 @@
     "established": "1998",
     "saleOff": null,
     "isAds": true,
-    "map": { "lat": -24.6563, "lng": 25.9084 }
+    "map": { "lat": -22.5597, "lng": 17.0832 }
   },
   {
-    "id": "bw_013",
+    "id": "na_013",
     "authorId": 13,
     "date": "October 20, 2025",
     "href": "/listing-stay-detail",
@@ -314,7 +314,7 @@
     "commentCount": 78,
     "viewCount": 1890,
     "like": true,
-    "address": "Mobile Sales, Gaborone",
+    "address": "Mobile Sales, Windhoek",
     "reviewStart": 4.9,
     "reviewCount": 167,
     "category": "Handcrafted Jewellery",
@@ -322,10 +322,10 @@
     "established": "2021",
     "saleOff": "-10% Custom Orders",
     "isAds": null,
-    "map": { "lat": -24.6581, "lng": 25.9123 }
+    "map": { "lat": -22.5597, "lng": 17.0832 }
   },
   {
-    "id": "bw_014",
+    "id": "na_014",
     "authorId": 14,
     "date": "October 20, 2025",
     "href": "/listing-stay-detail",
@@ -341,7 +341,7 @@
     "commentCount": 312,
     "viewCount": 6780,
     "like": false,
-    "address": "Plot 50634, Macheng Way, Gaborone",
+    "address": "Plot 50634, Macheng Way, Windhoek",
     "reviewStart": 3.7,
     "reviewCount": 2456,
     "category": "Utilities & Infrastructure",
@@ -349,10 +349,10 @@
     "established": "1970",
     "saleOff": null,
     "isAds": null,
-    "map": { "lat": -24.6512, "lng": 25.9034 }
+    "map": { "lat": -22.5597, "lng": 17.0832 }
   },
   {
-    "id": "bw_015",
+    "id": "na_015",
     "authorId": 15,
     "date": "October 20, 2025",
     "href": "/listing-stay-detail",
@@ -368,7 +368,7 @@
     "commentCount": 29,
     "viewCount": 645,
     "like": true,
-    "address": "University of Botswana Campus, Gaborone",
+    "address": "University of Namibia Campus, Windhoek",
     "reviewStart": 4.8,
     "reviewCount": 42,
     "category": "Aviation & AI Research",
@@ -376,7 +376,7 @@
     "established": "2022",
     "saleOff": null,
     "isAds": null,
-    "map": { "lat": -24.6590, "lng": 25.9123 }
+    "map": { "lat": -22.5597, "lng": 17.0832 }
   }
 
 ]

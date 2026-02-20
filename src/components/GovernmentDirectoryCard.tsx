@@ -57,7 +57,7 @@ const GovernmentDirectoryCard: FC<GovernmentDirectoryCardProps> = ({
                     <div className="relative h-32 sm:h-auto sm:w-28 overflow-hidden bg-neutral-50 dark:bg-neutral-800 flex-shrink-0 flex items-center justify-center">
                         <Image
                             src={data.image || coatOfArmsImg}
-                            alt={data.image ? `${data.name} logo` : "Coat of Arms of Botswana"}
+                            alt={data.image ? `${data.name} logo` : "Coat of Arms of Namibia"}
                             width={data.image ? 80 : undefined} // Adjust width for logos
                             height={data.image ? 80 : undefined} // Adjust height for logos
                             fill={data.image ? false : true} // Use fill only for coatOfArmsImg

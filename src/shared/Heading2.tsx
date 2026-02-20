@@ -12,10 +12,10 @@ export interface Heading2Props {
 
 const Heading2: React.FC<Heading2Props> = ({
   className = "",
-  heading = "Businesses in Gaborone",
+  heading = "Businesses Across Namibia",
   subHeading,
   resultsCount = 0,
-  location = "Gaborone",
+  location = "Namibia",
   category = "All Categories",
 }) => {
   return (

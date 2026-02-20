@@ -621,7 +621,7 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
                 placeholder="e.g., Plot 123, Main Street"
                 className="w-full"
               />                          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
-                Make it easy for customers to find you by entering your location clearly (e.g., Plot 123, Main Street, Gaborone)
+                Make it easy for customers to find you by entering your location clearly (e.g., Shop 5, Main Street, Windhoek)
               </p>
             </div>          </div>
         </div>

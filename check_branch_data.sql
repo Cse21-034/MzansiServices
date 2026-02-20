@@ -8,4 +8,4 @@ SELECT
   address,
   parentBusinessId
 FROM "Business"
-WHERE name LIKE '%Cheza%' OR branchName LIKE '%Gaborone%';
+WHERE name LIKE '%Cheza%' OR branchName LIKE '%Windhoek%';

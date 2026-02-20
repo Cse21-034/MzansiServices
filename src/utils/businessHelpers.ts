@@ -29,7 +29,7 @@ export function getBusinessDisplayName(business: Business): string {
  * Get a short display name for a branch (just the branch name)
  * Examples:
  * - "Main Mall Branch"
- * - "Gaborone Branch"
+ * - "Windhoek Branch"
  */
 export function getBranchShortName(business: Business): string {
     if (!business.isBranch || !business.branchName) {

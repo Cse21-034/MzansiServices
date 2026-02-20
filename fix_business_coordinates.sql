@@ -1,13 +1,13 @@
 -- Quick fix: Update existing businesses with default coordinates based on city
 -- Run this to fix "Location not available" for existing businesses
 
--- Gaborone businesses
+-- Windhoek businesses
 UPDATE "Business" 
-SET latitude = -24.6282, longitude = 25.9231 
-WHERE (city ILIKE '%gaborone%' OR address ILIKE '%gaborone%') 
+SET latitude = -22.5597, longitude = 17.0832 
+WHERE (city ILIKE '%windhoek%' OR address ILIKE '%windhoek%') 
   AND (latitude IS NULL OR latitude = 0);
 
--- Francistown businesses  
+-- Rundu businesses  
 UPDATE "Business" 
 SET latitude = -21.1700, longitude = 27.5086 
 WHERE (city ILIKE '%francistown%' OR address ILIKE '%francistown%') 

@@ -297,7 +297,7 @@ export default function BranchManagementPage() {
                                                 onChange={(e) =>
                                                     setFormData({ ...formData, city: e.target.value })
                                                 }
-                                                placeholder="e.g., Gaborone"
+                                                placeholder="e.g., Windhoek, Oshakati"
                                                 required
                                             />
                                         </div>

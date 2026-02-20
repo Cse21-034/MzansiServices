@@ -238,7 +238,7 @@ export async function PUT(req: Request) {
           ownerId: session.user.id,
           status: "DRAFT",
           slug: name.toLowerCase().replace(/\s+/g, '-') + '-' + Math.random().toString(36).substring(2, 7),
-          city: "Gaborone", // Default city
+          city: "Windhoek", // Default city
           country: "Namibia"
         },
         include: {

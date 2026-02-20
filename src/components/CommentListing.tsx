@@ -49,9 +49,9 @@ const DEMO_DATA: CommentListingDataType[] = [
   {
     name: "Odirile K.",
     date: "January 18, 2024",
-    comment: "Auto Tune Gabs fixed my Toyota Hilux quickly and at a fair price. They used genuine parts and explained everything clearly. My bakkie is running smoothly now - definitely my go-to mechanic.",
+    comment: "Auto Tune Windhoek fixed my Toyota Hilux quickly and at a fair price. They used genuine parts and explained everything clearly. My bakkie is running smoothly now - definitely my go-to mechanic.",
     starPoint: 5,
-    business: "Auto Tune Gaborone"
+    business: "Auto Tune Windhoek"
   },
   {
     name: "Bontle R.",
