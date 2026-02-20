@@ -37,6 +37,12 @@ import {
 import { categories } from "@/data/categories";
 import CreatableSelect from "@/components/CreatableSelect";
 
+// Type for CreatableSelect option
+interface Option {
+  value: string;
+  label: string;
+}
+
 const NAMIBIA_LOCATIONS = [
   { value: "Windhoek", label: "Windhoek" },
   { value: "Walvis Bay", label: "Walvis Bay" },
@@ -133,7 +139,7 @@ export interface BusinessDashboardPageProps { }
 const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
   const [activeTab, setActiveTab] = useState("overview");
   const [country, setCountry] = useState<string>("Namibia");
-  const [city, setCity] = useState<string | { value: string; label: string } | null>(null);
+  const [city, setCity] = useState<Option | null>(null);
   const [streetAddress, setStreetAddress] = useState("");
   const { data: session } = useSession();
   const router = useRouter();
@@ -327,8 +333,8 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
       }
 
       // Construct the address string from the new state variables
-      // Extract city value - handle both string and object (from CreatableSelect)
-      const cityStr = typeof city === 'string' ? city : (city?.value || '');
+      // Extract city value - city is now strictly an Option object or null
+      const cityStr = city?.value || '';
       const countryStr = country || 'Namibia';
       
       let fullAddress = streetAddress?.trim() || '';
