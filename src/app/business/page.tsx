@@ -327,12 +327,21 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
       }
 
       // Construct the address string from the new state variables
-      let fullAddress = streetAddress;
-      if (city) {
-        fullAddress += (fullAddress ? ", " : "") + city;
+      // Extract city value - handle both string and object (from CreatableSelect)
+      const cityStr = typeof city === 'string' ? city : (city?.value || '');
+      const countryStr = typeof country === 'string' ? country : (country?.value || 'Namibia');
+      
+      let fullAddress = streetAddress?.trim() || '';
+      if (cityStr && cityStr.trim()) {
+        fullAddress += (fullAddress ? ", " : "") + cityStr.trim();
       }
-      if (country) {
-        fullAddress += (fullAddress ? ", " : "") + country;
+      if (countryStr && countryStr.trim()) {
+        fullAddress += (fullAddress ? ", " : "") + countryStr.trim();
+      }
+      
+      // Fallback if no address provided
+      if (!fullAddress.trim()) {
+        fullAddress = `${cityStr || ''}, ${countryStr || 'Namibia'}`.replace(/^,\s*/, '').trim();
       }
 
       // Prepare business data (without photos array for the main update)

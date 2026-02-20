@@ -19,7 +19,7 @@ import LikeSaveBtns from "@/components/LikeSaveBtns";
 import Image from "next/image";
 import { usePathname, useRouter, useParams } from "next/navigation";
 import MembershipsDisplay from "@/components/MembershipsDisplay";
-import { formatLocation, formatFullAddress, safeToString } from "@/utils/formatAddress";
+import { formatLocation, formatFullAddress, safeToString, cleanAddress } from "@/utils/formatAddress";
 const logoMobile = "/images/namibia-logo/squarelogo.PNG";
 import { Amenities_demos, PHOTOS } from "../constant";
 import { Route } from "next";
@@ -566,14 +566,14 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
             </div>
           )}
 
-          {business?.address && (
+          {business?.address && cleanAddress(business.address) && (
             <div className="flex items-start space-x-4">
               <div className="p-3 bg-primary-50 dark:bg-primary-900/20 rounded-full mt-1">
                 <MapPinIcon className="w-6 h-6 text-primary-600 dark:text-primary-400" />
               </div>
               <div>
                 <div className="text-sm text-neutral-500">Business Address</div>
-                <div className="font-medium">{displayAddress}</div>
+                <div className="font-medium">{cleanAddress(displayAddress)}</div>
               </div>
             </div>
           )}

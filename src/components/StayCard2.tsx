@@ -7,6 +7,7 @@ import { DEMO_STAY_LISTINGS } from "@/data/listings";
 import StartRating from "@/components/StartRating";
 import Badge from "@/shared/Badge";
 import BtnLikeIcon from "@/components/BtnLikeIcon";
+import { cleanAddress } from "@/utils/formatAddress";
 
 export interface StayCard2Props {
   className?: string;
@@ -261,7 +262,7 @@ const StayCard2: FC<StayCard2Props> = ({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
             </svg>
             <p className="text-xs font-semibold text-neutral-800 dark:text-neutral-200 line-clamp-2 flex-1">
-              {address}
+              {cleanAddress(address) || 'Location not available'}
             </p>
           </div>
 

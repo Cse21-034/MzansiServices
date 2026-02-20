@@ -3,6 +3,37 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 
+/**
+ * Sanitize address to remove [object Object] and other invalid values
+ */
+function sanitizeAddress(address: any): string {
+  if (!address) return '';
+  
+  // If it's an object, try to extract value or label
+  if (typeof address === 'object') {
+    if ('value' in address && typeof address.value === 'string') {
+      return address.value.trim();
+    }
+    if ('label' in address && typeof address.label === 'string') {
+      return address.label.trim();
+    }
+    return '';
+  }
+  
+  // If it's a string, clean it
+  const str = String(address).trim();
+  
+  // Remove [object Object] strings
+  return str
+    .replace(/\[object Object\]/g, '')
+    .replace(/,\s*,/g, ',') // Remove double commas
+    .replace(/,\s*$/g, '') // Remove trailing comma
+    .split(',')
+    .map(part => part.trim())
+    .filter(part => part.length > 0)
+    .join(', ');
+}
+
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== "BUSINESS") {
@@ -67,7 +98,17 @@ export async function PUT(req: Request) {
     // Validate required fields
     if (!name || !category?.name || !description || !phone || !email || !address) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Missing required fields: name, category, description, phone, email, and address are required" },
+        { status: 400 }
+      );
+    }
+
+    // Sanitize the address to remove any [object Object] or invalid values
+    const sanitizedAddress = sanitizeAddress(address);
+    
+    if (!sanitizedAddress || sanitizedAddress.trim().length === 0) {
+      return NextResponse.json(
+        { error: "Address must be a valid string" },
         { status: 400 }
       );
     }
@@ -131,7 +172,7 @@ export async function PUT(req: Request) {
       phone,
       email,
       website,
-      address,
+      address: sanitizedAddress, // Use sanitized address
       establishedYear: establishedYear ? parseInt(establishedYear) : null,
       employees,
       services: body.services || [],

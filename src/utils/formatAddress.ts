@@ -7,29 +7,69 @@
  */
 export const safeToString = (value: any): string => {
   if (!value) return '';
-  if (typeof value === 'string') return value.trim();
+  
+  // If it's a string, trim and return
+  if (typeof value === 'string') {
+    const cleaned = value.trim();
+    // Clean out any [object Object] strings that might be in the value
+    return cleaned.replace(/\[object Object\]/g, '').trim();
+  }
+  
+  // If it's an object with a 'value' property (like from CreatableSelect), use that
   if (typeof value === 'object') {
-    // If it's an object with a 'name' property, use that
-    if ('name' in value) return value.name.toString().trim();
-    // If it's a date object, format it  
+    if ('value' in value && typeof value.value === 'string') {
+      return value.value.toString().trim();
+    }
+    if ('label' in value && typeof value.label === 'string') {
+      return value.label.toString().trim();
+    }
     if (value instanceof Date) return value.toLocaleDateString();
     // Otherwise return empty to avoid [object Object]
     return '';
   }
-  return String(value).trim();
+  
+  const str = String(value).trim();
+  // Clean out any [object Object] strings
+  return str.replace(/\[object Object\]/g, '').trim();
+};
+
+/**
+ * Clean address string by removing [object Object] and normalizing it
+ */
+export const cleanAddress = (address: string): string => {
+  if (!address) return '';
+  
+  // Remove [object Object] strings
+  return address
+    .replace(/\[object Object\]/g, '')
+    .replace(/,\s*,/g, ',') // Remove double commas
+    .replace(/,\s*$/g, '') // Remove trailing comma
+    .split(',')
+    .map(part => part.trim())
+    .filter(part => part.length > 0 && !part.match(/^[\s,]*$/))
+    .join(', ');
 };
 
 /**
  * Format a full address from components
  */
 export const formatFullAddress = (address?: string, city?: string, country?: string): string => {
-  const addressStr = safeToString(address);
-  const cityStr = safeToString(city);
-  const countryStr = safeToString(country);
-
-  const parts = [addressStr, cityStr, countryStr].filter(part => part.length > 0);
+  // Extract stringvalues, handling objects
+  let addressStr = safeToString(address);
+  let cityStr = safeToString(city);
+  let countryStr = safeToString(country);
   
-  return parts.length > 0 ? parts.join(', ') : 'Location not specified';
+  // Clean the address string in case it has [object Object]
+  if (addressStr) {
+    addressStr = cleanAddress(addressStr);
+  }
+
+  // Build parts array, filtering out empty values
+  const parts = [addressStr, cityStr, countryStr]
+    .filter(part => part && part.length > 0 && !part.includes('[object Object]'));
+  
+  // Return formatted address or default message
+  return parts.length > 0 ? parts.join(', ') : '';
 };
 
 /**
@@ -44,10 +84,12 @@ export const formatAddressForCard = (address?: string, city?: string, country?: 
  * Format location (city, country) for display
  */
 export const formatLocation = (city?: string, country?: string): string => {
-  const cityStr = safeToString(city);
-  const countryStr = safeToString(country);
-
-  const parts = [cityStr, countryStr].filter(part => part.length > 0);
+  let cityStr = safeToString(city);
+  let countryStr = safeToString(country);
   
-  return parts.length > 0 ? parts.join(', ') : 'Location not specified';
+  // If city or country is still "[object Object]", replace with empty
+  cityStr = cityStr.replace(/\[object Object\]/g, '').trim() || 'Unknown City';
+  countryStr = countryStr.replace(/\[object Object\]/g, '').trim() || 'Namibia';
+
+  return `${cityStr}, ${countryStr}`;
 };
