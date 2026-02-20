@@ -5,6 +5,7 @@ import { Popover, Transition } from "@headlessui/react";
 import { MapPinIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import ClearDataButton from "../ClearDataButton";
 import { NAMIBIA_LOCATIONS } from "@/data/namibiaLocations";
+import { findNearestCity } from "@/utils/locationUtils";
 
 export interface LocationSearchInputProps {
   className?: string;
@@ -49,13 +50,25 @@ const LocationSearchInput: FC<LocationSearchInputProps> = ({
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const location = "Current Location";
-          setInternalLocation(location);
-          setSearchQuery(location);
-          onLocationChange(location);
+          const { latitude, longitude } = position.coords;
+          console.log(`📍 Got user coordinates: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+          
+          // Find the nearest Namibian city to user's coordinates
+          const nearestCity = findNearestCity(latitude, longitude);
+          
+          setInternalLocation(nearestCity);
+          setSearchQuery(nearestCity);
+          onLocationChange(nearestCity);
+          
+          console.log(`✅ Selected nearest city: ${nearestCity}`);
         },
         (error) => {
           console.error("Error getting location:", error);
+          // Fallback to Windhoek if location access is denied
+          const fallbackCity = "Windhoek";
+          setInternalLocation(fallbackCity);
+          setSearchQuery(fallbackCity);
+          onLocationChange(fallbackCity);
         }
       );
     }
