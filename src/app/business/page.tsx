@@ -132,7 +132,7 @@ export interface BusinessDashboardPageProps { }
 
 const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
   const [activeTab, setActiveTab] = useState("overview");
-  const [country, setCountry] = useState<string | { value: string; label: string }>("Namibia");
+  const [country, setCountry] = useState<string>("Namibia");
   const [city, setCity] = useState<string | { value: string; label: string } | null>(null);
   const [streetAddress, setStreetAddress] = useState("");
   const { data: session } = useSession();
@@ -329,7 +329,7 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
       // Construct the address string from the new state variables
       // Extract city value - handle both string and object (from CreatableSelect)
       const cityStr = typeof city === 'string' ? city : (city?.value || '');
-      const countryStr = typeof country === 'string' ? country : (country?.value || 'Namibia');
+      const countryStr = country || 'Namibia';
       
       let fullAddress = streetAddress?.trim() || '';
       if (cityStr && cityStr.trim()) {
