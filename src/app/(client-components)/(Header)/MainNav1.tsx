@@ -13,6 +13,7 @@ import ButtonSecondary from "@/shared/ButtonSecondary";
 import MenuBar from "@/shared/MenuBar";
 import SwitchDarkMode from "@/shared/SwitchDarkMode";
 import HeroSearchForm2MobileFactory from "../(HeroSearchForm2Mobile)/HeroSearchForm2MobileFactory";
+import WeatherWidget from "@/components/WeatherWidget";
 import Link from "next/link";
 import {
   UserIcon,
@@ -165,8 +166,9 @@ const MainNav1: FC<MainNav1Props> = ({ className = "", isDashboard = false }) =>
         )}
 
         <div className="hidden md:flex flex-shrink-0 justify-end flex-1 lg:flex-none text-neutral-700 dark:text-neutral-100">
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center gap-2 lg:gap-3 xl:gap-4">
             <SwitchDarkMode />
+            <WeatherWidget />
             <ButtonSecondary href="/signup?tab=business-registration" className="border-2 border-burgundy-600 text-burgundy-600 hover:bg-burgundy-50 dark:hover:bg-burgundy-900/20 dark:border-burgundy-500 dark:text-burgundy-400">
               List Your Business
             </ButtonSecondary>
