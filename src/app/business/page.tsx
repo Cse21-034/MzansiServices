@@ -1,6 +1,7 @@
 "use client";
 
 import React, { FC, useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import ButtonPrimary from "@/shared/ButtonPrimary";
@@ -36,7 +37,16 @@ import {
 } from "@heroicons/react/24/outline";
 import { categories } from "@/data/categories";
 import CreatableSelect from "@/components/CreatableSelect";
-import MapPicker from "@/components/MapPicker";
+
+// Dynamically import MapPicker with client-side rendering only (no SSR)
+const MapPicker = dynamic(() => import("@/components/MapPicker"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-96 bg-neutral-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center animate-pulse">
+      <p className="text-neutral-500 dark:text-neutral-400">Loading map...</p>
+    </div>
+  ),
+});
 
 // Type for CreatableSelect option
 interface Option {
