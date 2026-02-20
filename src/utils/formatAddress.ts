@@ -5,7 +5,7 @@
 /**
  * Safely convert a value to string, handling objects properly
  */
-export const safeToString = (value: any): string => {
+const safeToString = (value: any): string => {
   if (!value) return '';
   
   // If it's a string, trim and return
@@ -36,7 +36,7 @@ export const safeToString = (value: any): string => {
 /**
  * Clean address string by removing [object Object] and normalizing it
  */
-export const cleanAddress = (address: string): string => {
+const cleanAddress = (address: string): string => {
   if (!address) return '';
   
   // Remove [object Object] strings
@@ -53,8 +53,8 @@ export const cleanAddress = (address: string): string => {
 /**
  * Format a full address from components
  */
-export const formatFullAddress = (address?: string, city?: string, country?: string): string => {
-  // Extract stringvalues, handling objects
+const formatFullAddress = (address?: string, city?: string, country?: string): string => {
+  // Extract string values, handling objects
   let addressStr = safeToString(address);
   let cityStr = safeToString(city);
   let countryStr = safeToString(country);
@@ -73,17 +73,9 @@ export const formatFullAddress = (address?: string, city?: string, country?: str
 };
 
 /**
- * Format address for display on cards (truncated)
- */
-export const formatAddressForCard = (address?: string, city?: string, country?: string, maxLength: number = 50): string => {
-  const fullAddress = formatFullAddress(address, city, country);
-  return fullAddress.length > maxLength ? fullAddress.substring(0, maxLength) + '...' : fullAddress;
-};
-
-/**
  * Format location (city, country) for display
  */
-export const formatLocation = (city?: string, country?: string): string => {
+const formatLocation = (city?: string, country?: string): string => {
   let cityStr = safeToString(city);
   let countryStr = safeToString(country);
   
@@ -93,3 +85,14 @@ export const formatLocation = (city?: string, country?: string): string => {
 
   return `${cityStr}, ${countryStr}`;
 };
+
+/**
+ * Format address for display on cards (truncated)
+ */
+const formatAddressForCard = (address?: string, city?: string, country?: string, maxLength: number = 50): string => {
+  const fullAddress = formatFullAddress(address, city, country);
+  return fullAddress.length > maxLength ? fullAddress.substring(0, maxLength) + '...' : fullAddress;
+};
+
+// Export all functions
+export { safeToString, cleanAddress, formatFullAddress, formatLocation, formatAddressForCard };

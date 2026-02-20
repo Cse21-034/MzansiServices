@@ -312,12 +312,12 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
           <ButtonSecondary
             className="w-full justify-center py-3"
             onClick={() => {
-              const cleanAddress = business?.address && 
+              const addressStr = business?.address && 
                 !business.address.includes("import LeafletMap") && 
                 !business.address.includes("renderSection7")
                 ? safeToString(business.address)
                 : "";
-              const displayAddress = cleanAddress || formatFullAddress(cleanAddress, business?.city, business?.country);
+              const displayAddress = addressStr || formatFullAddress(addressStr, business?.city, business?.country);
               const address = encodeURIComponent(displayAddress);
               window.open(`https://www.google.com/maps/dir/?api=1&destination=${address}`, '_blank');
             }}
@@ -520,13 +520,13 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
 
   const renderSection5 = () => {
     // Safely format the address, filtering out any unwanted content
-    const cleanAddress = business?.address && 
+    const addressStr = business?.address && 
       !business.address.includes("import LeafletMap") && 
       !business.address.includes("renderSection7")
       ? safeToString(business.address)
       : "";
     
-    const displayAddress = cleanAddress || formatFullAddress(cleanAddress, business?.city, business?.country);
+    const displayAddress = addressStr || formatFullAddress(addressStr, business?.city, business?.country);
 
     return (
       <div className="listingSection__wrap">
@@ -627,12 +627,12 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
   };
 
   const renderSection7 = () => {
-    const cleanAddress = business?.address && 
-      !business.address.includes("import LeafletMap") && 
-      !business.address.includes("renderSection7")
-      ? safeToString(business.address)
-      : "";
-    const displayAddress = cleanAddress || formatFullAddress(cleanAddress, business?.city, business?.country);
+const addressStr = business?.address && 
+        !business.address.includes("import LeafletMap") && 
+        !business.address.includes("renderSection7")
+        ? safeToString(business.address)
+        : "";
+      const displayAddress = addressStr || formatFullAddress(addressStr, business?.city, business?.country);
 
     return (
       <div className="listingSection__wrap">
