@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 import type { NextRequest } from 'next/server';
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
@@ -18,6 +19,12 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     where: { id },
     data
   });
+  
+  // Invalidate cache for updated business
+  revalidatePath('/');
+  revalidatePath('/listings');
+  revalidatePath('/namibiaservices');
+  
   return NextResponse.json({ business });
 }
 
@@ -27,6 +34,22 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     return new NextResponse('Unauthorized', { status: 401 });
   }
   const id = params.id;
+  
+  // Get business before deleting to get the slug
+  const business = await prisma.business.findUnique({
+    where: { id },
+    select: { slug: true }
+  });
+  
   await prisma.business.delete({ where: { id } });
+  
+  // Invalidate cache for deleted business on multiple paths
+  revalidatePath('/');
+  revalidatePath('/listings');
+  revalidatePath('/namibiaservices');
+  if (business?.slug) {
+    revalidatePath(`/listing-stay-detail/${business.slug}`);
+  }
+  
   return NextResponse.json({ success: true });
 }
