@@ -132,8 +132,8 @@ export interface BusinessDashboardPageProps { }
 
 const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
   const [activeTab, setActiveTab] = useState("overview");
-  const [country, setCountry] = useState("Namibia");
-  const [city, setCity] = useState<any>(null); // Use any or proper type for CreatableSelect value
+  const [country, setCountry] = useState<string | { value: string; label: string }>("Namibia");
+  const [city, setCity] = useState<string | { value: string; label: string } | null>(null);
   const [streetAddress, setStreetAddress] = useState("");
   const { data: session } = useSession();
   const router = useRouter();
