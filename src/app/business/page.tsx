@@ -36,6 +36,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { categories } from "@/data/categories";
 import CreatableSelect from "@/components/CreatableSelect";
+import MapPicker from "@/components/MapPicker";
 
 // Type for CreatableSelect option
 interface Option {
@@ -141,6 +142,8 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
   const [country, setCountry] = useState<string>("Namibia");
   const [city, setCity] = useState<Option | null>(null);
   const [streetAddress, setStreetAddress] = useState("");
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
   const { data: session } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -219,6 +222,10 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
         setCountry(parsedCountry);
         setCity({ value: parsedCity, label: parsedCity });
         setStreetAddress(parsedStreetAddress);
+
+        // Set latitude and longitude from fetched data
+        setLatitude(data.latitude || null);
+        setLongitude(data.longitude || null);
 
         setBusinessData({
           ...data,
@@ -361,6 +368,8 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
         address: fullAddress, // Use the newly constructed address
         city: cityStr, // Send city separately
         country: countryStr, // Send country separately
+        latitude: latitude, // Send latitude for map
+        longitude: longitude, // Send longitude for map
         businessHours: businessData.businessHours,
         services: businessData.services,
       };
@@ -631,7 +640,22 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
               />                          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
                 Make it easy for customers to find you by entering your location clearly (e.g., Shop 5, Main Street, Windhoek)
               </p>
-            </div>          </div>
+            </div>
+
+            {/* Map Picker for Location */}
+            <div className="md:col-span-2">
+              <MapPicker
+                latitude={latitude}
+                longitude={longitude}
+                address={streetAddress}
+                city={city?.value || "Windhoek"}
+                onCoordinatesChange={(lat, lng) => {
+                  setLatitude(lat);
+                  setLongitude(lng);
+                }}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Image Upload */}

@@ -98,8 +98,8 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
   // Geocoding function using Nominatim
   const geocodeAddress = async (address: string): Promise<[number, number] | null> => {
     // Add a basic check for obviously invalid addresses
-    if (!address || address.includes("import LeafletMap") || address.includes("renderSection7")) {
-      console.warn("Skipping geocoding for potentially invalid address:", address);
+    if (!address) {
+      console.warn("Skipping geocoding: address is empty");
       return null;
     }
     try {
@@ -259,11 +259,7 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
       };
     };
 
-    const displayAddress = business.address && 
-      !business.address.includes("import LeafletMap") && 
-      !business.address.includes("renderSection7")
-      ? safeToString(business.address)
-      : formatFullAddress(safeToString(business.address), business.city, business.country);
+    const displayAddress = business.address ? safeToString(business.address) : formatFullAddress("", business.city, business.country);
 
     return {
       id: business.id,

@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
+import { geocodeAddress, getDefaultCoordinates } from "@/utils/geocoding";
 
 /**
  * Sanitize address to remove [object Object] and other invalid values
@@ -91,7 +92,9 @@ export async function PUT(req: Request) {
       establishedYear,
       employees,
       businessHours,
-      services
+      services,
+      latitude,
+      longitude
     } = body;
 
     console.log('Extracted businessHours:', businessHours);
@@ -113,6 +116,32 @@ export async function PUT(req: Request) {
         { error: "Address must be a valid string" },
         { status: 400 }
       );
+    }
+
+    // Geocode address to get coordinates if not provided
+    let finalLatitude: number | null = null;
+    let finalLongitude: number | null = null;
+
+    if (latitude && longitude) {
+      // Use provided coordinates
+      finalLatitude = parseFloat(String(latitude));
+      finalLongitude = parseFloat(String(longitude));
+    } else {
+      // Geocode the address to get coordinates
+      const finalCity = city || "Windhoek";
+      const geocoded = await geocodeAddress(sanitizedAddress, finalCity);
+      
+      if (geocoded) {
+        finalLatitude = geocoded.latitude;
+        finalLongitude = geocoded.longitude;
+        console.log(`✅ Geocoded successfully: ${sanitizedAddress} -> ${finalLatitude}, ${finalLongitude}`);
+      } else {
+        // Fallback to city-level coordinates
+        const defaultCoords = getDefaultCoordinates(finalCity);
+        finalLatitude = defaultCoords.latitude;
+        finalLongitude = defaultCoords.longitude;
+        console.log(`⚠️ Using city fallback for ${finalCity}: ${finalLatitude}, ${finalLongitude}`);
+      }
     }
 
     // Find or create category
@@ -177,6 +206,8 @@ export async function PUT(req: Request) {
       address: sanitizedAddress, // Use sanitized address
       city: city || "Windhoek", // Update city field
       country: country || "Namibia", // Update country field
+      latitude: finalLatitude, // Save geocoded latitude
+      longitude: finalLongitude, // Save geocoded longitude
       establishedYear: establishedYear ? parseInt(establishedYear) : null,
       employees,
       services: body.services || [],
@@ -242,8 +273,10 @@ export async function PUT(req: Request) {
           ownerId: session.user.id,
           status: "DRAFT",
           slug: name.toLowerCase().replace(/\s+/g, '-') + '-' + Math.random().toString(36).substring(2, 7),
-          city: "Windhoek", // Default city
-          country: "Namibia"
+          city: city || "Windhoek", // Default city
+          country: country || "Namibia",
+          latitude: finalLatitude, // Add latitude for new business
+          longitude: finalLongitude // Add longitude for new business
         },
         include: {
           photos: {

@@ -102,8 +102,8 @@ interface BusinessDataType {
 
 // Geocoding function using Nominatim
 const geocodeAddress = async (address: string): Promise<[number, number] | null> => {
-  if (!address || address.includes("import LeafletMap") || address.includes("renderSection7")) {
-    console.warn("Skipping geocoding for potentially invalid address:", address);
+  if (!address) {
+    console.warn("Skipping geocoding: address is empty");
     return null;
   }
   try {
@@ -312,12 +312,8 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
           <ButtonSecondary
             className="w-full justify-center py-3"
             onClick={() => {
-              const addressStr = business?.address && 
-                !business.address.includes("import LeafletMap") && 
-                !business.address.includes("renderSection7")
-                ? safeToString(business.address)
-                : "";
-              const displayAddress = addressStr || formatFullAddress(addressStr, business?.city, business?.country);
+              const addressStr = business?.address ? safeToString(business.address) : "";
+              const displayAddress = addressStr || formatFullAddress(business?.city, business?.city, business?.country);
               const address = encodeURIComponent(displayAddress);
               window.open(`https://www.google.com/maps/dir/?api=1&destination=${address}`, '_blank');
             }}
@@ -520,13 +516,9 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
 
   const renderSection5 = () => {
     // Safely format the address, filtering out any unwanted content
-    const addressStr = business?.address && 
-      !business.address.includes("import LeafletMap") && 
-      !business.address.includes("renderSection7")
-      ? safeToString(business.address)
-      : "";
+    const addressStr = business?.address ? safeToString(business.address) : "";
     
-    const displayAddress = addressStr || formatFullAddress(addressStr, business?.city, business?.country);
+    const displayAddress = addressStr || formatFullAddress(business?.city, business?.city, business?.country);
 
     return (
       <div className="listingSection__wrap">
@@ -627,12 +619,8 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
   };
 
   const renderSection7 = () => {
-const addressStr = business?.address && 
-        !business.address.includes("import LeafletMap") && 
-        !business.address.includes("renderSection7")
-        ? safeToString(business.address)
-        : "";
-      const displayAddress = addressStr || formatFullAddress(addressStr, business?.city, business?.country);
+    const addressStr = business?.address ? safeToString(business.address) : "";
+    const displayAddress = addressStr || formatFullAddress(business?.city, business?.city, business?.country);
 
     return (
       <div className="listingSection__wrap">
@@ -644,7 +632,7 @@ const addressStr = business?.address &&
         </div>
         <div className="w-14 border-b border-neutral-200 dark:border-neutral-700" />
 
-        <div className="aspect-w-5 aspect-h-5 sm:aspect-h-3 ring-1 ring-black/10 rounded-xl z-0">
+        <div className="h-96 ring-1 ring-black/10 rounded-xl z-0 overflow-hidden">
           {business?.latitude && business?.longitude ? (
             <LeafletMap
               position={[business.latitude, business.longitude]}
