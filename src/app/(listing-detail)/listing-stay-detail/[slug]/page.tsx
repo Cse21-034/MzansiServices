@@ -19,6 +19,7 @@ import LikeSaveBtns from "@/components/LikeSaveBtns";
 import Image from "next/image";
 import { usePathname, useRouter, useParams } from "next/navigation";
 import MembershipsDisplay from "@/components/MembershipsDisplay";
+import { formatLocation, formatFullAddress, safeToString } from "@/utils/formatAddress";
 const logoMobile = "/images/namibia-logo/squarelogo.PNG";
 import { Amenities_demos, PHOTOS } from "../constant";
 import { Route } from "next";
@@ -288,7 +289,7 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
           <span>·</span>
           <span>
             <i className="las la-map-marker-alt"></i>
-            <span className="ml-1"> {business?.city}, {business?.country}</span>
+            <span className="ml-1"> {formatLocation(business?.city, business?.country)}</span>
           </span>
         </div>
 
@@ -311,9 +312,12 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
           <ButtonSecondary
             className="w-full justify-center py-3"
             onClick={() => {
-              const displayAddress = business?.address && !business.address.includes("import LeafletMap") && !business.address.includes("renderSection7")
-                ? business.address
-                : `${business?.city}, ${business?.country}`;
+              const cleanAddress = business?.address && 
+                !business.address.includes("import LeafletMap") && 
+                !business.address.includes("renderSection7")
+                ? safeToString(business.address)
+                : "";
+              const displayAddress = cleanAddress || formatFullAddress(cleanAddress, business?.city, business?.country);
               const address = encodeURIComponent(displayAddress);
               window.open(`https://www.google.com/maps/dir/?api=1&destination=${address}`, '_blank');
             }}
@@ -515,9 +519,14 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
   };
 
   const renderSection5 = () => {
-    const displayAddress = business?.address && !business.address.includes("import LeafletMap") && !business.address.includes("renderSection7")
-      ? business.address
-      : `${business?.city}, ${business?.country}`;
+    // Safely format the address, filtering out any unwanted content
+    const cleanAddress = business?.address && 
+      !business.address.includes("import LeafletMap") && 
+      !business.address.includes("renderSection7")
+      ? safeToString(business.address)
+      : "";
+    
+    const displayAddress = cleanAddress || formatFullAddress(cleanAddress, business?.city, business?.country);
 
     return (
       <div className="listingSection__wrap">
@@ -618,9 +627,12 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
   };
 
   const renderSection7 = () => {
-    const displayAddress = business?.address && !business.address.includes("import LeafletMap") && !business.address.includes("renderSection7")
-      ? business.address
-      : `${business?.city}, ${business?.country}`;
+    const cleanAddress = business?.address && 
+      !business.address.includes("import LeafletMap") && 
+      !business.address.includes("renderSection7")
+      ? safeToString(business.address)
+      : "";
+    const displayAddress = cleanAddress || formatFullAddress(cleanAddress, business?.city, business?.country);
 
     return (
       <div className="listingSection__wrap">

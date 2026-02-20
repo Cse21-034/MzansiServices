@@ -7,6 +7,7 @@ import ButtonSecondary from "@/shared/ButtonSecondary";
 import HeaderFilter from "./HeaderFilter";
 import StayCard from "./StayCard";
 import StayCard2 from "./StayCard2";
+import { formatFullAddress, safeToString } from "@/utils/formatAddress";
 
 // Define the real business data interface based on your Prisma schema
 export interface BusinessDataType {
@@ -261,7 +262,7 @@ const SectionGridFeaturePlaces: FC<SectionGridFeaturePlacesProps> = ({
       featuredImage: primaryPhoto?.url || "/images/placeholder-business.jpg",
       commentCount: totalReviews,
       viewCount: business.viewCount || 0,
-      address: business.address || `${business.city}, ${business.country}`,
+      address: formatFullAddress(business.address, business.city, business.country),
       reviewStart: Math.round(averageRating * 2) / 2, // Round to nearest 0.5
       reviewCount: totalReviews,
       like: false,

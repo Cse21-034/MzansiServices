@@ -13,6 +13,7 @@ import Heading2 from "@/shared/Heading2";
 import StayCard2 from "@/components/StayCard2";
 import { useSearchParams, useRouter } from "next/navigation";
 import StayCard from "@/components/StayCard";
+import { formatFullAddress, safeToString } from "@/utils/formatAddress";
 
 // Define the real business data interface
 export interface BusinessDataType {
@@ -258,9 +259,11 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
       };
     };
 
-    const displayAddress = business.address && !business.address.includes("import LeafletMap") && !business.address.includes("renderSection7")
-      ? business.address
-      : `${business.city}, ${business.country}`; // Fallback to city, country if address is problematic
+    const displayAddress = business.address && 
+      !business.address.includes("import LeafletMap") && 
+      !business.address.includes("renderSection7")
+      ? safeToString(business.address)
+      : formatFullAddress(safeToString(business.address), business.city, business.country);
 
     return {
       id: business.id,
