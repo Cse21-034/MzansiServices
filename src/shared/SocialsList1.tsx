@@ -15,7 +15,7 @@ const socials: SocialType[] = [
   { 
     name: "Facebook", 
     icon: "facebook",
-    href: "https://www.facebook.com/Namibiaservicesonline/",
+    href: "https://www.facebook.com/share/19aXjkJZQC/",
     color: "#1877F2"
   },
   { 
@@ -33,7 +33,7 @@ const socials: SocialType[] = [
   { 
     name: "Instagram", 
     icon: "instagram",
-    href: "https://www.instagram.com/servicesnamibia/",
+    href: "https://www.instagram.com/gecko.9206411?igsh=aGttaDYzN2RiZjA3",
     color: "#E1306C"
   },
 ];
@@ -45,7 +45,7 @@ const SocialsList1: FC<SocialsList1Props> = ({ className = "space-y-2.5" }) => {
         href={item.href}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center justify-center w-10 h-10 rounded-full transition-all duration-200 hover:scale-110"
+        className="inline-flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full transition-all duration-200 hover:scale-110 flex-shrink-0"
         style={{
           backgroundColor: item.color,
           opacity: 0.9
@@ -58,6 +58,7 @@ const SocialsList1: FC<SocialsList1Props> = ({ className = "space-y-2.5" }) => {
         }}
         key={index}
         title={item.name}
+        aria-label={item.name}
       >
         {item.icon === "facebook" && (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
@@ -76,11 +77,7 @@ const SocialsList1: FC<SocialsList1Props> = ({ className = "space-y-2.5" }) => {
         )}
         {item.icon === "instagram" && (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
-            <rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="white" opacity="0"/>
-            <circle cx="12" cy="12" r="3" fill="white"/>
-            <rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="none" stroke="white" strokeWidth="2"/>
-            <circle cx="18" cy="6" r="1" fill="white"/>
-            <path d="M 2 12 C 2 6.477 6.477 2 12 2 C 17.523 2 22 6.477 22 12 C 22 17.523 17.523 22 12 22 C 6.477 22 2 17.523 2 12 Z" fill="none" stroke="white" strokeWidth="2"/>
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.266.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1 1 12.324 0 6.162 6.162 0 0 1-12.324 0zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm4.965-10.322a1.44 1.44 0 1 1 2.881.001 1.44 1.44 0 0 1-2.881-.001z"/>
           </svg>
         )}
       </a>

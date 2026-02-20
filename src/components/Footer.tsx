@@ -33,16 +33,15 @@ const widgetMenus: WidgetFooterMenu[] = [
 const Footer: React.FC = () => {
   const renderWidgetMenuItem = (menu: WidgetFooterMenu, index: number) => {
     return (
-      <div key={index} className="text-sm">
-        <h2 className="font-semibold text-neutral-700 dark:text-neutral-200">
+      <div key={index} className="text-xs sm:text-sm">
+        <h2 className="font-semibold text-neutral-800 dark:text-neutral-100 text-sm sm:text-base">
           {menu.title}
         </h2>
-        <ul className="mt-5 space-y-4">
+        <ul className="mt-3 sm:mt-4 space-y-2 sm:space-y-3">
           {menu.menus.map((item, index) => (
             <li key={index}>
               <a
-                key={index}
-                className="text-neutral-6000 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors duration-200"
+                className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200 text-xs sm:text-sm"
                 href={item.href}
               >
                 {item.label}
@@ -58,26 +57,26 @@ const Footer: React.FC = () => {
     <>
       <FooterNav />
 
-      <div className="nc-Footer relative py-24 lg:py-28 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-900/50">
-        <div className="container grid grid-cols-2 gap-y-10 gap-x-5 sm:gap-x-8 md:grid-cols-4 lg:grid-cols-5 lg:gap-x-10 ">
-          <div className="grid grid-cols-4 gap-5 col-span-2 md:col-span-4 lg:md:col-span-1 lg:flex lg:flex-col">
-            <div className="col-span-2 md:col-span-1">
+      <div className="nc-Footer relative py-12 lg:py-16 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-900/50">
+        <div className="container grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-6 md:grid-cols-4 lg:grid-cols-5 lg:gap-x-10">
+          <div className="flex flex-col sm:col-span-2 md:col-span-1">
+            <div className="mb-6">
               <Logo />
             </div>
-            <div className="col-span-2 flex items-center md:col-span-3 lg:mt-4">
-              <SocialsList1 className="flex items-center gap-4 lg:gap-3 lg:flex-row" />
+            <div className="flex items-center">
+              <SocialsList1 className="flex items-center gap-3" />
             </div>
           </div>
           {widgetMenus.map(renderWidgetMenuItem)}
         </div>
         
         {/* Bottom section with developer credit */}
-        <div className="container border-t border-neutral-200 dark:border-neutral-800 mt-12 pt-8">
-          <div className="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
-            <div className="text-sm text-neutral-600 dark:text-neutral-400">
+        <div className="container border-t border-neutral-200 dark:border-neutral-800 mt-8 pt-6 sm:mt-10 sm:pt-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+            <div className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400">
               <p>&copy; {new Date().getFullYear()} Namibia Services. All rights reserved.</p>
             </div>
-            <div className="text-sm">
+            <div className="text-xs sm:text-sm">
               <p className="text-neutral-600 dark:text-neutral-400 font-medium">
                 Developed by SolidCare Services
               </p>
