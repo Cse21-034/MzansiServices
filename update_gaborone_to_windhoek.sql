@@ -4,13 +4,13 @@
 BEGIN;
 
 -- Update city field from Gaborone to Windhoek
-UPDATE "Business"
+UPDATE "businesses"
 SET city = 'Windhoek'
 WHERE city ILIKE 'Gaborone'
   AND country = 'Namibia';
 
 -- Update addresses that contain "Gaborone" to "Windhoek"
-UPDATE "Business"
+UPDATE "businesses"
 SET address = REPLACE(address, 'Gaborone', 'Windhoek')
 WHERE address ILIKE '%Gaborone%'
   AND country = 'Namibia';
@@ -22,7 +22,7 @@ SELECT
   city,
   address,
   updated_at
-FROM "Business"
+FROM "businesses"
 WHERE city = 'Windhoek'
   AND country = 'Namibia'
 ORDER BY updated_at DESC;

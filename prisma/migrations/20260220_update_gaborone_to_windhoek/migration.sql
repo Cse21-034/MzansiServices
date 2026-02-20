@@ -1,13 +1,13 @@
 -- Migration: Update Gaborone to Windhoek for Namibia-focused application
 
 -- Update city field from Gaborone to Windhoek for all Namibia businesses
-UPDATE "Business"
+UPDATE "businesses"
 SET city = 'Windhoek', updated_at = NOW()
 WHERE city ILIKE 'Gaborone'
   AND country = 'Namibia';
 
 -- Update addresses containing Gaborone to Windhoek
-UPDATE "Business"
+UPDATE "businesses"
 SET address = REPLACE(address, 'Gaborone', 'Windhoek'), updated_at = NOW()
 WHERE address ILIKE '%Gaborone%'
   AND country = 'Namibia';
