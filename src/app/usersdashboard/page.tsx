@@ -324,19 +324,19 @@ const UserDashboardPage: FC<UserDashboardPageProps> = ({}) => {
               Quick Actions
             </h3>
             <div className="space-y-3">
-              <ButtonPrimary className="w-full justify-center">
+              <ButtonPrimary className="w-full justify-center" onClick={() => setActiveTab('reviews')}>
                 <PlusIcon className="w-4 h-4 mr-2" />
                 Write a Review
               </ButtonPrimary>
-              <ButtonSecondary className="w-full justify-center">
+              <ButtonSecondary className="w-full justify-center" onClick={() => setActiveTab('favorites')}>
                 <HeartIcon className="w-4 h-4 mr-2" />
                 View Favorites
               </ButtonSecondary>
-              <ButtonSecondary className="w-full justify-center">
+              <ButtonSecondary className="w-full justify-center" onClick={() => setActiveTab('profile')}>
                 <UserIcon className="w-4 h-4 mr-2" />
                 Edit Profile
               </ButtonSecondary>
-              <ButtonSecondary className="w-full justify-center">
+              <ButtonSecondary className="w-full justify-center" onClick={() => setActiveTab('reviews')}>
                 <StarIcon className="w-4 h-4 mr-2" />
                 Review History
               </ButtonSecondary>

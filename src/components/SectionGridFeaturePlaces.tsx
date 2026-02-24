@@ -298,7 +298,7 @@ const SectionGridFeaturePlaces: FC<SectionGridFeaturePlacesProps> = ({
         CardName = StayCard;
     }
 
-    return <CardName key={business.id} data={stayData} />;
+    return <CardName key={business.id} data={stayData} businessHours={business.businessHours} />;
   };
 
   // Show loading state
