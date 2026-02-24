@@ -108,6 +108,7 @@ const NAMIBIA_LOCATIONS = [
 
 interface BusinessData {
   id?: string;
+  slug?: string;
   name: string;
   category: string;
   subcategory: string;
@@ -493,7 +494,11 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
                 <BuildingStorefrontIcon className="w-4 h-4 mr-2" />
                 Add New Listing
               </ButtonPrimary>
-              <ButtonSecondary className="w-full justify-center" onClick={() => router.push(`/listing-stay-detail/${businessData.slug}`)}>
+              <ButtonSecondary className="w-full justify-center" onClick={() => {
+                // Use slug if available, otherwise generate from name
+                const slugToUse = businessData.slug || businessData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+                router.push(`/listing-stay-detail/${slugToUse}`);
+              }}>
                 <EyeIcon className="w-4 h-4 mr-2" />
                 View Public Profile
               </ButtonSecondary>
