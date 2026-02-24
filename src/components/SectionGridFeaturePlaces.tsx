@@ -285,20 +285,13 @@ const SectionGridFeaturePlaces: FC<SectionGridFeaturePlacesProps> = ({
 
   const renderCard = (business: BusinessDataType) => {
     const stayData = convertBusinessToStayData(business);
-    let CardName = StayCard;
     
-    switch (cardType) {
-      case "card1":
-        CardName = StayCard;
-        break;
-      case "card2":
-        CardName = StayCard2;
-        break;
-      default:
-        CardName = StayCard;
+    // Only pass businessHours to StayCard2, not to StayCard
+    if (cardType === "card2") {
+      return <StayCard2 key={business.id} data={stayData} businessHours={business.businessHours} />;
     }
-
-    return <CardName key={business.id} data={stayData} businessHours={business.businessHours} />;
+    
+    return <StayCard key={business.id} data={stayData} />;
   };
 
   // Show loading state
