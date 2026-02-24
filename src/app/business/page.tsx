@@ -489,15 +489,15 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
               Quick Actions
             </h3>
             <div className="space-y-3">
-              <ButtonPrimary className="w-full justify-center">
+              <ButtonPrimary className="w-full justify-center" onClick={() => router.push('/business/add-listing')}>
                 <BuildingStorefrontIcon className="w-4 h-4 mr-2" />
                 Add New Listing
               </ButtonPrimary>
-              <ButtonSecondary className="w-full justify-center">
+              <ButtonSecondary className="w-full justify-center" onClick={() => router.push(`/listing-stay-detail/${businessData.slug}`)}>
                 <EyeIcon className="w-4 h-4 mr-2" />
                 View Public Profile
               </ButtonSecondary>
-              <ButtonSecondary className="w-full justify-center">
+              <ButtonSecondary className="w-full justify-center" onClick={() => setActiveTab('analytics')}>
                 <ChartBarIcon className="w-4 h-4 mr-2" />
                 View Analytics
               </ButtonSecondary>
