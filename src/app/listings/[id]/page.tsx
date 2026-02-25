@@ -22,7 +22,7 @@ const ListingDetailPage = ({ params }: ListingDetailPageProps) => {
     const fetchListing = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`/api/business/listings/${params.id}`);
+        const res = await fetch(`/api/listings/${params.id}`);
         if (!res.ok) {
           throw new Error('Listing not found');
         }
