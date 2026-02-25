@@ -251,6 +251,7 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
           category: typeof data.category === 'object' ? data.category?.name || "" : data.category || "",
           subcategory: typeof data.subcategory === 'object' ? data.subcategory?.name || "" : data.subcategory || "",
           businessHours: fullBusinessHours,
+          services: data.services || [],
           photos: (data.photos || []).map((photo: any) => ({
             id: photo.id,
             url: photo.url,

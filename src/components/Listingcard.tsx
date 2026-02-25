@@ -16,7 +16,7 @@ const ListingCard: React.FC<ListingCardProps> = ({ data, viewMode }) => {
         {/* Image */}
         <div className="lg:w-64 h-48 lg:h-auto rounded-xl overflow-hidden flex-shrink-0 relative">
           <img
-            src={data.business.coverImage || "/images/placeholder-business.jpg"}
+            src={data.image || data.business.coverImage || "/images/placeholder-business.jpg"}
             alt={data.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
@@ -58,7 +58,7 @@ const ListingCard: React.FC<ListingCardProps> = ({ data, viewMode }) => {
 
             <div className="flex-shrink-0">
               <Link
-                href={`/listings/${data.id}?title=${encodeURIComponent(data.title)}&description=${encodeURIComponent(data.description || "")}&businessName=${encodeURIComponent(data.business.name)}&businessCity=${encodeURIComponent(data.business.city || "")}&businessImage=${encodeURIComponent(data.business.coverImage || "")}&businessPhone=${encodeURIComponent(data.business.phone || "")}&businessEmail=${encodeURIComponent(data.business.email || "")}&businessWebsite=${encodeURIComponent(data.business.website || "")}&businessId=${data.business.id}`}
+                href={`/listings/${data.id}`}
                 className="inline-flex items-center justify-center px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-medium transition-colors"
               >
                 View Details
@@ -79,7 +79,7 @@ const ListingCard: React.FC<ListingCardProps> = ({ data, viewMode }) => {
       {/* Image with Promotion Badge */}
       <div className="relative aspect-square overflow-hidden">
         <img
-          src={data.business.coverImage || "/images/placeholder-business.jpg"}
+          src={data.image || data.business.coverImage || "/images/placeholder-business.jpg"}
           alt={data.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
@@ -117,7 +117,7 @@ const ListingCard: React.FC<ListingCardProps> = ({ data, viewMode }) => {
 
         <div className="flex items-center justify-between mt-auto">
           <Link
-            href={`/listings/${data.id}?title=${encodeURIComponent(data.title)}&description=${encodeURIComponent(data.description || "")}&businessName=${encodeURIComponent(data.business.name)}&businessCity=${encodeURIComponent(data.business.city || "")}&businessImage=${encodeURIComponent(data.business.coverImage || "")}&businessPhone=${encodeURIComponent(data.business.phone || "")}&businessEmail=${encodeURIComponent(data.business.email || "")}&businessWebsite=${encodeURIComponent(data.business.website || "")}&businessId=${data.business.id}`}
+            href={`/listings/${data.id}`}
             className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-medium transition-colors text-sm"
           >
             Details
