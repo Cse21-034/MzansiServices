@@ -318,11 +318,6 @@ const ListingDetailPage = ({ params }: ListingDetailPageProps) => {
 
 export default ListingDetailPage;
 
-  return (
-    <div className="min-h-screen bg-white dark:bg-gray-950">
-      {/* Sticky Header */}
-      <div className="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <button
             onClick={() => router.back()}
             className="flex items-center gap-2 px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all"
