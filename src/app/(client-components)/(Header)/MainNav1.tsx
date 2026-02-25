@@ -169,9 +169,11 @@ const MainNav1: FC<MainNav1Props> = ({ className = "", isDashboard = false }) =>
           <div className="flex items-center gap-2 lg:gap-3 xl:gap-4">
             <SwitchDarkMode />
             <WeatherWidget />
-            <ButtonSecondary href="/signup?tab=business-registration" className="border-2 border-burgundy-600 text-burgundy-600 hover:bg-burgundy-50 dark:hover:bg-burgundy-900/20 dark:border-burgundy-500 dark:text-burgundy-400">
-              List Your Business
-            </ButtonSecondary>
+            {!session?.user && (
+              <ButtonSecondary href="/signup?tab=business-registration" className="border-2 border-burgundy-600 text-burgundy-600 hover:bg-burgundy-50 dark:hover:bg-burgundy-900/20 dark:border-burgundy-500 dark:text-burgundy-400">
+                List Your Business
+              </ButtonSecondary>
+            )}
             <AuthButtons />
             {isDashboard && session?.user && (
               <Link

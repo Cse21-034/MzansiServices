@@ -5,6 +5,7 @@ import SocialsList1 from "@/shared/SocialsList1";
 import { CustomLink } from "@/data/types";
 import React from "react";
 import FooterNav from "./FooterNav";
+import { useSession } from "next-auth/react";
 
 export interface WidgetFooterMenu {
   id: string;
@@ -12,25 +13,29 @@ export interface WidgetFooterMenu {
   menus: CustomLink[];
 }
 
-const widgetMenus: WidgetFooterMenu[] = [
-  {
-    id: "1",
-    title: "For Businesses",
-    menus: [
-      { href: "/list-your-business", label: "List Your Business" },
-      { href: "/advertise", label: "Advertise With Us" },
-    ],
-  },
-  {
-    id: "2",
-    title: "Explore Namibia",
-    menus: [
-      { href: "/categories", label: "Business Categories" },
-    ],
-  },
-];
-
 const Footer: React.FC = () => {
+  const { data: session } = useSession();
+
+  const widgetMenus: WidgetFooterMenu[] = [
+    ...(session?.user ? [] : [
+      {
+        id: "1",
+        title: "For Businesses",
+        menus: [
+          { href: "/list-your-business", label: "List Your Business" },
+          { href: "/advertise", label: "Advertise With Us" },
+        ],
+      },
+    ]),
+    {
+      id: "2",
+      title: "Explore Namibia",
+      menus: [
+        { href: "/categories", label: "Business Categories" },
+      ],
+    },
+  ];
+
   const renderWidgetMenuItem = (menu: WidgetFooterMenu, index: number) => {
     return (
       <div key={index} className="text-xs sm:text-sm">

@@ -1,6 +1,10 @@
+"use client";
+
 import Heading from "@/shared/Heading";
 import React from "react";
 import PricingCard, { PackageType } from "./pricingcard";
+import { useSession } from "next-auth/react";
+
 export interface PricingPackageProps {
   packages?: PackageType[];
   headingCenter?: boolean;
@@ -79,6 +83,13 @@ const SectionGridCategoryBox: React.FC<PricingPackageProps> = ({
   className = "",
   gridClassName = "grid-cols-1 lg:grid-cols-3 gap-8",
 }) => {
+  const { data: session } = useSession();
+
+  // Hide this section if user is logged in
+  if (session?.user) {
+    return null;
+  }
+
   return (
     <div className={`nc-SectionGridCategoryBox relative ${className}`}>
       <Heading
