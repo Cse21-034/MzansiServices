@@ -33,7 +33,8 @@ import {
   StarIcon,
   XCircleIcon,
   BuildingOfficeIcon,
-  SparklesIcon
+  SparklesIcon,
+  PencilIcon
 } from "@heroicons/react/24/outline";
 import { categories } from "@/data/categories";
 import CreatableSelect from "@/components/CreatableSelect";
@@ -533,6 +534,74 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
     }
   };
 
+  // Handle update listing status
+  const handleUpdateListingStatus = async (listingId: string, newStatus: string) => {
+    if (!businessData.id) return;
+
+    setSaving(true);
+    try {
+      const formData = new FormData();
+      formData.append('status', newStatus);
+
+      const res = await fetch(`/api/business/listings/${listingId}`, {
+        method: 'PUT',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to update listing');
+      }
+
+      setModalTitle('Success');
+      setModalMessage('Listing status updated successfully!');
+      setModalOpen(true);
+
+      // Refresh listings
+      await fetchListings();
+
+    } catch (error) {
+      console.error('Error updating listing:', error);
+      setModalTitle('Error');
+      setModalMessage(getErrorMessage(error));
+      setModalOpen(true);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Handle delete listing
+  const handleDeleteListing = async (listingId: string) => {
+    if (!confirm('Are you sure you want to delete this listing?')) return;
+
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/business/listings/${listingId}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to delete listing');
+      }
+
+      setModalTitle('Success');
+      setModalMessage('Listing deleted successfully!');
+      setModalOpen(true);
+
+      // Refresh listings
+      await fetchListings();
+
+    } catch (error) {
+      console.error('Error deleting listing:', error);
+      setModalTitle('Error');
+      setModalMessage(getErrorMessage(error));
+      setModalOpen(true);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const renderOverviewTab = () => {
     return (
       <div className="space-y-8">
@@ -983,9 +1052,7 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
                             Created {new Date(listing.createdAt).toLocaleDateString()}
                           </p>
                         </div>
-                        <Badge className={listing.status === 'ACTIVE' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'}>
-                          {listing.status}
-                        </Badge>
+                        <Badge color={listing.status === 'ACTIVE' ? 'green' : 'yellow'} name={listing.status} />
                       </div>
                       <p className="text-neutral-600 dark:text-neutral-400 text-sm line-clamp-2 mb-4">
                         {listing.description}
