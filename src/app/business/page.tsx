@@ -909,6 +909,110 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
           </p>
         </div>
 
+        {/* Business Hours */}
+        <div className="bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700">
+          <h2 className="text-2xl font-semibold flex items-center gap-3 mb-6">
+            <ClockIcon className="w-6 h-6 text-primary-600" />
+            Business Hours
+          </h2>
+          <div className="space-y-4">
+            {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day, index) => {
+              const hour = businessData.businessHours?.[index] || { dayOfWeek: index, isClosed: true };
+              return (
+                <div key={index} className="flex items-center gap-4 pb-4 border-b border-neutral-200 dark:border-neutral-700 last:border-0">
+                  <div className="w-24">
+                    <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300">{day}</p>
+                  </div>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={hour.isClosed}
+                      onChange={(e) => {
+                        const updated = [...businessData.businessHours];
+                        updated[index] = { ...updated[index], isClosed: e.target.checked };
+                        setBusinessData(prev => ({ ...prev, businessHours: updated }));
+                      }}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm text-neutral-600 dark:text-neutral-400">Closed</span>
+                  </label>
+                  {!hour.isClosed && (
+                    <div className="flex gap-2 flex-1">
+                      <input
+                        type="time"
+                        value={hour.openTime || hour.open || "09:00"}
+                        onChange={(e) => {
+                          const updated = [...businessData.businessHours];
+                          updated[index] = { ...updated[index], openTime: e.target.value };
+                          setBusinessData(prev => ({ ...prev, businessHours: updated }));
+                        }}
+                        className="px-3 py-2 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 text-sm"
+                      />
+                      <span className="text-neutral-500">to</span>
+                      <input
+                        type="time"
+                        value={hour.closeTime || hour.close || "17:00"}
+                        onChange={(e) => {
+                          const updated = [...businessData.businessHours];
+                          updated[index] = { ...updated[index], closeTime: e.target.value };
+                          setBusinessData(prev => ({ ...prev, businessHours: updated }));
+                        }}
+                        className="px-3 py-2 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 text-sm"
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Services Offered */}
+        <div className="bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700">
+          <h2 className="text-2xl font-semibold flex items-center gap-3 mb-6">
+            <SparklesIcon className="w-6 h-6 text-primary-600" />
+            Services Offered
+          </h2>
+          <div className="space-y-3">
+            {(businessData.services || []).map((service, index) => (
+              <div key={index} className="flex items-center gap-3">
+                <input
+                  type="text"
+                  value={service}
+                  onChange={(e) => {
+                    const updated = [...(businessData.services || [])];
+                    updated[index] = e.target.value;
+                    setBusinessData(prev => ({ ...prev, services: updated }));
+                  }}
+                  placeholder="e.g., Consultation, Design, Implementation"
+                  className="flex-1 px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:ring-primary-500 focus:border-primary-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const updated = (businessData.services || []).filter((_, i) => i !== index);
+                    setBusinessData(prev => ({ ...prev, services: updated }));
+                  }}
+                  className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                >
+                  <TrashIcon className="w-5 h-5" />
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => {
+                const updated = [...(businessData.services || []), ''];
+                setBusinessData(prev => ({ ...prev, services: updated }));
+              }}
+              className="w-full px-4 py-3 rounded-lg border-2 border-dashed border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-900/50 transition-colors flex items-center justify-center gap-2"
+            >
+              <PlusIcon className="w-5 h-5" />
+              Add Service
+            </button>
+          </div>
+        </div>
+
         {/* Save Button */}
         <ButtonPrimary className="mt-4" onClick={handleSave} disabled={saving}>
           {saving ? "Saving Profile..." : "Save Profile"}
