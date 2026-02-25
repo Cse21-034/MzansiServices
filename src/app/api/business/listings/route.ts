@@ -3,9 +3,19 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
+
+// Initialize Supabase Admin directly in the route
+const initSupabaseAdmin = async () => {
+  const { createClient } = await import('@supabase/supabase-js');
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  
+  if (!url || !key) {
+    throw new Error('Missing Supabase environment variables');
+  }
+  
+  return createClient(url, key);
+};
 
 // GET - Fetch all listings for a business
 export async function GET(request: NextRequest) {
@@ -97,26 +107,61 @@ export async function POST(request: NextRequest) {
 
     let imageUrl: string | null = null;
 
-    // Handle image upload
+    // Handle image upload to Supabase Storage
     if (imageFile) {
       try {
-        const buffer = await imageFile.arrayBuffer();
-        const timestamp = Date.now();
-        const filename = `listing-${businessId}-${timestamp}.${imageFile.type.split("/")[1]}`;
-        
-        // Create uploads directory if it doesn't exist
-        const uploadsDir = join(process.cwd(), "public", "uploads", "listings");
-        if (!existsSync(uploadsDir)) {
-          await mkdir(uploadsDir, { recursive: true });
+        const supabaseAdmin = await initSupabaseAdmin();
+
+        // Validate file type
+        if (!imageFile.type.startsWith('image/')) {
+          return NextResponse.json({ error: "Only image files are allowed" }, { status: 400 });
         }
 
-        const filepath = join(uploadsDir, filename);
-        const uint8Array = new Uint8Array(buffer);
-        await writeFile(filepath, uint8Array);
-        imageUrl = `/uploads/listings/${filename}`;
+        // Validate file size (5MB max)
+        if (imageFile.size > 5 * 1024 * 1024) {
+          return NextResponse.json({ error: "File size must be less than 5MB" }, { status: 400 });
+        }
+
+        // Generate unique filename
+        const timestamp = Date.now();
+        const randomString = Math.random().toString(36).substring(2, 15);
+        const fileExtension = imageFile.name.split('.').pop() || 'jpg';
+        const fileName = `listings/${businessId}/${timestamp}-${randomString}.${fileExtension}`;
+
+        // Convert File to Buffer for server-side upload
+        const arrayBuffer = await imageFile.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+
+        // Upload to Supabase Storage
+        const { data, error } = await supabaseAdmin.storage
+          .from("business-images")
+          .upload(fileName, buffer, {
+            cacheControl: '3600',
+            upsert: false,
+            contentType: imageFile.type
+          });
+
+        if (error) {
+          console.error('Upload error:', error);
+          return NextResponse.json({ error: `Upload failed: ${error.message}` }, { status: 500 });
+        }
+
+        // Get public URL
+        const { data: publicUrlData } = supabaseAdmin.storage
+          .from("business-images")
+          .getPublicUrl(fileName);
+
+        if (!publicUrlData.publicUrl) {
+          throw new Error('Failed to get public URL');
+        }
+
+        imageUrl = publicUrlData.publicUrl;
       } catch (imageError) {
         console.error("Image upload error:", imageError);
-        // Continue without image if upload fails
+        return NextResponse.json(
+          { error: "Failed to upload image" },
+          { status: 500 }
+        );
       }
     }
 
