@@ -275,6 +275,13 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
     }
   }, [session]);
 
+  // Fetch listings when businessData.id changes
+  useEffect(() => {
+    if (businessData.id) {
+      fetchListings();
+    }
+  }, [businessData.id]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setBusinessData(prev => ({ ...prev, [name]: value }));
@@ -419,6 +426,106 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
     } catch (error) {
       console.error('Save error:', error);
       setModalTitle("Error");
+      setModalMessage(getErrorMessage(error));
+      setModalOpen(true);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Fetch listings for the business
+  const fetchListings = async () => {
+    if (!businessData.id) return;
+    try {
+      const res = await fetch(`/api/business/listings?businessId=${businessData.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        setListings(data);
+      }
+    } catch (error) {
+      console.error('Error fetching listings:', error);
+    }
+  };
+
+  // Handle listing image upload
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size must be less than 5MB');
+      return;
+    }
+
+    // Validate file type
+    if (!['image/jpeg', 'image/png', 'image/gif'].includes(file.type)) {
+      alert('Please upload a valid image (JPG, PNG, or GIF)');
+      return;
+    }
+
+    setListingForm(prev => ({ ...prev, image: file }));
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setListingPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Handle listing form submission
+  const handleAddListing = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!listingForm.title.trim()) {
+      alert('Please enter a listing title');
+      return;
+    }
+
+    if (!businessData.id) {
+      alert('Business ID not found');
+      return;
+    }
+
+    setSaving(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('title', listingForm.title);
+      formData.append('description', listingForm.description);
+      formData.append('businessId', businessData.id);
+      
+      if (listingForm.image) {
+        formData.append('image', listingForm.image);
+      }
+
+      const res = await fetch('/api/business/listings', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to create listing');
+      }
+
+      // Listing created successfully
+      setModalTitle('Success');
+      setModalMessage('Listing created successfully!');
+      setModalOpen(true);
+
+      // Reset form
+      setListingForm({ title: '', description: '', image: null });
+      setListingPreview(null);
+      setShowAddListing(false);
+
+      // Refresh listings
+      await fetchListings();
+
+    } catch (error) {
+      console.error('Error creating listing:', error);
+      setModalTitle('Error');
       setModalMessage(getErrorMessage(error));
       setModalOpen(true);
     } finally {
