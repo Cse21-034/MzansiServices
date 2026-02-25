@@ -159,6 +159,13 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  
+  // Listings state
+  const [listings, setListings] = useState<any[]>([]);
+  const [showAddListing, setShowAddListing] = useState(false);
+  const [listingForm, setListingForm] = useState({ title: "", description: "", image: null as File | null });
+  const [editingListingId, setEditingListingId] = useState<string | null>(null);
+  const [listingPreview, setListingPreview] = useState<string | null>(null);
 
   const emptyBusiness: BusinessData = {
     name: "",
@@ -735,152 +742,170 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
   };
 
   const renderListingsTab = () => {
-    if (loading) return <div className="text-center py-8">Loading listing details...</div>;
-
-    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
-    const handleBusinessHoursChange = (dayIndex: number, field: "openTime" | "closeTime" | "isClosed", value: string | boolean) => {
-      setBusinessData(prev => ({
-        ...prev,
-        businessHours: prev.businessHours.map((day, index) =>
-          index === dayIndex ? { ...day, [field]: value } : day
-        )
-      }));
-    };
-
-    const handleAddService = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Enter') {
-        const newService = e.currentTarget.value.trim();
-        if (newService && !businessData.services.includes(newService)) {
-          setBusinessData(prev => ({
-            ...prev,
-            services: [...prev.services, newService]
-          }));
-          e.currentTarget.value = "";
-        }
-      }
-    };
-
-    const handleRemoveService = (serviceToRemove: string) => {
-      setBusinessData(prev => ({
-        ...prev,
-        services: prev.services.filter(service => service !== serviceToRemove)
-      }));
-    };
-
     return (
       <div className="space-y-8">
-        {/* Operation Hours */}
-        <div className="bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700">
-          <h2 className="text-2xl font-semibold flex items-center gap-3 mb-6">
-            <ClockIcon className="w-6 h-6 text-primary-600" />
-            Operation Hours
-          </h2>
-          <div className="space-y-4">
-            {daysOfWeek.map((dayName, index) => {
-              const day = businessData.businessHours.find(d => d.dayOfWeek === index) || { dayOfWeek: index, isClosed: true, openTime: "", closeTime: "" };
-              return (
-                <div key={index} className="flex items-center space-x-4">
-                  <span className="w-24 font-medium text-neutral-700 dark:text-neutral-300">{dayName}</span>
-                  <input
-                    type="time"
-                    value={day.openTime || ""}
-                    onChange={(e) => handleBusinessHoursChange(index, "openTime", e.target.value)}
-                    className="w-32 px-3 py-2 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 focus:ring-primary-500 focus:border-primary-500"
-                    disabled={day.isClosed}
-                  />
-                  <span className="text-neutral-500">-</span>
-                  <input
-                    type="time"
-                    value={day.closeTime || ""}
-                    onChange={(e) => handleBusinessHoursChange(index, "closeTime", e.target.value)}
-                    className="w-32 px-3 py-2 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 focus:ring-primary-500 focus:border-primary-500"
-                    disabled={day.isClosed}
-                  />
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={day.isClosed}
-                      onChange={(e) => handleBusinessHoursChange(index, "isClosed", e.target.checked)}
-                      className="rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
-                    />
-                    <span className="text-sm text-neutral-700 dark:text-neutral-300">Closed</span>
-                  </label>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        {/* Add Listing Form */}
+        {showAddListing && (
+          <div className="bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700">
+            <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
+              <PlusIcon className="w-6 h-6 text-primary-600" />
+              Add New Listing
+            </h2>
+            <form onSubmit={handleAddListing} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                  Listing Title *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={listingForm.title}
+                  onChange={(e) => setListingForm(prev => ({ ...prev, title: e.target.value }))}
+                  className="w-full px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:ring-primary-500 focus:border-primary-500"
+                  placeholder="e.g., Summer Collection 2024"
+                />
+              </div>
 
-        {/* Services Offered */}
-        <div className="bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700">
-          <h2 className="text-2xl font-semibold flex items-center gap-3 mb-6">
-            <CheckCircleIcon className="w-6 h-6 text-primary-600" />
-            Services Offered
-          </h2>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
-              Add a new service (Press Enter to add)
-            </label>
-            <Input
-              type="text"
-              placeholder="e.g., Web Design, Catering, Plumbing"
-              onKeyPress={handleAddService}
-              className="w-full"
-            />
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {businessData.services.map((service, index) => (
-              <Badge
-                key={index}
-                className="flex items-center space-x-1"
-                name={
-                  <div className="flex items-center space-x-1">
-                    <span>{service}</span>
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                  Description
+                </label>
+                <textarea
+                  value={listingForm.description}
+                  onChange={(e) => setListingForm(prev => ({ ...prev, description: e.target.value }))}
+                  rows={5}
+                  className="w-full px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:ring-primary-500 focus:border-primary-500"
+                  placeholder="Describe your listing in detail..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                  Listing Image
+                </label>
+                {listingPreview && (
+                  <div className="mb-4 relative w-40 h-40">
+                    <img
+                      src={listingPreview}
+                      alt="Preview"
+                      className="w-full h-full object-cover rounded-lg border-2 border-primary-500"
+                    />
                     <button
-                      onClick={() => handleRemoveService(service)}
-                      className="text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+                      type="button"
+                      onClick={() => {
+                        setListingPreview(null);
+                        setListingForm(prev => ({ ...prev, image: null }));
+                      }}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                     >
-                      <XCircleIcon className="w-4 h-4" />
+                      <TrashIcon className="w-4 h-4" />
                     </button>
                   </div>
-                }
-              />
-            ))}
-          </div>
-        </div>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="w-full px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-primary-50 dark:file:bg-primary-900/30 file:text-primary-700 dark:file:text-primary-300 hover:file:bg-primary-100 dark:hover:file:bg-primary-900/50"
+                />
+                <p className="text-xs text-neutral-500 mt-2">JPG, PNG or GIF (max 5MB)</p>
+              </div>
 
-        {/* Product Listings */}
+              <div className="flex gap-4">
+                <ButtonPrimary type="submit" disabled={saving || !listingForm.title}>
+                  {saving ? "Saving..." : "Add Listing"}
+                </ButtonPrimary>
+                <ButtonSecondary onClick={() => {
+                  setShowAddListing(false);
+                  setListingForm({ title: "", description: "", image: null });
+                  setListingPreview(null);
+                }}>
+                  Cancel
+                </ButtonSecondary>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* Listings List */}
         <div className="bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700">
-          <h2 className="text-2xl font-semibold flex items-center gap-3 mb-6">
-            <DocumentTextIcon className="w-6 h-6 text-primary-600" />
-            Product Listings
-          </h2>
-          <p className="text-neutral-600 dark:text-neutral-400 mb-6">
-            Create and manage product listings to showcase your offerings to customers.
-          </p>
-          <div className="flex gap-4">
-            <ButtonPrimary onClick={() => router.push('/business/add-listing')}>
-              <PlusIcon className="w-5 h-5 inline mr-2" />
-              Add New Listing
-            </ButtonPrimary>
-            <ButtonSecondary onClick={() => router.push('/listings')}>
-              View All Listings
-            </ButtonSecondary>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-semibold flex items-center gap-3">
+              <DocumentTextIcon className="w-6 h-6 text-primary-600" />
+              Your Listings ({listings.length})
+            </h2>
+            {!showAddListing && (
+              <ButtonPrimary onClick={() => setShowAddListing(true)} className="flex items-center gap-2">
+                <PlusIcon className="w-5 h-5" />
+                Add Listing
+              </ButtonPrimary>
+            )}
           </div>
-        </div>
 
-        {/* Save Listing Details Button */}
-        <ButtonPrimary
-          className="mt-4"
-          onClick={handleSave}
-          disabled={saving}
-        >
-          {saving ? "Saving Listing Details..." : "Save Listing Details"}
-        </ButtonPrimary>
+          {listings.length === 0 ? (
+            <div className="text-center py-12">
+              <DocumentTextIcon className="w-12 h-12 text-neutral-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
+                No listings yet
+              </h3>
+              <p className="text-neutral-600 dark:text-neutral-400 mb-6">
+                Create your first listing to showcase your products and services
+              </p>
+              <ButtonPrimary onClick={() => setShowAddListing(true)}>
+                <PlusIcon className="w-5 h-5 inline mr-2" />
+                Add Your First Listing
+              </ButtonPrimary>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {listings.map((listing: any) => (
+                <div key={listing.id} className="border border-neutral-200 dark:border-neutral-700 rounded-xl p-4 hover:shadow-lg transition-shadow">
+                  <div className="flex items-start gap-4">
+                    {listing.image && (
+                      <div className="w-24 h-24 flex-shrink-0">
+                        <img src={listing.image} alt={listing.title} className="w-full h-full object-cover rounded-lg" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 break-words">
+                            {listing.title}
+                          </h3>
+                          <p className="text-sm text-neutral-500">
+                            Created {new Date(listing.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <Badge className={listing.status === 'ACTIVE' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'}>
+                          {listing.status}
+                        </Badge>
+                      </div>
+                      <p className="text-neutral-600 dark:text-neutral-400 text-sm line-clamp-2 mb-4">
+                        {listing.description}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <button onClick={() => handleUpdateListingStatus(listing.id, listing.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')} className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors" title="Toggle status">
+                        <EyeIcon className="w-5 h-5" />
+                      </button>
+                      <button onClick={() => router.push(`/business/listings/${listing.id}/edit`)} className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors" title="Edit">
+                        <PencilIcon className="w-5 h-5" />
+                      </button>
+                      <button onClick={() => handleDeleteListing(listing.id)} className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors" title="Delete">
+                        <TrashIcon className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     );
   };
+
+  return (
 
   return (
     <div className="nc-BusinessDashboardPage bg-neutral-50 dark:bg-neutral-900 min-h-screen">

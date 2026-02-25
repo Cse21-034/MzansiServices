@@ -191,6 +191,8 @@ model Listing {
   id          String   @id @default(cuid())
   title       String
   description String
+  image       String?  @map("image")
+  status      ListingStatus @default(ACTIVE) @map("status")
   businessId  String   @map("business_id")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -400,4 +402,10 @@ enum MembershipStatus {
   EXPIRED
   PENDING
   REJECTED
+}
+
+enum ListingStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
 }
