@@ -131,7 +131,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       data: {
         ...(title && { title }),
         ...(description && { description }),
-        ...(status && { status }),
+        ...(status && { status: status as any }),
         ...(imageUrl && { image: imageUrl })
       }
     });
