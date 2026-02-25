@@ -674,7 +674,7 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
               Quick Actions
             </h3>
             <div className="space-y-3">
-              <ButtonPrimary className="w-full justify-center" onClick={() => router.push('/business/add-listing')}>
+              <ButtonPrimary className="w-full justify-center" onClick={() => setActiveTab('products')}>
                 <BuildingStorefrontIcon className="w-4 h-4 mr-2" />
                 Add New Listing
               </ButtonPrimary>
