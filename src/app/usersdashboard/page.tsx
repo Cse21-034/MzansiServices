@@ -2,6 +2,7 @@
 
 import React, { FC, useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import type { DashboardUser, ReviewWithBusiness, FavoriteWithBusiness, BookingWithBusiness } from "./types";
 import type { Notification } from "@prisma/client";
 import { 
@@ -16,7 +17,8 @@ import {
   BuildingStorefrontIcon,
   CheckBadgeIcon,
   PlusIcon,
-  ArrowTopRightOnSquareIcon
+  ArrowTopRightOnSquareIcon,
+  Cog6ToothIcon
 } from "@heroicons/react/24/outline";
 import ButtonPrimary from "@/shared/ButtonPrimary";
 import ButtonSecondary from "@/shared/ButtonSecondary";
@@ -127,7 +129,9 @@ const mockRecentActivity = [
 ];
 
 const UserDashboardPage: FC<UserDashboardPageProps> = ({}) => {
-  const [activeTab, setActiveTab] = useState("overview");
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(tabParam || "overview");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dashboardData, setDashboardData] = useState<{
@@ -174,6 +178,14 @@ const UserDashboardPage: FC<UserDashboardPageProps> = ({}) => {
       fetchDashboardData();
     }
   }, [session]);
+
+  // Update active tab when search params change
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
 
   // API interaction handlers
   const handleDeleteReview = async (reviewId: string) => {
@@ -556,6 +568,80 @@ const UserDashboardPage: FC<UserDashboardPageProps> = ({}) => {
     );
   };
 
+  const renderSettingsTab = () => {
+    return (
+      <div className="space-y-6">
+        {/* Settings Header */}
+        <div className="bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700">
+          <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
+            Account Settings
+          </h2>
+          <p className="text-neutral-600 dark:text-neutral-400">
+            Manage your account preferences and security settings
+          </p>
+        </div>
+
+        {/* Account Information */}
+        <div className="bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700">
+          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">
+            Personal Information
+          </h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                Full Name
+              </label>
+              <p className="px-4 py-2 bg-neutral-50 dark:bg-neutral-900 rounded-lg text-neutral-700 dark:text-neutral-300">
+                {session?.user?.name || 'Not set'}
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                Email Address
+              </label>
+              <p className="px-4 py-2 bg-neutral-50 dark:bg-neutral-900 rounded-lg text-neutral-700 dark:text-neutral-300">
+                {session?.user?.email}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Security Settings */}
+        <div className="bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700">
+          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">
+            Security
+          </h3>
+          <ButtonPrimary className="w-full justify-center">
+            Change Password
+          </ButtonPrimary>
+        </div>
+
+        {/* Preferences */}
+        <div className="bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700">
+          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">
+            Preferences
+          </h3>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-neutral-900 dark:text-neutral-100">Email Notifications</p>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">Receive email updates about your reviews and activity</p>
+              </div>
+              <input type="checkbox" defaultChecked className="w-5 h-5" />
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-neutral-900 dark:text-neutral-100">Marketing Emails</p>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">Receive promotional content and updates</p>
+              </div>
+              <input type="checkbox" className="w-5 h-5" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="nc-UserDashboardPage bg-neutral-50 dark:bg-neutral-900 min-h-screen">
       {/* User Navigation Header */}
@@ -582,7 +668,8 @@ const UserDashboardPage: FC<UserDashboardPageProps> = ({}) => {
                 { id: 'reviews', name: 'My Reviews', icon: StarIcon },
                 { id: 'favorites', name: 'Favorites', icon: HeartIcon },
                 { id: 'bookings', name: 'Bookings', icon: CalendarIcon },
-                { id: 'profile', name: 'Profile', icon: UserIcon }
+                { id: 'profile', name: 'Profile', icon: UserIcon },
+                { id: 'settings', name: 'Settings', icon: Cog6ToothIcon }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -606,6 +693,7 @@ const UserDashboardPage: FC<UserDashboardPageProps> = ({}) => {
           {activeTab === 'overview' && renderOverviewTab()}
           {activeTab === 'reviews' && renderReviewsTab()}
           {activeTab === 'favorites' && renderFavoritesTab()}
+          {activeTab === 'settings' && renderSettingsTab()}
           {(activeTab === 'bookings' || activeTab === 'profile') && (
             <div className="text-center py-12">
               <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center mx-auto mb-4">

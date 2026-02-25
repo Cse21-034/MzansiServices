@@ -52,26 +52,20 @@ const UserNav: FC<UserNavProps> = ({ className = "" }) => {
               Dashboard
             </Link>
             <Link
-              href="/usersdashboard/reviews"
-              className={`font-medium text-neutral-600 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors ${
-                pathname === '/usersdashboard/reviews' ? 'font-semibold text-primary-600 dark:text-primary-400 border-b-2 border-primary-600 dark:border-primary-400 pb-1' : ''
-              }`}
+              href="/usersdashboard?tab=reviews"
+              className={`font-medium text-neutral-600 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors`}
             >
               My Reviews
             </Link>
             <Link
-              href="/usersdashboard/favorites"
-              className={`font-medium text-neutral-600 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors ${
-                pathname === '/usersdashboard/favorites' ? 'font-semibold text-primary-600 dark:text-primary-400 border-b-2 border-primary-600 dark:border-primary-400 pb-1' : ''
-              }`}
+              href="/usersdashboard?tab=favorites"
+              className={`font-medium text-neutral-600 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors`}
             >
               Favorites
             </Link>
             <Link
-              href="/usersdashboard/bookings"
-              className={`font-medium text-neutral-600 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors ${
-                pathname === '/usersdashboard/bookings' ? 'font-semibold text-primary-600 dark:text-primary-400 border-b-2 border-primary-600 dark:border-primary-400 pb-1' : ''
-              }`}
+              href="/usersdashboard?tab=bookings"
+              className={`font-medium text-neutral-600 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors`}
             >
               Bookings
             </Link>
@@ -130,28 +124,28 @@ const UserNav: FC<UserNavProps> = ({ className = "" }) => {
               
               <div className="p-2">
                 <a
-                  href="/usersdashboard/profile"
+                  href="/usersdashboard?tab=profile"
                   className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300"
                 >
                   <UserIcon className="w-5 h-5" />
                   <span>My Profile</span>
                 </a>
                 <a
-                  href="/usersdashboard/reviews"
+                  href="/usersdashboard?tab=reviews"
                   className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300"
                 >
                   <StarIcon className="w-5 h-5" />
                   <span>My Reviews</span>
                 </a>
                 <a
-                  href="/usersdashboard/favorites"
+                  href="/usersdashboard?tab=favorites"
                   className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300"
                 >
                   <HeartIcon className="w-5 h-5" />
                   <span>Favorites</span>
                 </a>
                 <a
-                  href="/usersdashboard/settings"
+                  href="/usersdashboard?tab=settings"
                   className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300"
                 >
                   <Cog6ToothIcon className="w-5 h-5" />
