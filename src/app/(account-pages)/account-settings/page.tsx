@@ -12,6 +12,7 @@ import {
   CheckCircleIcon,
   TrashIcon
 } from "@heroicons/react/24/outline";
+import { signOut } from "next-auth/react";
 
 export default function AccountSettingsPage() {
   const { data: session, update } = useSession();
@@ -92,6 +93,37 @@ export default function AccountSettingsPage() {
         setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
       } else {
         setMessage({ type: "error", text: "Failed to change password" });
+      }
+    } catch (error) {
+      setMessage({ type: "error", text: "An error occurred" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm(
+      "Are you absolutely sure? This will permanently delete your account and all associated data. This action cannot be undone."
+    );
+
+    if (!confirmed) return;
+
+    setLoading(true);
+    setMessage(null);
+
+    try {
+      const response = await fetch("/api/user/delete-account", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (response.ok) {
+        setMessage({ type: "success", text: "Account deleted successfully. Signing out..." });
+        setTimeout(() => {
+          signOut({ redirect: true, callbackUrl: "/" });
+        }, 2000);
+      } else {
+        setMessage({ type: "error", text: "Failed to delete account" });
       }
     } catch (error) {
       setMessage({ type: "error", text: "An error occurred" });
@@ -276,13 +308,18 @@ export default function AccountSettingsPage() {
               <div className="bg-white dark:bg-neutral-900 rounded-xl border border-red-200 dark:border-red-800 p-6">
                 <h2 className="text-xl font-bold text-red-600 dark:text-red-400 mb-6">Danger Zone</h2>
                 <div className="space-y-4">
-                  <div className="border border-red-200 dark:border-red-800 rounded-lg p-4 bg-red-50 dark:bg-red-900/20">
-                    <h3 className="font-semibold text-red-900 dark:text-red-100 mb-2">Delete Account</h3>
-                    <p className="text-sm text-red-800 dark:text-red-200 mb-4">
+                  <div className="border border-red-200 dark:border-red-800 rounded-lg p-6 bg-red-50 dark:bg-red-900/20">
+                    <h3 className="font-semibold text-red-900 dark:text-red-100 mb-2 text-lg">Delete Account</h3>
+                    <p className="text-sm text-red-800 dark:text-red-200 mb-6">
                       Once you delete your account, there is no going back. Please be certain.
                     </p>
-                    <button className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors">
-                      Delete Account
+                    <button
+                      type="button"
+                      onClick={handleDeleteAccount}
+                      disabled={loading}
+                      className="w-full px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {loading ? "Deleting..." : "Permanently Delete Account"}
                     </button>
                   </div>
                 </div>
