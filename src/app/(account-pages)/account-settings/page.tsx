@@ -208,7 +208,7 @@ export default function AccountSettingsPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-6 py-3 bg-burgundy-600 hover:bg-burgundy-800 text-neutral-50 font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-6"
                   >
                     {loading ? "Saving..." : "Save Changes"}
                   </button>
@@ -263,7 +263,7 @@ export default function AccountSettingsPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-6 py-3 bg-burgundy-600 hover:bg-burgundy-800 text-neutral-50 font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-6"
                   >
                     {loading ? "Updating..." : "Change Password"}
                   </button>
