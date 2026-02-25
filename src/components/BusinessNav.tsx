@@ -2,15 +2,11 @@
 
 import React, { FC } from "react";
 import Logo from "@/shared/Logo";
-import ButtonPrimary from "@/shared/ButtonPrimary";
-import ButtonSecondary from "@/shared/ButtonSecondary";
 import SwitchDarkMode from "@/shared/SwitchDarkMode";
 import Avatar from "@/shared/Avatar";
 import { 
-  BuildingStorefrontIcon,
   ChartBarIcon,
   Cog6ToothIcon,
-  BellIcon,
   ArrowRightOnRectangleIcon
 } from "@heroicons/react/24/outline";
 import { signOut } from "next-auth/react";
@@ -40,7 +36,7 @@ const BusinessNav: FC<BusinessNavProps> = ({ className = "", business }) => {
   return (
     <div className={`nc-BusinessNav relative z-10 ${className}`}>
       <div className="px-4 lg:container h-20 relative flex justify-between items-center">
-        {/* Left Section - Logo & Navigation */}
+        {/* Left Section - Logo & Dashboard Link */}
         <div className="flex items-center justify-start flex-1 space-x-8">
           <Logo className="w-24" />
           <nav className="hidden md:flex items-center space-x-6">
@@ -50,28 +46,10 @@ const BusinessNav: FC<BusinessNavProps> = ({ className = "", business }) => {
             >
               Dashboard
             </a>
-            <a
-              href="/business/analytics"
-              className="font-medium text-neutral-500 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-            >
-              Analytics
-            </a>
-            <a
-              href="/business/listings"
-              className="font-medium text-neutral-500 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-            >
-              Listings
-            </a>
-            <a
-              href="/business/promotions"
-              className="font-medium text-neutral-500 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-            >
-              Promotions
-            </a>
           </nav>
         </div>
 
-        {/* Right Section - User Menu & Actions */}
+        {/* Right Section - Business Info & User Menu */}
         <div className="flex items-center justify-end flex-1 space-x-4">
           {/* Business Status */}
           <div className="hidden lg:flex items-center space-x-4">
@@ -85,28 +63,9 @@ const BusinessNav: FC<BusinessNavProps> = ({ className = "", business }) => {
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="hidden md:flex items-center space-x-2">
-            <ButtonSecondary 
-              href="/business/add-listing"
-              className="border-primary-500 text-primary-600 hover:bg-primary-50 dark:border-primary-400 dark:text-primary-400 dark:hover:bg-primary-900/20"
-            >
-              <BuildingStorefrontIcon className="w-4 h-4 mr-2" />
-              Add Listing
-            </ButtonSecondary>
-          </div>
-
-          {/* Icons */}
+          {/* Icons & Avatar */}
           <div className="flex items-center space-x-3">
             <SwitchDarkMode />
-            
-            <button className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
-              <BellIcon className="w-5 h-5 text-neutral-600 dark:text-neutral-400" />
-            </button>
-            
-            <button className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
-              <Cog6ToothIcon className="w-5 h-5 text-neutral-600 dark:text-neutral-400" />
-            </button>
 
             {/* User Avatar Dropdown */}
             <div className="relative group">
@@ -135,13 +94,6 @@ const BusinessNav: FC<BusinessNavProps> = ({ className = "", business }) => {
                   >
                     <ChartBarIcon className="w-5 h-5" />
                     <span>Business Profile</span>
-                  </a>
-                  <a
-                    href="/business/settings"
-                    className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300"
-                  >
-                    <Cog6ToothIcon className="w-5 h-5" />
-                    <span>Settings</span>
                   </a>
                   <div className="border-t border-neutral-200 dark:border-neutral-700 my-2"></div>
                   <button
