@@ -906,8 +906,6 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
   };
 
   return (
-
-  return (
     <div className="nc-BusinessDashboardPage bg-neutral-50 dark:bg-neutral-900 min-h-screen">
       {/* Business Navigation Header */}
       <BusinessNav business={{

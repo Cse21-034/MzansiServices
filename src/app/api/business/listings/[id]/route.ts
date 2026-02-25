@@ -1,7 +1,8 @@
-import { getServerSession } from "next-auth/next";
-import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { writeFile, mkdir, unlink } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
@@ -117,7 +118,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         }
 
         const filepath = join(uploadsDir, filename);
-        await writeFile(filepath, Buffer.from(buffer));
+        const uint8Array = new Uint8Array(buffer);
+        await writeFile(filepath, uint8Array);
         imageUrl = `/uploads/listings/${filename}`;
       } catch (imageError) {
         console.error("Image upload error:", imageError);
