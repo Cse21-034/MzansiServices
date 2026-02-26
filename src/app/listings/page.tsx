@@ -41,8 +41,8 @@ const ListingsPage = async () => {
 
         {/* Content Area - Listings Only */}
         <div>
-          {/* Listings Grid/List */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-1 sm:gap-1.5 md:gap-2">
+          {/* Listings Grid/List - Responsive with proportional stretching */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5">
             {listings.map((listing: any) => (
               <ListingCard 
                 key={listing.id} 
