@@ -75,17 +75,17 @@ const ListingCard: React.FC<ListingCardProps> = ({ data, viewMode }) => {
 
   // Grid View (Default)
   return (
-    <div className="group flex flex-col h-full rounded-lg border border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all hover:shadow-lg overflow-hidden">
-      {/* Image with Promotion Badge */}
-      <div className="relative w-full aspect-square overflow-hidden bg-neutral-100 dark:bg-neutral-800">
+    <div className="group flex flex-col h-full rounded-md border border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all hover:shadow-md overflow-hidden bg-white dark:bg-neutral-900">
+      {/* Image with Promotion Badge - Fixed Size */}
+      <div className="relative w-full h-32 sm:h-40 overflow-hidden bg-neutral-100 dark:bg-neutral-800 flex-shrink-0">
         <img
           src={data.image || data.business.coverImage || "/images/placeholder-business.jpg"}
           alt={data.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
           loading="lazy"
         />
         {data.business.membershipStatus && data.business.membershipStatus !== "NONE" && (
-          <div className="absolute top-1 right-1">
+          <div className="absolute top-0.5 right-0.5">
             <MembershipBadge
               status={data.business.membershipStatus}
               membershipType={data.business.membershipType}
@@ -95,31 +95,27 @@ const ListingCard: React.FC<ListingCardProps> = ({ data, viewMode }) => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 p-3">
-        <div className="mb-1">
-          <div className="flex items-center gap-1 text-xs text-neutral-500 mb-0.5">
-            <MapPin size={10} />
-            <span className="line-clamp-1">{data.business.city}</span>
+      <div className="flex-1 p-2 flex flex-col">
+        <div className="mb-0.5">
+          <div className="flex items-center gap-0.5 text-xs text-neutral-600 dark:text-neutral-400 mb-0.5 truncate">
+            <MapPin size={9} className="flex-shrink-0" />
+            <span className="truncate">{data.business.city}</span>
           </div>
-          <div className="flex items-center gap-0.5 text-xs mb-1">
-            <Star size={11} className="text-yellow-500 fill-yellow-500 flex-shrink-0" />
-            <span className="font-medium flex-shrink-0">{data.business.averageRating || "N/A"}</span>
-            <span className="text-neutral-500 flex-shrink-0">({data.business.reviewCount})</span>
+          <div className="flex items-center gap-0.5 text-xs">
+            <Star size={10} className="text-yellow-500 fill-yellow-500 flex-shrink-0" />
+            <span className="font-medium flex-shrink-0 text-neutral-900 dark:text-neutral-100">{data.business.averageRating || "N/A"}</span>
+            <span className="text-neutral-500 flex-shrink-0 text-xs">({data.business.reviewCount})</span>
           </div>
         </div>
 
-        <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100 mb-1 line-clamp-1">
+        <h3 className="text-xs font-semibold text-neutral-900 dark:text-neutral-100 line-clamp-2 flex-1">
           {data.title}
         </h3>
-        
-        <p className="text-xs text-neutral-600 dark:text-neutral-400 mb-2 line-clamp-1">
-          {data.description}
-        </p>
 
-        <div className="flex items-center justify-center mt-auto">
+        <div className="flex items-center justify-center mt-auto pt-1">
           <Link
             href={`/listings/${data.id}`}
-            className="px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md font-medium transition-colors text-xs"
+            className="px-2 py-0.5 bg-yellow-500 hover:bg-yellow-600 text-white rounded text-xs font-medium transition-colors"
           >
             View
           </Link>
