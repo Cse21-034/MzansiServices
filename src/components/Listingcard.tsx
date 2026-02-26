@@ -75,16 +75,17 @@ const ListingCard: React.FC<ListingCardProps> = ({ data, viewMode }) => {
 
   // Grid View (Default)
   return (
-    <div className="group flex flex-col h-full rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all hover:shadow-xl overflow-hidden">
+    <div className="group flex flex-col h-full rounded-lg border border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all hover:shadow-lg overflow-hidden">
       {/* Image with Promotion Badge */}
-      <div className="relative aspect-square overflow-hidden">
+      <div className="relative w-full aspect-square overflow-hidden bg-neutral-100 dark:bg-neutral-800">
         <img
           src={data.image || data.business.coverImage || "/images/placeholder-business.jpg"}
           alt={data.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          loading="lazy"
         />
         {data.business.membershipStatus && data.business.membershipStatus !== "NONE" && (
-          <div className="absolute top-2 right-2">
+          <div className="absolute top-1 right-1">
             <MembershipBadge
               status={data.business.membershipStatus}
               membershipType={data.business.membershipType}
@@ -94,33 +95,33 @@ const ListingCard: React.FC<ListingCardProps> = ({ data, viewMode }) => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 p-5">
-        <div className="mb-2">
-          <div className="flex items-center gap-1 text-sm text-neutral-500 mb-1">
-            <MapPin size={12} />
-            {data.business.city}
+      <div className="flex-1 p-3">
+        <div className="mb-1">
+          <div className="flex items-center gap-1 text-xs text-neutral-500 mb-0.5">
+            <MapPin size={10} />
+            <span className="line-clamp-1">{data.business.city}</span>
           </div>
-          <div className="flex items-center gap-1 text-sm mb-2">
-            <Star size={14} className="text-yellow-500 fill-yellow-500" />
-            <span className="font-medium">{data.business.averageRating || "N/A"}</span>
-            <span className="text-neutral-500">({data.business.reviewCount})</span>
+          <div className="flex items-center gap-0.5 text-xs mb-1">
+            <Star size={11} className="text-yellow-500 fill-yellow-500 flex-shrink-0" />
+            <span className="font-medium flex-shrink-0">{data.business.averageRating || "N/A"}</span>
+            <span className="text-neutral-500 flex-shrink-0">({data.business.reviewCount})</span>
           </div>
         </div>
 
-        <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-2 line-clamp-1">
+        <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100 mb-1 line-clamp-1">
           {data.title}
         </h3>
         
-        <p className="text-neutral-600 dark:text-neutral-400 text-sm mb-4 line-clamp-2">
+        <p className="text-xs text-neutral-600 dark:text-neutral-400 mb-2 line-clamp-1">
           {data.description}
         </p>
 
-        <div className="flex items-center justify-between mt-auto">
+        <div className="flex items-center justify-center mt-auto">
           <Link
             href={`/listings/${data.id}`}
-            className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-medium transition-colors text-sm"
+            className="px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md font-medium transition-colors text-xs"
           >
-            Details
+            View
           </Link>
         </div>
       </div>
