@@ -1,62 +1,95 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
 interface ExternalAdProps {
   scriptSrc: string;
   className?: string;
   containerId?: string;
+  syncMode?: boolean; // For scripts that use document.write()
 }
 
 const ExternalAdScript: React.FC<ExternalAdProps> = ({ 
   scriptSrc, 
   className = "", 
-  containerId = "external-ad-container" 
+  containerId = "external-ad-container",
+  syncMode = true // Default to sync mode for partnership scripts that use document.write()
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    // Create a new script element
-    const script = document.createElement("script");
-    script.type = "text/javascript";
-    script.src = scriptSrc;
-    script.async = true;
-    script.defer = true;
+    const container = containerRef.current;
+    if (!container) return;
 
-    // Optional: Handle script loading errors
-    script.onerror = () => {
-      console.error("Failed to load ad script:", scriptSrc);
-    };
+    if (syncMode) {
+      // For scripts that use document.write(), use iframe approach
+      try {
+        // Create iframe
+        const iframe = document.createElement("iframe");
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.border = "none";
+        iframe.style.minHeight = "250px";
+        iframe.frameBorder = "0";
+        iframe.scrolling = "no";
 
-    script.onload = () => {
-      console.log("Ad script loaded successfully:", scriptSrc);
-    };
+        // Clear container and add iframe
+        container.innerHTML = "";
+        container.appendChild(iframe);
 
-    // Get the container and append the script
-    const container = document.getElementById(containerId);
-    if (container) {
-      container.appendChild(script);
-    }
-
-    // Cleanup function
-    return () => {
-      if (container && script.parentNode === container) {
-        container.removeChild(script);
+        // Write content to iframe that will load the external script
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+        if (iframeDoc) {
+          iframeDoc.open();
+          iframeDoc.write(`
+            <html>
+            <head><style>body { margin: 0; padding: 0; }</style></head>
+            <body>
+              <script type="text/javascript" src="${scriptSrc}"><\/script>
+            </body>
+            </html>
+          `);
+          iframeDoc.close();
+          console.log("Ad script injected via iframe:", scriptSrc);
+        }
+      } catch (error) {
+        console.error("Failed to inject ad script via iframe:", scriptSrc, error);
       }
-    };
-  }, [scriptSrc, containerId]);
+    } else {
+      // Asynchronous mode for modern ad networks
+      const script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src = scriptSrc;
+      script.async = true;
+      script.defer = true;
+
+      script.onerror = () => {
+        console.error("Failed to load ad script:", scriptSrc);
+      };
+
+      script.onload = () => {
+        console.log("Ad script loaded successfully:", scriptSrc);
+      };
+
+      container.innerHTML = "";
+      container.appendChild(script);
+
+      return () => {
+        if (script.parentNode === container) {
+          container.removeChild(script);
+        }
+      };
+    }
+  }, [scriptSrc, syncMode]);
 
   return (
     <div
+      ref={containerRef}
       id={containerId}
       className={`bg-white dark:bg-neutral-800 rounded-lg shadow-md p-4 ${className}`}
       style={{ minHeight: "250px", display: "flex", alignItems: "center", justifyContent: "center" }}
     >
-      {/* Placeholder while ad loads */}
-      <div className="text-center text-neutral-500 dark:text-neutral-400">
-        <div className="animate-pulse">
-          <div className="h-4 bg-neutral-300 dark:bg-neutral-700 rounded w-3/4 mx-auto mb-4"></div>
-          <div className="h-4 bg-neutral-300 dark:bg-neutral-700 rounded w-1/2 mx-auto"></div>
-        </div>
-      </div>
+      {/* Placeholder - will be replaced by ad content */}
     </div>
   );
 };
