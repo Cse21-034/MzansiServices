@@ -46,6 +46,28 @@ const ExternalAdScript: React.FC<ExternalAdProps> = ({
             <head><style>body { margin: 0; padding: 0; }</style></head>
             <body>
               <script type="text/javascript" src="${scriptSrc}"><\/script>
+              <script type="text/javascript">
+                // Make all links open in parent window/new tab
+                function makeLinksTargetBlank() {
+                  try {
+                    const links = document.querySelectorAll('a');
+                    links.forEach(link => {
+                      link.setAttribute('target', '_blank');
+                      link.setAttribute('rel', 'noopener noreferrer');
+                    });
+                  } catch (e) {
+                    console.log('Could not modify links');
+                  }
+                }
+                
+                // Run on load and also watch for dynamically added links
+                document.addEventListener('DOMContentLoaded', makeLinksTargetBlank);
+                makeLinksTargetBlank();
+                
+                // Also check periodically for new links added by the ad script
+                setTimeout(makeLinksTargetBlank, 500);
+                setTimeout(makeLinksTargetBlank, 1000);
+              <\/script>
             </body>
             </html>
           `);
