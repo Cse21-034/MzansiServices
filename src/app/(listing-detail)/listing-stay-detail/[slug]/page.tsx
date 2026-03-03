@@ -20,6 +20,7 @@ import Image from "next/image";
 import { usePathname, useRouter, useParams } from "next/navigation";
 import MembershipsDisplay from "@/components/MembershipsDisplay";
 import TopStoriesBanners from "@/components/TopStoriesBanners";
+import VerticalAdBanners from "@/components/VerticalAdBanners";
 import { formatLocation, formatFullAddress, safeToString, cleanAddress } from "@/utils/formatAddress";
 const logoMobile = "/images/namibia-logo/squarelogo.PNG";
 import { Amenities_demos, PHOTOS } from "../constant";
@@ -830,9 +831,16 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
       </header>
 
       {/* MAIN */}
-      <main className="relative z-10 mt-11 flex flex-col lg:flex-row">
-        {/* CONTENT */}
-        <div className="w-full lg:w-3/5 xl:w-2/3 space-y-8 lg:space-y-10 lg:pr-10">
+      <main className="relative z-10 mt-11 flex flex-col lg:flex-row gap-4 xl:gap-6">
+        {/* LEFT - Advertisement Banners */}
+        <div className="hidden lg:block w-1/5 flex-shrink-0">
+          <div className="sticky top-28">
+            <VerticalAdBanners />
+          </div>
+        </div>
+
+        {/* CENTER - Listing Details */}
+        <div className="w-full lg:w-3/5 space-y-8 lg:space-y-10">
           {renderSection1()}
           {memberships && memberships.length > 0 && (
             <MembershipsDisplay memberships={memberships} />
@@ -846,8 +854,8 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
           {renderSection8()}
         </div>
 
-        {/* SIDEBAR - Now only has Quick Info and Share buttons */}
-        <div className="hidden lg:block flex-grow mt-14 lg:mt-0">
+        {/* RIGHT - Business Quick Info & Top Stories */}
+        <div className="hidden lg:block w-1/5 flex-shrink-0">
           <div className="sticky top-28">{renderSidebar()}</div>
         </div>
       </main>

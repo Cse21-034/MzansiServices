@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import ListingCard from "@/components/Listingcard";
-import RotatingBannerAd from "@/components/ads/RotatingBannerAd";
+import VerticalFeatureBanners from "@/components/VerticalFeatureBanners";
 import InlineAd from "@/components/ads/InlineAd";
 import StickyAd from "@/components/ads/StickyAd";
 import { getServerSession } from "next-auth";
@@ -42,11 +42,6 @@ const ListingsPage = async () => {
               View Promotions
             </Link>
           </div>
-
-          {/* Premium Ad Banner */}
-          <div className="mb-8 lg:mb-10">
-            <RotatingBannerAd />
-          </div>
         </div>
 
         {/* Content Area - Listings Only */}
@@ -79,13 +74,11 @@ const ListingsPage = async () => {
               </p>
             </div>
           )}
+        </div>
 
-          {/* Inline Ad Section */}
-          {listings.length > 0 && (
-            <div className="mt-12 lg:mt-16 mb-8 lg:mb-12">
-              <InlineAd style="highlight" />
-            </div>
-          )}
+        {/* Featured Resources Section */}
+        <div className="mt-16 lg:mt-20 mb-12 lg:mb-16">
+          <VerticalFeatureBanners />
         </div>
 
         {/* Business CTA - Modernized - Only show when NOT logged in */}
