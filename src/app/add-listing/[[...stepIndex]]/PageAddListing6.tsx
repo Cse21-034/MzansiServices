@@ -1,9 +1,14 @@
+"use client";
+
 import React, { FC } from "react";
 import Textarea from "@/shared/Textarea";
+import { useAddListing } from "@/contexts/AddListingContext";
 
 export interface PageAddListing6Props {}
 
 const PageAddListing6: FC<PageAddListing6Props> = () => {
+  const { formData, updateFormData } = useAddListing();
+
   return (
     <>
       <div>
@@ -17,7 +22,12 @@ const PageAddListing6: FC<PageAddListing6Props> = () => {
         </span>
       </div>
 
-      <Textarea placeholder="..." rows={14} />
+      <Textarea 
+        placeholder="Describe your place..." 
+        rows={14} 
+        value={formData.description}
+        onChange={(e) => updateFormData({ description: e.target.value })}
+      />
     </>
   );
 };

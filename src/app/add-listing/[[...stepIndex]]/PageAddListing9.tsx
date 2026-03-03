@@ -5,10 +5,12 @@ import DatePickerCustomHeaderTwoMonth from "@/components/DatePickerCustomHeaderT
 import NcInputNumber from "@/components/NcInputNumber";
 import React, { FC, useState } from "react";
 import DatePicker from "react-datepicker";
+import { useAddListing } from "@/contexts/AddListingContext";
 
 export interface PageAddListing9Props {}
 
 const PageAddListing9: FC<PageAddListing9Props> = () => {
+  const { formData, updateFormData } = useAddListing();
   const [dates, setDates] = useState<number[]>([
     new Date("2023/02/06").getTime(),
     new Date("2023/02/09").getTime(),
@@ -27,9 +29,15 @@ const PageAddListing9: FC<PageAddListing9Props> = () => {
       <div className="w-14 border-b border-neutral-200 dark:border-neutral-700"></div>
       {/* FORM */}
       <div className="space-y-7">
-        {/* ITEM */}
-        <NcInputNumber label="Nights min" defaultValue={1} />
-        <NcInputNumber label="Nights max" defaultValue={99} />
+        {/* ITEM - Note: NcInputNumber doesn't expose onChange, may need custom component */}
+        <NcInputNumber 
+          label="Nights min" 
+          defaultValue={formData.minNights || 1} 
+        />
+        <NcInputNumber 
+          label="Nights max" 
+          defaultValue={formData.maxNights || 99} 
+        />
       </div>
 
       {/*  */}

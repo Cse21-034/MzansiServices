@@ -1,4 +1,5 @@
 import React from "react";
+import { AddListingProvider } from "@/contexts/AddListingContext";
 import PageAddListing1 from "./PageAddListing1";
 import PageAddListing10 from "./PageAddListing10";
 import PageAddListing2 from "./PageAddListing2";
@@ -55,7 +56,11 @@ const Page = ({
       break;
   }
 
-  return <ContentComponent />;
+  return (
+    <AddListingProvider>
+      <ContentComponent />
+    </AddListingProvider>
+  );
 };
 
 export default Page;

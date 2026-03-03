@@ -10,12 +10,17 @@ import FormItem from "../FormItem";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { useAddListing } from "@/contexts/AddListingContext";
 
 export interface PageAddListing2Props {}
 
 const PageAddListing2: FC<PageAddListing2Props> = () => {
+  const { formData, updateFormData } = useAddListing();
+  
   // Default center for the map
-  const defaultCenter: [number, number] = [55.9607277, 36.2172614];
+  const mapCenter: [number, number] = formData.latitude && formData.longitude 
+    ? [formData.latitude, formData.longitude]
+    : [-24.6282, 25.9245]; // Botswana center
 
   // Custom Leaflet icon (using default Leaflet marker for now)
   const customIcon = new L.Icon({
@@ -40,47 +45,52 @@ const PageAddListing2: FC<PageAddListing2Props> = () => {
         </ButtonSecondary>
         {/* ITEM */}
         <FormItem label="Country/Region">
-          <Select>
-            <option value="Viet Nam">Viet Nam</option>
-            <option value="Thailand">Thailand</option>
-            <option value="France">France</option>
-            <option value="Singapore">Singapore</option>
-            <option value="Jappan">Jappan</option>
-            <option value="Korea">Korea</option>
-            <option value="...">...</option>
+          <Select value={formData.address} onChange={(e) => updateFormData({ address: e.target.value })}>
+            <option value="">Select country</option>
+            <option value="Botswana">Botswana</option>
+            <option value="South Africa">South Africa</option>
+            <option value="Namibia">Namibia</option>
+            <option value="Zimbabwe">Zimbabwe</option>
           </Select>
         </FormItem>
         <FormItem label="Street">
-          <Input placeholder="..." />
+          <Input 
+            placeholder="Street address"
+            value={formData.address}
+            onChange={(e) => updateFormData({ address: e.target.value })}
+          />
         </FormItem>
         <FormItem label="Room number (optional)">
-          <Input />
+          <Input placeholder="Apt, Suite, etc." />
         </FormItem>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-5">
           <FormItem label="City">
-            <Input />
+            <Input 
+              value={formData.city}
+              onChange={(e) => updateFormData({ city: e.target.value })}
+            />
           </FormItem>
           <FormItem label="State">
-            <Input />
+            <Input placeholder="State/Province" />
           </FormItem>
           <FormItem label="Postal code">
-            <Input />
+            <Input placeholder="Postal code" />
           </FormItem>
         </div>
         <div>
           <Label>Detailed address</Label>
           <span className="block mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-            1110 Pennsylvania Avenue NW, Washington, DC 20230
+            {formData.address || "Enter your address above"}
           </span>
           <div className="mt-4">
             <div className="aspect-w-5 aspect-h-5 sm:aspect-h-3">
               <div className="rounded-xl overflow-hidden">
-                <MapContainer center={defaultCenter} zoom={15} scrollWheelZoom={false} className="w-full h-full">
+                <MapContainer center={mapCenter} zoom={15} scrollWheelZoom={false} className="w-full h-full">
                   <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
-                  <Marker position={defaultCenter} icon={customIcon} />
+                  <Marker position={mapCenter} icon={customIcon} />
                 </MapContainer>
               </div>
             </div>
