@@ -19,6 +19,7 @@ import LikeSaveBtns from "@/components/LikeSaveBtns";
 import Image from "next/image";
 import { usePathname, useRouter, useParams } from "next/navigation";
 import MembershipsDisplay from "@/components/MembershipsDisplay";
+import TopStoriesBanners from "@/components/TopStoriesBanners";
 import { formatLocation, formatFullAddress, safeToString, cleanAddress } from "@/utils/formatAddress";
 const logoMobile = "/images/namibia-logo/squarelogo.PNG";
 import { Amenities_demos, PHOTOS } from "../constant";
@@ -752,6 +753,11 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
                 <i className="lab la-whatsapp"></i>
               </ButtonCircle>
             </div>
+          </div>
+
+          {/* Top Stories Banners */}
+          <div className="border-t border-neutral-200 dark:border-neutral-700 pt-6">
+            <TopStoriesBanners />
           </div>
         </div>
       </div>
