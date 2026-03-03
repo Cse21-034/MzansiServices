@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import StickyAd from "@/components/ads/StickyAd";
 import InlineAd from "@/components/ads/InlineAd";
+import ExternalAdScript from "@/components/ExternalAdScript";
 
 type PromotionType = "all" | "featured" | "ending-soon" | "high-discount";
 
@@ -468,8 +469,20 @@ const PromotionsPage = () => {
             ))}
           </div>
 
+          {/* External Ad Scripts - Partnership Programs */}
+          <div className="mt-8 lg:mt-12 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ExternalAdScript 
+              scriptSrc="https://js.partnershipsprogram.com/javascript.php?prefix=-1DpJjc-4UjzqbYFgbz_omNd7ZgqdRLk&media=2910&campaign=1"
+              className="rounded-xl overflow-hidden"
+            />
+            <ExternalAdScript 
+              scriptSrc="https://js.example-ad-network.com/ads?channel=promotions&format=rectangle"
+              className="rounded-xl overflow-hidden"
+            />
+          </div>
+
           {/* Promotions Grid */}
-          <div className="space-y-8">
+          <div className="space-y-8 mt-8 lg:mt-12">
             {/* Loading State */}
             {isLoading && (
               <div className="text-center py-16">
@@ -544,6 +557,15 @@ const PromotionsPage = () => {
                 )}
               </>
             )}
+          </div>
+
+          {/* External Ad Section - After Promotions */}
+          <div className="mt-12 lg:mt-16">
+            <h3 className="text-lg lg:text-xl font-bold text-gray-900 dark:text-white mb-6">Featured Partnerships</h3>
+            <ExternalAdScript 
+              scriptSrc="https://js.partnershipsprogram.com/javascript.php?prefix=-1DpJjc-4UjzqbYFgbz_omNd7ZgqdRLk&media=2911&campaign=2"
+              className="rounded-xl overflow-hidden"
+            />
           </div>
         </div>
 

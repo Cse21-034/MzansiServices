@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeftIcon, CalendarIcon, PercentBadgeIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import ExternalAdScript from "@/components/ExternalAdScript";
 
 interface PromotionDetailPageProps {
   params: {
@@ -118,9 +119,17 @@ const PromotionDetailPage = async ({ params }: PromotionDetailPageProps) => {
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Right Column - Business Info & CTA */}
+            {/* External Ad Script - Featured Partnership */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg">
+              <div className="p-6 lg:p-8">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Featured Partnership</h3>
+                <ExternalAdScript 
+                  scriptSrc="https://js.partnershipsprogram.com/javascript.php?prefix=-1DpJjc-4UjzqbYFgbz_omNd7ZgqdRLk&media=2912&campaign=3"
+                  className="rounded-lg overflow-hidden"
+                />
+              </div>
+            </div>
           <div className="space-y-6">
             {/* Business Card */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-lg sticky top-24">
@@ -179,6 +188,17 @@ const PromotionDetailPage = async ({ params }: PromotionDetailPageProps) => {
               )}
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* External Ad Section - Bottom */}
+      <div className="container py-12 lg:py-16">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg p-6 lg:p-8">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">More Great Offers</h2>
+          <ExternalAdScript 
+            scriptSrc="https://js.partnershipsprogram.com/javascript.php?prefix=-1DpJjc-4UjzqbYFgbz_omNd7ZgqdRLk&media=2913&campaign=4"
+            className="rounded-lg overflow-hidden"
+          />
         </div>
       </div>
     </div>
