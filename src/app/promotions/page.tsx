@@ -1,6 +1,8 @@
 'use client'
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import StickyAd from "@/components/ads/StickyAd";
+import InlineAd from "@/components/ads/InlineAd";
 
 type PromotionType = "all" | "featured" | "ending-soon" | "high-discount";
 
@@ -175,6 +177,7 @@ const PromotionsPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
+      <StickyAd position="bottom-right" />
       {/* Hero Section with Dummy Ad Specials */}
       <div className="relative overflow-hidden">
         {/* Hero Ads Slider */}
@@ -501,8 +504,16 @@ const PromotionsPage = () => {
                      "All Promotions"}
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredPromotions.map((promo) => (
-                      <PromotionCard key={promo.id} promo={promo} />
+                    {filteredPromotions.map((promo, index) => (
+                      <React.Fragment key={promo.id}>
+                        <PromotionCard promo={promo} />
+                        {/* Insert inline ad after 6th promotion */}
+                        {index === 5 && (
+                          <div className="col-span-1 md:col-span-2 lg:col-span-3 py-4">
+                            <InlineAd style="highlight" />
+                          </div>
+                        )}
+                      </React.Fragment>
                     ))}
                   </div>
                 </div>

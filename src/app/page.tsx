@@ -10,6 +10,9 @@ import SectionSubscribe2 from "@/components/SectionSubscribe2";
 import SectionGridCategoryBox from "@/components/SectionGridCategoryBox";
 import SectionBecomeAnAuthor from "@/components/SectionBecomeAnAuthor";
 import AdRotation from "@/components/ads/addemobanner";
+import RotatingBannerAd from "@/components/ads/RotatingBannerAd";
+import InlineAd from "@/components/ads/InlineAd";
+import StickyAd from "@/components/ads/StickyAd";
 import FAQSection from "@/components/FAQSection";
 import { prisma } from "@/lib/prisma";
 import { categories } from "@/data/categories";
@@ -76,9 +79,15 @@ async function PageHome() {
   return (
     <main className="nc-PageHome relative overflow-hidden">
       <BgGlassmorphism />
+      <StickyAd position="bottom-right" />
 
       <div className="container relative space-y-24 mb-24 lg:space-y-28 lg:mb-28">
         <SectionHero className="pt-10 lg:pt-16 lg:pb-16" />
+
+        {/* Premium Rotating Banner Ad */}
+        <div className="relative py-8">
+          <RotatingBannerAd />
+        </div>
 
         <SectionSliderNewCategories
           categories={businessCategories}
@@ -86,6 +95,11 @@ async function PageHome() {
           subHeading="Find local businesses across Namibia"
           categoryCardType="card4"
         />
+
+        {/* Inline Ad - Highlight Style */}
+        <div className="relative py-6">
+          <InlineAd style="highlight" />
+        </div>
 
         <SectionGridFeaturePlaces
           cardType="card2"
@@ -95,8 +109,14 @@ async function PageHome() {
 
         <SectionHowItWork />
 
+        {/* Original Rotating Ad */}
         <div className="relative py-16">
           <AdRotation />
+        </div>
+
+        {/* Inline Ad - Minimal Style */}
+        <div className="relative py-6">
+          <InlineAd style="minimal" />
         </div>
 
         <div className="relative py-16">
@@ -106,6 +126,11 @@ async function PageHome() {
 
         <div className="relative py-16">
           <SectionBecomeAnAuthor />
+        </div>
+
+        {/* Inline Ad - Default Style */}
+        <div className="relative py-6">
+          <InlineAd style="default" />
         </div>
 
         <SectionSubscribe2 />

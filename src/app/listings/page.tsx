@@ -1,6 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import ListingCard from "@/components/Listingcard";
+import RotatingBannerAd from "@/components/ads/RotatingBannerAd";
+import InlineAd from "@/components/ads/InlineAd";
+import StickyAd from "@/components/ads/StickyAd";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth"; // Adjust path if needed
 
@@ -14,6 +17,8 @@ const ListingsPage = async () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
+      <StickyAd position="bottom-left" />
+      
       {/* Header with Navigation */}
       <div className="container py-6 lg:py-10">
         <div className="mb-8 lg:mb-12">
@@ -36,6 +41,11 @@ const ListingsPage = async () => {
               </svg>
               View Promotions
             </Link>
+          </div>
+
+          {/* Premium Ad Banner */}
+          <div className="mb-8 lg:mb-10">
+            <RotatingBannerAd />
           </div>
         </div>
 
@@ -69,11 +79,23 @@ const ListingsPage = async () => {
               </p>
             </div>
           )}
+
+          {/* Inline Ad Section */}
+          {listings.length > 0 && (
+            <div className="mt-12 lg:mt-16 mb-8 lg:mb-12">
+              <InlineAd style="highlight" />
+            </div>
+          )}
         </div>
 
         {/* Business CTA - Modernized - Only show when NOT logged in */}
         {!session?.user && (
           <div className="mt-8 lg:mt-12 pt-6 lg:pt-8 border-t border-gray-200 dark:border-gray-800">
+            {/* Inline Ad - Minimal */}
+            <div className="mb-8 lg:mb-10">
+              <InlineAd style="minimal" />
+            </div>
+
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl lg:rounded-2xl p-6 lg:p-8">
               <div className="flex flex-col lg:flex-row items-center justify-between gap-4 lg:gap-6">
                 <div>
