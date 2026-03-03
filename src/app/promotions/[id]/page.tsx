@@ -125,7 +125,7 @@ const PromotionDetailPage = async ({ params }: PromotionDetailPageProps) => {
               <div className="p-6 lg:p-8">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Featured Partnership</h3>
                 <ExternalAdScript 
-                  scriptSrc="https://js.partnershipsprogram.com/javascript.php?prefix=-1DpJjc-4UjzqbYFgbz_omNd7ZgqdRLk&media=2912&campaign=3"
+                  scriptSrc="https://js.partnershipsprogram.com/javascript.php?prefix=-1DpJjc-4UjzqbYFgbz_omNd7ZgqdRLk&media=2891&campaign=1"
                   className="rounded-lg overflow-hidden"
                 />
               </div>
@@ -199,7 +199,7 @@ const PromotionDetailPage = async ({ params }: PromotionDetailPageProps) => {
         <div className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg p-6 lg:p-8">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">More Great Offers</h2>
           <ExternalAdScript 
-            scriptSrc="https://js.partnershipsprogram.com/javascript.php?prefix=-1DpJjc-4UjzqbYFgbz_omNd7ZgqdRLk&media=2913&campaign=4"
+            scriptSrc="https://js.partnershipsprogram.com/javascript.php?prefix=-1DpJjc-4UjzqbYFgbz_omNd7ZgqdRLk&media=2910&campaign=1"
             className="rounded-lg overflow-hidden"
           />
         </div>

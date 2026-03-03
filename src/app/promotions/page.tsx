@@ -476,7 +476,7 @@ const PromotionsPage = () => {
               className="rounded-xl overflow-hidden"
             />
             <ExternalAdScript 
-              scriptSrc="https://js.example-ad-network.com/ads?channel=promotions&format=rectangle"
+              scriptSrc="https://js.partnershipsprogram.com/javascript.php?prefix=-1DpJjc-4UjzqbYFgbz_omNd7ZgqdRLk&media=2891&campaign=1"
               className="rounded-xl overflow-hidden"
             />
           </div>
@@ -563,7 +563,7 @@ const PromotionsPage = () => {
           <div className="mt-12 lg:mt-16">
             <h3 className="text-lg lg:text-xl font-bold text-gray-900 dark:text-white mb-6">Featured Partnerships</h3>
             <ExternalAdScript 
-              scriptSrc="https://js.partnershipsprogram.com/javascript.php?prefix=-1DpJjc-4UjzqbYFgbz_omNd7ZgqdRLk&media=2911&campaign=2"
+              scriptSrc="https://js.partnershipsprogram.com/javascript.php?prefix=-1DpJjc-4UjzqbYFgbz_omNd7ZgqdRLk&media=2911&campaign=1"
               className="rounded-xl overflow-hidden"
             />
           </div>
