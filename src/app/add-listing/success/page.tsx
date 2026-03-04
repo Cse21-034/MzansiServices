@@ -2,7 +2,6 @@
 
 import React from "react";
 import ButtonPrimary from "@/shared/ButtonPrimary";
-import { Route } from "@/routers/types";
 import Link from "next/link";
 
 export default function SuccessPage() {
@@ -43,10 +42,10 @@ export default function SuccessPage() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center sm:justify-start">
-          <Link href="/" as={Route}>
+          <Link href="/">
             <ButtonPrimary>Return to Home</ButtonPrimary>
           </Link>
-          <Link href="/usersdashboard" as={Route}>
+          <Link href="/usersdashboard">
             <ButtonPrimary>View My Listings</ButtonPrimary>
           </Link>
         </div>

@@ -1,7 +1,6 @@
 import React, { FC } from "react";
 import Link from "next/link";
-import { StarIcon, MapPinIcon, BedIcon, WifiIcon } from "@heroicons/react/24/outline";
-import { BedIcon as BedSolid } from "@heroicons/react/24/solid";
+import { MapPinIcon } from "@heroicons/react/24/outline";
 
 interface PropertyCardProps {
   property: {
@@ -61,16 +60,14 @@ const PropertyCard: FC<PropertyCardProps> = ({ property }) => {
           {/* Amenities */}
           <div className="flex items-center gap-3 mt-3 text-sm">
             {property.beds && (
-              <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
-                <BedSolid className="w-4 h-4" />
-                <span>{property.beds} Beds</span>
-              </div>
+              <span className="text-gray-600 dark:text-gray-400 font-medium">
+                {property.beds} Beds
+              </span>
             )}
             {property.baths && (
-              <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
-                <WifiIcon className="w-4 h-4" />
-                <span>{property.baths} Bath</span>
-              </div>
+              <span className="text-gray-600 dark:text-gray-400 font-medium">
+                {property.baths} Bath
+              </span>
             )}
           </div>
 

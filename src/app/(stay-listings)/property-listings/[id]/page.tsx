@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import React from "react";
-import { MapPinIcon, PhoneIcon, EnvelopeIcon, BedIcon as BedSolid } from "@heroicons/react/24/outline";
+import { MapPinIcon, PhoneIcon, EnvelopeIcon } from "@heroicons/react/24/outline";
 
 interface PropertyDetailPageProps {
   params: {
