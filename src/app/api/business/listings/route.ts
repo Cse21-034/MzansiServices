@@ -52,7 +52,14 @@ export async function GET(request: NextRequest) {
     }
 
     const listings = await prisma.listing.findMany({
-      where: { businessId },
+      where: { 
+        businessId,
+        // Only fetch GENERAL product listings (not property listings)
+        // Property listings have non-null beds/baths/pricePerNight
+        beds: null,
+        baths: null,
+        pricePerNight: null
+      },
       orderBy: { createdAt: "desc" }
     });
 

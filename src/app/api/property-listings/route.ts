@@ -13,6 +13,12 @@ export async function GET(request: NextRequest) {
     // Build where clause - using any to avoid Prisma type conflicts
     const where: any = {
       status: "APPROVED", // Only approved listings
+      // Only show property listings (those with property-specific fields)
+      OR: [
+        { beds: { not: null } },
+        { baths: { not: null } },
+        { pricePerNight: { not: null } }
+      ]
     };
 
     if (city) {

@@ -26,16 +26,27 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     // Build where clause
-    const where: any = {};
+    const where: any = {
+      // Only show property listings (those with property-specific fields)
+      OR: [
+        { beds: { not: null } },
+        { baths: { not: null } },
+        { pricePerNight: { not: null } }
+      ]
+    };
 
     if (status) {
       where.status = status;
     }
 
     if (search) {
-      where.OR = [
-        { title: { contains: search, mode: "insensitive" as any } },
-        { description: { contains: search, mode: "insensitive" as any } },
+      where.AND = [
+        {
+          OR: [
+            { title: { contains: search, mode: "insensitive" as any } },
+            { description: { contains: search, mode: "insensitive" as any } },
+          ]
+        }
       ];
     }
 
