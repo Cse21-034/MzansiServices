@@ -10,28 +10,19 @@ export async function GET(request: NextRequest) {
     const city = searchParams.get("city");
     const search = searchParams.get("search");
 
-    // Build where clause
-    interface WhereClause {
-      status: string;
-      city?: { contains: string; mode: string };
-      OR?: Array<{
-        title?: { contains: string; mode: string };
-        description?: { contains: string; mode: string };
-      }>;
-    }
-
-    const where: WhereClause = {
+    // Build where clause - using any to avoid Prisma type conflicts
+    const where: any = {
       status: "APPROVED", // Only approved listings
     };
 
     if (city) {
-      where.city = { contains: city, mode: "insensitive" };
+      where.city = { contains: city, mode: "insensitive" as any };
     }
 
     if (search) {
       where.OR = [
-        { title: { contains: search, mode: "insensitive" } },
-        { description: { contains: search, mode: "insensitive" } },
+        { title: { contains: search, mode: "insensitive" as any } },
+        { description: { contains: search, mode: "insensitive" as any } },
       ];
     }
 
