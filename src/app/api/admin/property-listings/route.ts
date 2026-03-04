@@ -26,33 +26,22 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     // Build where clause
-    const where: any = {
-      // Only show property listings (those with property-specific fields)
-      OR: [
-        { beds: { not: null } },
-        { baths: { not: null } },
-        { pricePerNight: { not: null } }
-      ]
-    };
+    const where: any = {};
 
     if (status) {
       where.status = status;
     }
 
     if (search) {
-      where.AND = [
-        {
-          OR: [
-            { title: { contains: search, mode: "insensitive" as any } },
-            { description: { contains: search, mode: "insensitive" as any } },
-          ]
-        }
+      where.OR = [
+        { title: { contains: search, mode: "insensitive" as any } },
+        { description: { contains: search, mode: "insensitive" as any } },
       ];
     }
 
     // Fetch listings
     const [listings, total] = await Promise.all([
-      prisma.listing.findMany({
+      prisma.propertyListing.findMany({
         where,
         include: {
           business: {
@@ -67,7 +56,7 @@ export async function GET(request: NextRequest) {
         skip,
         take: limit,
       }),
-      prisma.listing.count({ where }),
+      prisma.propertyListing.count({ where }),
     ]);
 
     const totalPages = Math.ceil(total / limit);

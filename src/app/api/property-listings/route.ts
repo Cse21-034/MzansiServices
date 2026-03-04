@@ -12,13 +12,7 @@ export async function GET(request: NextRequest) {
 
     // Build where clause - using any to avoid Prisma type conflicts
     const where: any = {
-      status: "APPROVED", // Only approved listings
-      // Only show property listings (those with property-specific fields)
-      OR: [
-        { beds: { not: null } },
-        { baths: { not: null } },
-        { pricePerNight: { not: null } }
-      ]
+      status: "APPROVED", // Only approved
     };
 
     if (city) {
@@ -33,7 +27,7 @@ export async function GET(request: NextRequest) {
     }
 
     const [listings, total] = await Promise.all([
-      prisma.listing.findMany({
+      prisma.propertyListing.findMany({
         where,
         include: {
           business: {
@@ -52,7 +46,7 @@ export async function GET(request: NextRequest) {
         skip,
         take: limit,
       }),
-      prisma.listing.count({ where }),
+      prisma.propertyListing.count({ where }),
     ]);
 
     const totalPages = Math.ceil(total / limit);

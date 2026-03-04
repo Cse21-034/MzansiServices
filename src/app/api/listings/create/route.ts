@@ -58,8 +58,8 @@ export async function POST(req: NextRequest) {
 
     const business = user.businesses[0];
 
-    // Create the listing
-    const listing = await prisma.listing.create({
+    // Create the property listing (using PropertyListing model, not Listing)
+    const listing = await prisma.propertyListing.create({
       data: {
         title,
         description,

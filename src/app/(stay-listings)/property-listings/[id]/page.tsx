@@ -10,7 +10,7 @@ interface PropertyDetailPageProps {
 }
 
 export default async function PropertyDetailPage({ params }: PropertyDetailPageProps) {
-  const property = await prisma.listing.findUnique({
+  const property = await prisma.propertyListing.findUnique({
     where: { id: params.id },
     include: {
       business: true,

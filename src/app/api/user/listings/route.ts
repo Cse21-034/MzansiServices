@@ -29,16 +29,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch all property listings for the user's primary business
-    // Only fetch listings with property-specific fields (beds, baths, pricePerNight)
-    const listings = await prisma.listing.findMany({
+    const listings = await prisma.propertyListing.findMany({
       where: {
         businessId: primaryBusiness.id,
-        // Only fetch property listings (those with property-specific fields)
-        OR: [
-          { beds: { not: null } },
-          { baths: { not: null } },
-          { pricePerNight: { not: null } }
-        ]
       },
       select: {
         id: true,

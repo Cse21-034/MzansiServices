@@ -153,6 +153,7 @@ model Business {
   favorites       Favorite[]
   bookings        Booking[]
   listings        Listing[]
+  propertyListings PropertyListing[] @relation("BusinessPropertyListings")
   promotions      Promotion[]
   memberships     BusinessMembership[]
   
@@ -188,6 +189,21 @@ model BusinessMembership {
 }
 
 model Listing {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  image       String?  @map("image")
+  status      String   @default("ACTIVE")
+  businessId  String   @map("business_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@map("listings")
+}
+
+model PropertyListing {
   id                String   @id @default(cuid())
   title             String
   description       String
@@ -200,11 +216,9 @@ model Listing {
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
 
-  // Basic fields
-  category          String   @default("General")
-  type              String   @default("General")
-
   // Property-specific fields
+  category          String   @default("Accommodation")
+  type              String   @default("Rental")
   beds              Int?
   baths             Int?
   pricePerNight     Float?   @map("price_per_night")
@@ -218,9 +232,9 @@ model Listing {
   minNights         Int?     @map("min_nights")
   maxNights         Int?     @map("max_nights")
 
-  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  business    Business @relation("BusinessPropertyListings", fields: [businessId], references: [id], onDelete: Cascade)
 
-  @@map("listings")
+  @@map("property_listings")
 }
 
 model Promotion {

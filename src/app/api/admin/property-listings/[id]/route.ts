@@ -39,8 +39,8 @@ export async function PATCH(
       updates.approvedAt = new Date();
     }
 
-    // Update the listing
-    const updatedListing = await prisma.listing.update({
+    // Update the property listing
+    const updatedListing = await prisma.propertyListing.update({
       where: { id },
       data: updates,
       include: {

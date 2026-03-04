@@ -52,16 +52,9 @@ export async function GET(req: NextRequest) {
     }
 
     // Fetch all property listings for this business
-    // Property listings have beds, baths, and pricePerNight fields filled
-    const listings = await prisma.listing.findMany({
+    const listings = await prisma.propertyListing.findMany({
       where: {
-        businessId: businessId,
-        // Only fetch property listings (those with property-specific fields)
-        OR: [
-          { beds: { not: null } },
-          { baths: { not: null } },
-          { pricePerNight: { not: null } }
-        ]
+        businessId: businessId
       },
       select: {
         id: true,
