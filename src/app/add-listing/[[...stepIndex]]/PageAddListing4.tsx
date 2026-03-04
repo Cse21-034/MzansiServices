@@ -47,8 +47,8 @@ const PageAddListing4: FC<PageAddListing4Props> = () => {
             key={amenity}
             label={amenity}
             name={amenity}
-            checked={selectedAmenities.includes(amenity)}
-            onChange={(e) => handleAmenityChange(amenity, e.target.checked)}
+            defaultChecked={selectedAmenities.includes(amenity)}
+            onChange={(checked) => handleAmenityChange(amenity, checked)}
           />
         ))}
       </div>
