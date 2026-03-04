@@ -11,7 +11,7 @@ const ListingsPage = async () => {
   const session = await getServerSession(authOptions);
   const listings = await prisma.listing.findMany({
     where: {
-      status: "APPROVED", // Only show approved listings
+      status: "ACTIVE", // Only show active general listings
     },
     include: {
       business: true,
