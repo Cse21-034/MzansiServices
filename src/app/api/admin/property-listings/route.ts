@@ -2,8 +2,10 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { QueryMode } from "@prisma/client";
 
 import type { NextRequest } from 'next/server';
+import type { ListingWhereInput } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   try {
@@ -26,23 +28,16 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     // Build where clause
-    interface WhereClause {
-      status?: string;
-      OR?: Array<{
-        title?: { contains: string; mode: string };
-        description?: { contains: string; mode: string };
-      }>;
-    }
-    const where: WhereClause = {};
+    const where: ListingWhereInput = {};
 
     if (status) {
-      where.status = status;
+      where.status = status as any;
     }
 
     if (search) {
       where.OR = [
-        { title: { contains: search, mode: "insensitive" } },
-        { description: { contains: search, mode: "insensitive" } },
+        { title: { contains: search, mode: QueryMode.insensitive } },
+        { description: { contains: search, mode: QueryMode.insensitive } },
       ];
     }
 
