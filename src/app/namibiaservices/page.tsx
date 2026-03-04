@@ -156,6 +156,24 @@ const AdminDashboardPage: FC<AdminDashboardPageProps> = ({}) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [verificationFilter, setVerificationFilter] = useState("all");
+
+  // Property Listings State
+  type PropertyListing = {
+    id: string;
+    title: string;
+    description: string;
+    status: string;
+    businessId: string;
+    business?: { name: string };
+    createdAt?: string;
+  };
+  const [properties, setProperties] = useState<PropertyListing[]>([]);
+  const [propertySearchTerm, setPropertySearchTerm] = useState("");
+  const [propertyStatusFilter, setPropertyStatusFilter] = useState("all");
+  const [selectedProperty, setSelectedProperty] = useState<PropertyListing | null>(null);
+  const [showPropertyModal, setShowPropertyModal] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [showRejectionInput, setShowRejectionInput] = useState(false);
   // Fetch businesses from API
   useEffect(() => {
     const fetchBusinesses = async () => {
@@ -191,6 +209,46 @@ const AdminDashboardPage: FC<AdminDashboardPageProps> = ({}) => {
     const res = await fetch('/api/admin/businesses');
     const data = await res.json();
     setBusinesses(data.businesses || []);
+  };
+
+  // Fetch property listings from API
+  useEffect(() => {
+    const fetchProperties = async () => {
+      const params: string[] = [];
+      if (propertyStatusFilter !== 'all') params.push(`status=${propertyStatusFilter.toUpperCase()}`);
+      if (propertySearchTerm) params.push(`search=${encodeURIComponent(propertySearchTerm)}`);
+      const query = params.length ? `?${params.join('&')}` : '';
+      try {
+        const res = await fetch(`/api/admin/property-listings${query}`);
+        const data = await res.json();
+        setProperties(data.data || []);
+      } catch (error) {
+        console.error("Error fetching properties:", error);
+      }
+    };
+    fetchProperties();
+  }, [propertyStatusFilter, propertySearchTerm]);
+
+  // Update property listing status
+  const handleUpdateProperty = async (id: string, status: string, rejectionReason?: string) => {
+    const update: any = { status };
+    if (rejectionReason) {
+      update.rejectionReason = rejectionReason;
+    }
+    
+    await fetch(`/api/admin/property-listings/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(update)
+    });
+    
+    // Refresh list
+    const res = await fetch('/api/admin/property-listings');
+    const data = await res.json();
+    setProperties(data.data || []);
+    setShowPropertyModal(false);
+    setShowRejectionInput(false);
+    setRejectionReason("");
   };
 
   // Hide default header
@@ -603,6 +661,185 @@ const AdminDashboardPage: FC<AdminDashboardPageProps> = ({}) => {
     );
   };
 
+  const renderPropertiesTab = () => {
+    return (
+      <div className="space-y-6">
+        {/* Filters and Search */}
+        <div className="bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700">
+          <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+            <div className="flex flex-1 max-w-md">
+              <div className="relative flex-1">
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                <input
+                  type="text"
+                  placeholder="Search properties..."
+                  value={propertySearchTerm}
+                  onChange={(e) => setPropertySearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:text-white"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <select
+                value={propertyStatusFilter}
+                onChange={(e) => setPropertyStatusFilter(e.target.value)}
+                className="px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:text-white"
+              >
+                <option value="all">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="suspended">Suspended</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Properties Table */}
+        <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-neutral-50 dark:bg-neutral-700">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-neutral-500 dark:text-neutral-300 uppercase tracking-wider">Title</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-neutral-500 dark:text-neutral-300 uppercase tracking-wider">Business</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-neutral-500 dark:text-neutral-300 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-neutral-500 dark:text-neutral-300 uppercase tracking-wider">Created</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-neutral-500 dark:text-neutral-300 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neutral-200 dark:divide-neutral-600">
+                {properties.map((property) => (
+                  <tr key={property.id} className="hover:bg-neutral-50 dark:hover:bg-neutral-700/50">
+                    <td className="px-6 py-4">
+                      <div>
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
+                            <BuildingStorefrontIcon className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                          </div>
+                          <div>
+                            <div className="font-medium text-neutral-900 dark:text-neutral-100">{property.title}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-neutral-600 dark:text-neutral-400">
+                        {property.business?.name || property.businessId}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <Badge 
+                        name={property.status.charAt(0).toUpperCase() + property.status.slice(1).toLowerCase()} 
+                        color={
+                          property.status === 'APPROVED' ? 'green' :
+                          property.status === 'PENDING' ? 'yellow' :
+                          property.status === 'REJECTED' ? 'red' : 'gray'
+                        } 
+                      />
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-neutral-600 dark:text-neutral-400">
+                        {property.createdAt ? new Date(property.createdAt).toLocaleDateString() : ''}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center space-x-2">
+                        <button 
+                          className="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors" 
+                          title="View details" 
+                          onClick={() => { setSelectedProperty(property); setShowPropertyModal(true); setShowRejectionInput(false); }}
+                        >
+                          <EyeIcon className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {properties.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-neutral-500 dark:text-neutral-400">No properties found</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  {/* Property Details Modal */}
+  const PropertyModal = () => (
+    showPropertyModal && selectedProperty && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-xl p-8 w-full max-w-lg relative max-h-[90vh] overflow-y-auto">
+          <button className="absolute top-4 right-4 text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100" onClick={() => { setShowPropertyModal(false); setShowRejectionInput(false); }}>
+            ×
+          </button>
+          <h2 className="text-2xl font-bold mb-4">Property Details</h2>
+          <div className="space-y-3">
+            <div><strong>Title:</strong> {selectedProperty.title}</div>
+            <div><strong>Description:</strong> {selectedProperty.description}</div>
+            <div><strong>Business:</strong> {selectedProperty.business?.name || selectedProperty.businessId}</div>
+            <div><strong>Status:</strong> <Badge name={selectedProperty.status} color={selectedProperty.status === 'APPROVED' ? 'green' : selectedProperty.status === 'PENDING' ? 'yellow' : selectedProperty.status === 'REJECTED' ? 'red' : 'gray'} /></div>
+            <div><strong>Created At:</strong> {selectedProperty.createdAt ? new Date(selectedProperty.createdAt).toLocaleDateString() : ''}</div>
+          </div>
+          
+          {showRejectionInput && (
+            <div className="mt-4">
+              <label className="block text-sm font-medium mb-2">Rejection Reason:</label>
+              <textarea 
+                value={rejectionReason} 
+                onChange={(e) => setRejectionReason(e.target.value)} 
+                rows={3}
+                className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 dark:text-white"
+                placeholder="Enter reason for rejection..."
+              />
+            </div>
+          )}
+
+          <div className="mt-6 flex gap-3 flex-wrap">
+            {selectedProperty.status === 'PENDING' && (
+              <>
+                <button 
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg" 
+                  onClick={() => handleUpdateProperty(selectedProperty.id, 'APPROVED')}
+                >
+                  Approve
+                </button>
+                <button 
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg" 
+                  onClick={() => setShowRejectionInput(!showRejectionInput)}
+                >
+                  {showRejectionInput ? 'Cancel Rejection' : 'Reject'}
+                </button>
+                {showRejectionInput && (
+                  <button 
+                    className="px-4 py-2 bg-red-700 text-white rounded-lg" 
+                    onClick={() => handleUpdateProperty(selectedProperty.id, 'REJECTED', rejectionReason)}
+                  >
+                    Confirm Rejection
+                  </button>
+                )}
+              </>
+            )}
+            {selectedProperty.status !== 'PENDING' && (
+              <button 
+                className="px-4 py-2 bg-gray-600 text-white rounded-lg" 
+                onClick={() => setShowPropertyModal(false)}
+              >
+                Close
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  );
+
   return (
     <div className="nc-AdminDashboardPage bg-neutral-50 dark:bg-neutral-900 min-h-screen">
       {/* Admin Navigation Header */}
@@ -627,6 +864,7 @@ const AdminDashboardPage: FC<AdminDashboardPageProps> = ({}) => {
               {[
                 { id: 'overview', name: 'Overview', icon: ChartBarIcon },
                 { id: 'businesses', name: 'Businesses', icon: BuildingStorefrontIcon },
+                { id: 'properties', name: 'Properties', icon: MapPinIcon },
                 { id: 'users', name: 'Users', icon: UsersIcon },
                 { id: 'memberships', name: 'Memberships', icon: CheckCircleIcon },
                 { id: 'categories', name: 'Categories', icon: MapPinIcon },
@@ -654,6 +892,7 @@ const AdminDashboardPage: FC<AdminDashboardPageProps> = ({}) => {
         <div className="mb-12">
           {activeTab === 'overview' && renderOverviewTab()}
           {activeTab === 'businesses' && renderBusinessesTab()}
+          {activeTab === 'properties' && renderPropertiesTab()}
           {activeTab === 'users' && renderUsersTab()}
           {activeTab === 'memberships' && <MembershipApprovalPanel initialStatus="PENDING" />}
           {activeTab === 'categories' && renderCategoriesTab()}
@@ -673,6 +912,9 @@ const AdminDashboardPage: FC<AdminDashboardPageProps> = ({}) => {
             </div>
           )}
         </div>
+
+        {/* Property Modal */}
+        <PropertyModal />
       </main>
     </div>
   );

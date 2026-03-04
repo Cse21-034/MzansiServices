@@ -134,6 +134,17 @@ const UserDashboardPage: FC<UserDashboardPageProps> = ({}) => {
   const [activeTab, setActiveTab] = useState(tabParam || "overview");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Property listings state
+  type PropertyListing = {
+    id: string;
+    title: string;
+    description: string;
+    status: string;
+    createdAt?: string;
+  };
+  const [propertyListings, setPropertyListings] = useState<PropertyListing[]>([]);
+  
   const [dashboardData, setDashboardData] = useState<{
     user: DashboardUser;
     stats: {
@@ -167,6 +178,13 @@ const UserDashboardPage: FC<UserDashboardPageProps> = ({}) => {
         }
         const data = await response.json();
         setDashboardData(data);
+        
+        // Fetch user's property listings
+        const listingsResponse = await fetch('/api/user/listings');
+        if (listingsResponse.ok) {
+          const listingsData = await listingsResponse.json();
+          setPropertyListings(listingsData.listings || []);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Something went wrong');
       } finally {
@@ -568,6 +586,96 @@ const UserDashboardPage: FC<UserDashboardPageProps> = ({}) => {
     );
   };
 
+  const renderListingsTab = () => {
+    if (propertyListings.length === 0) {
+      return (
+        <div className="text-center py-12 bg-white dark:bg-neutral-800 rounded-2xl">
+          <BuildingStorefrontIcon className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-2">No Property Listings Yet</h3>
+          <p className="text-neutral-600 dark:text-neutral-400 mb-6">Start by creating your first property listing</p>
+          <a href="/add-listing/1">
+            <ButtonPrimary>
+              <PlusIcon className="w-4 h-4 mr-2" />
+              Create New Listing
+            </ButtonPrimary>
+          </a>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">My Property Listings</h2>
+          <a href="/add-listing/1">
+            <ButtonPrimary>
+              <PlusIcon className="w-4 h-4 mr-2" />
+              New Listing
+            </ButtonPrimary>
+          </a>
+        </div>
+
+        {propertyListings.map((listing) => (
+          <div key={listing.id} className="bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-3">
+                  <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">{listing.title}</h3>
+                  <Badge 
+                    name={listing.status.charAt(0).toUpperCase() + listing.status.slice(1).toLowerCase()}
+                    color={
+                      listing.status === 'APPROVED' ? 'green' :
+                      listing.status === 'PENDING' ? 'yellow' :
+                      listing.status === 'REJECTED' ? 'red' :
+                      listing.status === 'SUSPENDED' ? 'orange' : 'gray'
+                    }
+                  />
+                </div>
+                <p className="text-neutral-600 dark:text-neutral-400 mt-2 line-clamp-2">{listing.description}</p>
+                <div className="mt-4 text-sm text-neutral-500 dark:text-neutral-400">
+                  Created: {listing.createdAt ? new Date(listing.createdAt).toLocaleDateString() : 'N/A'}
+                </div>
+
+                {listing.status === 'REJECTED' && (
+                  <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-700">
+                    <p className="text-sm text-red-800 dark:text-red-300">
+                      <strong>Rejection Reason:</strong> {(listing as any).rejectionReason || 'Not specified'}
+                    </p>
+                  </div>
+                )}
+
+                {listing.status === 'PENDING' && (
+                  <div className="mt-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-700">
+                    <p className="text-sm text-yellow-800 dark:text-yellow-300">
+                      Your listing is under review by our admin team. We'll notify you once it's approved.
+                    </p>
+                  </div>
+                )}
+
+                {listing.status === 'APPROVED' && (
+                  <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-700">
+                    <p className="text-sm text-green-800 dark:text-green-300">
+                      ✓ Your listing is live and visible to all users!
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="ml-4 flex gap-2">
+                <button className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors" title="Edit listing">
+                  <PencilIcon className="w-5 h-5" />
+                </button>
+                <button className="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors" title="View listing">
+                  <EyeIcon className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   const renderSettingsTab = () => {
     return (
       <div className="space-y-6">
@@ -667,6 +775,7 @@ const UserDashboardPage: FC<UserDashboardPageProps> = ({}) => {
                 { id: 'overview', name: 'Overview', icon: UserIcon },
                 { id: 'reviews', name: 'My Reviews', icon: StarIcon },
                 { id: 'favorites', name: 'Favorites', icon: HeartIcon },
+                { id: 'listings', name: 'My Listings', icon: BuildingStorefrontIcon },
                 { id: 'bookings', name: 'Bookings', icon: CalendarIcon },
                 { id: 'profile', name: 'Profile', icon: UserIcon },
                 { id: 'settings', name: 'Settings', icon: Cog6ToothIcon }
@@ -693,6 +802,7 @@ const UserDashboardPage: FC<UserDashboardPageProps> = ({}) => {
           {activeTab === 'overview' && renderOverviewTab()}
           {activeTab === 'reviews' && renderReviewsTab()}
           {activeTab === 'favorites' && renderFavoritesTab()}
+          {activeTab === 'listings' && renderListingsTab()}
           {activeTab === 'settings' && renderSettingsTab()}
           {(activeTab === 'bookings' || activeTab === 'profile') && (
             <div className="text-center py-12">

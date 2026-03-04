@@ -10,6 +10,9 @@ import { authOptions } from "@/lib/auth"; // Adjust path if needed
 const ListingsPage = async () => {
   const session = await getServerSession(authOptions);
   const listings = await prisma.listing.findMany({
+    where: {
+      status: "APPROVED", // Only show approved listings
+    },
     include: {
       business: true,
     },

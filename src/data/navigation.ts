@@ -33,6 +33,11 @@ export const NAVIGATION_DEMO: NavItemType[] = [
   },
   {
     id: ncNanoId(),
+    href: "/property-listings",
+    name: "Rentals",
+  },
+  {
+    id: ncNanoId(),
     href: "/promotions",
     name: "Promotions",
   },
@@ -63,6 +68,11 @@ export const NAVIGATION_DEMO_2: NavItemType[] = [
     id: ncNanoId(),
     href: "/listings",
     name: "Listings",
+  },
+  {
+    id: ncNanoId(),
+    href: "/property-listings",
+    name: "Rentals",
   },
   {
     id: ncNanoId(),

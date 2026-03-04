@@ -1,4 +1,8 @@
 import React from "react";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
 import { AddListingProvider } from "@/contexts/AddListingContext";
 import PageAddListing1 from "./PageAddListing1";
 import PageAddListing10 from "./PageAddListing10";
@@ -11,13 +15,32 @@ import PageAddListing7 from "./PageAddListing7";
 import PageAddListing8 from "./PageAddListing8";
 import PageAddListing9 from "./PageAddListing9";
 
-const Page = ({
+const Page = async ({
   params,
   searchParams,
 }: {
   params: { stepIndex: string };
   searchParams?: { [key: string]: string | string[] | undefined };
 }) => {
+  // Check if user is authenticated
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.email) {
+    // Redirect to login if not authenticated
+    redirect("/login");
+  }
+
+  // Check if user has a business profile
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    include: { businesses: { where: { isBranch: false } } }
+  });
+
+  if (!user || !user.businesses || user.businesses.length === 0) {
+    // Redirect to business creation if they don't have a business
+    redirect("/namibiaservices?tab=create-business");
+  }
+
   let ContentComponent = PageAddListing1;
   switch (Number(params.stepIndex)) {
     case 1:

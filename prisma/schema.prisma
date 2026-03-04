@@ -188,14 +188,17 @@ model BusinessMembership {
 }
 
 model Listing {
-  id          String   @id @default(cuid())
-  title       String
-  description String
-  image       String?  @map("image")
-  status      ListingStatus @default(ACTIVE) @map("status")
-  businessId  String   @map("business_id")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id                String   @id @default(cuid())
+  title             String
+  description       String
+  image             String?  @map("image")
+  status            ListingStatus @default(PENDING) @map("status")
+  businessId        String   @map("business_id")
+  approvedBy        String?  @map("approved_by")
+  approvedAt        DateTime? @map("approved_at")
+  rejectionReason   String?  @map("rejection_reason")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 
   business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
@@ -408,4 +411,15 @@ enum ListingStatus {
   ACTIVE
   INACTIVE
   ARCHIVED
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum PropertyListingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
 }
