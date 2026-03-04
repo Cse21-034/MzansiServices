@@ -627,7 +627,7 @@ const UserDashboardPage: FC<UserDashboardPageProps> = ({}) => {
                       listing.status === 'APPROVED' ? 'green' :
                       listing.status === 'PENDING' ? 'yellow' :
                       listing.status === 'REJECTED' ? 'red' :
-                      listing.status === 'SUSPENDED' ? 'orange' : 'gray'
+                      listing.status === 'SUSPENDED' ? 'purple' : 'pink'
                     }
                   />
                 </div>
