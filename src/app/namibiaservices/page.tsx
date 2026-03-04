@@ -772,8 +772,11 @@ const AdminDashboardPage: FC<AdminDashboardPageProps> = ({}) => {
   };
 
   {/* Property Details Modal */}
-  const PropertyModal = () => (
-    showPropertyModal && selectedProperty && (
+  const PropertyModal = () => {
+    if (!showPropertyModal || !selectedProperty) {
+      return null;
+    }
+    return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
         <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-xl p-8 w-full max-w-lg relative max-h-[90vh] overflow-y-auto">
           <button className="absolute top-4 right-4 text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100" onClick={() => { setShowPropertyModal(false); setShowRejectionInput(false); }}>
@@ -837,8 +840,8 @@ const AdminDashboardPage: FC<AdminDashboardPageProps> = ({}) => {
           </div>
         </div>
       </div>
-    )
-  );
+    );
+  };
 
   return (
     <div className="nc-AdminDashboardPage bg-neutral-50 dark:bg-neutral-900 min-h-screen">
