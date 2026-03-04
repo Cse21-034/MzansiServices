@@ -22,7 +22,8 @@ interface PropertyCardProps {
       slug: string;
       email: string;
       phone: string;
-      location: string;
+      city?: string;
+      address?: string;
     };
   };
 }
