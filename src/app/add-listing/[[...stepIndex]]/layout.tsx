@@ -7,6 +7,7 @@ import ButtonSecondary from "@/shared/ButtonSecondary";
 import { Route } from "@/routers/types";
 import { useRouter } from "next/navigation";
 import { useAddListing } from "@/contexts/AddListingContext";
+import { AddListingProvider } from "@/contexts/AddListingContext";
 
 export interface CommonLayoutProps {
   children: React.ReactNode;
@@ -16,6 +17,14 @@ export interface CommonLayoutProps {
 }
 
 const CommonLayout: FC<CommonLayoutProps> = ({ children, params }) => {
+  return (
+    <AddListingProvider>
+      <CommonLayoutContent children={children} params={params} />
+    </AddListingProvider>
+  );
+};
+
+const CommonLayoutContent: FC<CommonLayoutProps> = ({ children, params }) => {
   const router = useRouter();
   const { publishListing, isPublishing, error } = useAddListing();
   const index = Number(params.stepIndex) || 1;

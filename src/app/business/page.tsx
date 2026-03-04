@@ -34,7 +34,8 @@ import {
   XCircleIcon,
   BuildingOfficeIcon,
   SparklesIcon,
-  PencilIcon
+  PencilIcon,
+  HomeIcon
 } from "@heroicons/react/24/outline";
 import { categories } from "@/data/categories";
 import CreatableSelect from "@/components/CreatableSelect";
@@ -168,6 +169,23 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
   const [editingListingId, setEditingListingId] = useState<string | null>(null);
   const [listingPreview, setListingPreview] = useState<string | null>(null);
 
+  // Property listings state
+  type PropertyListing = {
+    id: string;
+    title: string;
+    description: string;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+    beds?: number;
+    baths?: number;
+    pricePerNight?: number;
+    city?: string;
+    image?: string;
+  };
+  const [propertyListings, setPropertyListings] = useState<PropertyListing[]>([]);
+  const [loadingPropertyListings, setLoadingPropertyListings] = useState(false);
+
   const emptyBusiness: BusinessData = {
     name: "",
     category: "",
@@ -281,6 +299,7 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
   useEffect(() => {
     if (businessData.id) {
       fetchListings();
+      fetchPropertyListings();
     }
   }, [businessData.id]);
 
@@ -446,6 +465,23 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
       }
     } catch (error) {
       console.error('Error fetching listings:', error);
+    }
+  };
+
+  // Fetch property listings for the business
+  const fetchPropertyListings = async () => {
+    if (!businessData.id) return;
+    setLoadingPropertyListings(true);
+    try {
+      const res = await fetch(`/api/business/property-listings?businessId=${businessData.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        setPropertyListings(data.listings || []);
+      }
+    } catch (error) {
+      console.error('Error fetching property listings:', error);
+    } finally {
+      setLoadingPropertyListings(false);
     }
   };
 
@@ -1022,6 +1058,194 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
     );
   };
 
+  const renderPropertyListingsTab = () => {
+    if (loadingPropertyListings) {
+      return (
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin">
+            <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full"></div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        <div className="bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-semibold flex items-center gap-3">
+                <HomeIcon className="w-6 h-6 text-primary-600" />
+                Property Listings
+              </h2>
+              <p className="text-neutral-600 dark:text-neutral-400 mt-2">Manage your rental properties and accommodations</p>
+            </div>
+            <a href="/add-listing/1">
+              <ButtonPrimary className="flex items-center gap-2">
+                <PlusIcon className="w-5 h-5" />
+                Add Property
+              </ButtonPrimary>
+            </a>
+          </div>
+
+          {propertyListings.length === 0 ? (
+            <div className="text-center py-12">
+              <HomeIcon className="w-16 h-16 text-neutral-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
+                No Property Listings Yet
+              </h3>
+              <p className="text-neutral-600 dark:text-neutral-400 mb-6">
+                Create your first property listing to start accepting bookings
+              </p>
+              <a href="/add-listing/1">
+                <ButtonPrimary>
+                  <PlusIcon className="w-4 h-4 mr-2 inline" />
+                  Create First Property
+                </ButtonPrimary>
+              </a>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {propertyListings.map((listing) => (
+                <div
+                  key={listing.id}
+                  className="border border-neutral-200 dark:border-neutral-700 rounded-xl p-6 hover:shadow-lg transition-shadow hover:border-primary-300 dark:hover:border-primary-600"
+                >
+                  <div className="flex items-start gap-4">
+                    {listing.image && (
+                      <div className="w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden">
+                        <img
+                          src={listing.image}
+                          alt={listing.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100 break-words">
+                            {listing.title}
+                          </h3>
+                          <p className="text-sm text-neutral-500 mt-1">
+                            Created {new Date(listing.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <Badge
+                          name={listing.status.charAt(0).toUpperCase() + listing.status.slice(1).toLowerCase()}
+                          color={
+                            listing.status === 'APPROVED'
+                              ? 'green'
+                              : listing.status === 'PENDING'
+                              ? 'yellow'
+                              : listing.status === 'REJECTED'
+                              ? 'red'
+                              : listing.status === 'SUSPENDED'
+                              ? 'purple'
+                              : 'pink'
+                          }
+                        />
+                      </div>
+
+                      <p className="text-neutral-600 dark:text-neutral-400 text-sm mb-3 line-clamp-2">
+                        {listing.description}
+                      </p>
+
+                      <div className="flex flex-wrap gap-4 text-sm text-neutral-600 dark:text-neutral-400 mb-3">
+                        {listing.beds !== undefined && (
+                          <div className="flex items-center gap-1">
+                            <span className="font-medium">{listing.beds}</span>
+                            <span>bed{listing.beds !== 1 ? 's' : ''}</span>
+                          </div>
+                        )}
+                        {listing.baths !== undefined && (
+                          <div className="flex items-center gap-1">
+                            <span className="font-medium">{listing.baths}</span>
+                            <span>bath{listing.baths !== 1 ? 's' : ''}</span>
+                          </div>
+                        )}
+                        {listing.pricePerNight !== undefined && (
+                          <div className="flex items-center gap-1">
+                            <span className="font-medium">NAD {listing.pricePerNight}/night</span>
+                          </div>
+                        )}
+                        {listing.city && (
+                          <div className="flex items-center gap-1">
+                            <MapPinIcon className="w-4 h-4" />
+                            <span>{listing.city}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {listing.status === 'REJECTED' && (
+                        <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-700 mb-3">
+                          <p className="text-sm text-red-800 dark:text-red-300">
+                            <strong>Rejection Reason:</strong> {(listing as any).rejectionReason || 'Not specified'}
+                          </p>
+                        </div>
+                      )}
+
+                      {listing.status === 'PENDING' && (
+                        <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-700">
+                          <p className="text-sm text-yellow-800 dark:text-yellow-300">
+                            ⏳ Your property is under review by our admin team. You'll be notified once it's approved.
+                          </p>
+                        </div>
+                      )}
+
+                      {listing.status === 'APPROVED' && (
+                        <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-700">
+                          <p className="text-sm text-green-800 dark:text-green-300">
+                            ✓ Your property is live and visible to all users!
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+                      <button
+                        onClick={() => window.open(`/property-listings/${listing.id}`, '_blank')}
+                        className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                        title="View listing"
+                      >
+                        <EyeIcon className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => router.push(`/add-listing/1?edit=${listing.id}`)}
+                        className="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
+                        title="Edit property"
+                      >
+                        <PencilIcon className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Info Box */}
+        <div className="bg-primary-50 dark:bg-primary-900/20 rounded-2xl p-6 border border-primary-200 dark:border-primary-800">
+          <h3 className="text-lg font-semibold text-primary-900 dark:text-primary-100 mb-2">
+            Property Listing Status
+          </h3>
+          <div className="space-y-2 text-sm text-primary-800 dark:text-primary-300">
+            <p>
+              <strong>Pending:</strong> Your property is waiting for admin approval. Make sure all details are accurate.
+            </p>
+            <p>
+              <strong>Approved:</strong> Your property is now visible to all users and accepting bookings.
+            </p>
+            <p>
+              <strong>Rejected:</strong> Review the rejection reason and update your property details to resubmit.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderListingsTab = () => {
     return (
       <div className="space-y-8">
@@ -1216,6 +1440,7 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
                 { id: 'overview', name: 'Overview', icon: ChartBarIcon },
                 { id: 'profile', name: 'Profile', icon: BuildingStorefrontIcon },
                 { id: 'products', name: 'Products & Listings', icon: DocumentTextIcon },
+                { id: 'property-listings', name: 'Property Listings', icon: HomeIcon },
                 { id: 'promotions', name: 'Promotions', icon: SparklesIcon },                { id: 'membership', name: 'Membership', icon: CheckCircleIcon },                { id: 'analytics', name: 'Analytics', icon: EyeIcon },
                 { id: 'branches', name: 'Branches', icon: BuildingOfficeIcon }
               ].map((tab) => (
@@ -1240,6 +1465,7 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
           {activeTab === 'overview' && renderOverviewTab()}
           {activeTab === 'profile' && renderProfileTab()}
           {activeTab === 'products' && renderListingsTab()} {/* Render the products & listings tab */}
+          {activeTab === 'property-listings' && renderPropertyListingsTab()}
           {activeTab === 'promotions' && (
             <div className="text-center py-12">
               <SparklesIcon className="w-12 h-12 text-neutral-400 mx-auto mb-4" />
