@@ -45,7 +45,7 @@ const PageAddListing2: FC<PageAddListing2Props> = () => {
         </ButtonSecondary>
         {/* ITEM */}
         <FormItem label="Country/Region">
-          <Select value={formData.address} onChange={(e) => updateFormData({ address: e.target.value })}>
+          <Select value={formData.country} onChange={(e) => updateFormData({ country: e.target.value })}>
             <option value="">Select country</option>
             <option value="Botswana">Botswana</option>
             <option value="South Africa">South Africa</option>
@@ -71,16 +71,26 @@ const PageAddListing2: FC<PageAddListing2Props> = () => {
             />
           </FormItem>
           <FormItem label="State">
-            <Input placeholder="State/Province" />
+            <Input 
+              placeholder="State/Province" 
+              value={formData.state}
+              onChange={(e) => updateFormData({ state: e.target.value })}
+            />
           </FormItem>
           <FormItem label="Postal code">
-            <Input placeholder="Postal code" />
+            <Input 
+              placeholder="Postal code" 
+              value={formData.postalCode}
+              onChange={(e) => updateFormData({ postalCode: e.target.value })}
+            />
           </FormItem>
         </div>
         <div>
           <Label>Detailed address</Label>
           <span className="block mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-            {formData.address || "Enter your address above"}
+            {formData.address && formData.city 
+              ? `${formData.address}, ${formData.state ? formData.state + ", " : ""}${formData.city}, ${formData.country}` 
+              : "Enter your address above"}
           </span>
           <div className="mt-4">
             <div className="aspect-w-5 aspect-h-5 sm:aspect-h-3">

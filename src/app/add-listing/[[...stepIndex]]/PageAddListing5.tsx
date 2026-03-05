@@ -39,6 +39,16 @@ const PageAddListing5: FC<PageAddListing5Props> = () => {
     );
   };
 
+  const toggleFeature = (featureName: string) => {
+    const currentFeatures = formData.features || [];
+    // Find and remove existing smoking/pet/party policies
+    const filtered = currentFeatures.filter(f => 
+      !f.includes("smoking") && !f.includes("pets") && !f.includes("party")
+    );
+    // This is for radio - so we filter based on the category being changed
+    updateFormData({ features: [...filtered, featureName] });
+  };
+
   const renderNoInclude = (text: string, onRemove: () => void) => {
     return (
       <div className="flex items-center justify-between py-3">
@@ -89,13 +99,13 @@ const PageAddListing5: FC<PageAddListing5Props> = () => {
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {renderRadio("Smoking", "S_Do", "Do not allow", "not-allow", 
               formData.features?.includes("no-smoking"), 
-              () => updateFormData({ features: ["no-smoking"] }))}
+              () => toggleFeature("no-smoking"))}
             {renderRadio("Smoking", "S_Allow", "Allow", "allow", 
               formData.features?.includes("smoking"), 
-              () => updateFormData({ features: ["smoking"] }))}
+              () => toggleFeature("smoking"))}
             {renderRadio("Smoking", "S_Charge", "Charge extra", "charge", 
               formData.features?.includes("smoking-charge"), 
-              () => updateFormData({ features: ["smoking-charge"] }))}
+              () => toggleFeature("smoking-charge"))}
           </div>
         </div>
 
@@ -107,13 +117,13 @@ const PageAddListing5: FC<PageAddListing5Props> = () => {
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {renderRadio("Pet", "P_Do", "Do not allow", "not-allow",
               formData.features?.includes("no-pets"),
-              () => updateFormData({ features: ["no-pets"] }))}
+              () => toggleFeature("no-pets"))}
             {renderRadio("Pet", "P_Allow", "Allow", "allow",
               formData.features?.includes("pets"),
-              () => updateFormData({ features: ["pets"] }))}
+              () => toggleFeature("pets"))}
             {renderRadio("Pet", "P_Charge", "Charge extra", "charge",
               formData.features?.includes("pets-charge"),
-              () => updateFormData({ features: ["pets-charge"] }))}
+              () => toggleFeature("pets-charge"))}
           </div>
         </div>
 
@@ -125,13 +135,13 @@ const PageAddListing5: FC<PageAddListing5Props> = () => {
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {renderRadio("Party", "Party_Do", "Do not allow", "not-allow",
               formData.features?.includes("no-parties"),
-              () => updateFormData({ features: ["no-parties"] }))}
+              () => toggleFeature("no-parties"))}
             {renderRadio("Party", "Party_Allow", "Allow", "allow",
               formData.features?.includes("parties"),
-              () => updateFormData({ features: ["parties"] }))}
+              () => toggleFeature("parties"))}
             {renderRadio("Party", "Party_Charge", "Charge extra", "charge",
               formData.features?.includes("parties-charge"),
-              () => updateFormData({ features: ["parties-charge"] }))}
+              () => toggleFeature("parties-charge"))}
           </div>
         </div>
 
@@ -143,13 +153,13 @@ const PageAddListing5: FC<PageAddListing5Props> = () => {
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {renderRadio("Cooking", "C_Do", "Do not allow", "not-allow",
               formData.features?.includes("no-cooking"),
-              () => updateFormData({ features: ["no-cooking"] }))}
+              () => toggleFeature("no-cooking"))}
             {renderRadio("Cooking", "C_Allow", "Allow", "allow",
               formData.features?.includes("cooking"),
-              () => updateFormData({ features: ["cooking"] }))}
+              () => toggleFeature("cooking"))}
             {renderRadio("Cooking", "C_Charge", "Charge extra", "charge",
               formData.features?.includes("cooking-charge"),
-              () => updateFormData({ features: ["cooking-charge"] }))}
+              () => toggleFeature("cooking-charge"))}
           </div>
         </div>
 

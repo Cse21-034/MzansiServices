@@ -6,37 +6,48 @@ export interface ListingFormData {
   // Step 1 - Basic info
   title: string;
   description: string;
-  category: string;
-  
-  // Step 2 - Details
   type: string;
-  beds: number;
-  baths: number;
+  category: string; // Entire place, Private room, Share room
   
-  // Step 3 - Amenities
-  amenities: string[];
-  
-  // Step 4 - Features
-  features: string[];
-  
-  // Step 5 - Pricing
-  pricePerNight: number;
-  
-  // Step 6 - Rules
-  rules: string;
-  
-  // Step 7 - Location
+  // Step 2 - Location
+  country: string;
   address: string;
   city: string;
+  state: string;
+  postalCode: string;
   latitude: number | null;
   longitude: number | null;
   
-  // Step 8 - Photos
+  // Step 3 - Size
+  acreage: string;
+  guests: number;
+  beds: number;
+  baths: number;
+  kitchens: number;
+  
+  // Step 4 - Amenities
+  amenities: string[];
+  
+  // Step 5 - House Rules (features/policies)
+  features: string[];
+  rules: string; // Additional custom rules
+  
+  // Step 6 - Description
+  // Uses description from Step 1
+  
+  // Step 7 - Photos
   images: File[];
+  
+  // Step 8 - Pricing
+  currency: string;
+  pricePerNight: number;
+  weekendPrice: number;
+  monthlyDiscount: number;
   
   // Step 9 - Availability
   minNights: number;
   maxNights: number;
+  blockedDates: number[]; // Array of timestamps
   
   // Step 10 - Review & Publish
   // No additional fields needed
@@ -56,21 +67,31 @@ const AddListingContext = createContext<AddListingContextType | undefined>(undef
 const defaultFormData: ListingFormData = {
   title: "",
   description: "",
-  category: "",
   type: "",
-  beds: 1,
-  baths: 1,
-  amenities: [],
-  features: [],
-  pricePerNight: 0,
-  rules: "",
+  category: "",
+  country: "",
   address: "",
   city: "",
+  state: "",
+  postalCode: "",
   latitude: null,
   longitude: null,
+  acreage: "",
+  guests: 1,
+  beds: 1,
+  baths: 1,
+  kitchens: 1,
+  amenities: [],
+  features: [],
+  rules: "",
   images: [],
+  currency: "USD",
+  pricePerNight: 0,
+  weekendPrice: 0,
+  monthlyDiscount: 0,
   minNights: 1,
   maxNights: 365,
+  blockedDates: [],
 };
 
 export const AddListingProvider = ({ children }: { children: React.ReactNode }) => {
@@ -113,14 +134,23 @@ export const AddListingProvider = ({ children }: { children: React.ReactNode }) 
         description: formData.description,
         category: formData.category,
         type: formData.type,
-        beds: formData.beds,
-        baths: formData.baths,
-        amenities: formData.amenities,
-        features: formData.features,
-        pricePerNight: formData.pricePerNight,
-        rules: formData.rules,
+        country: formData.country,
         address: formData.address,
         city: formData.city,
+        state: formData.state,
+        postalCode: formData.postalCode,
+        acreage: formData.acreage,
+        guests: formData.guests,
+        beds: formData.beds,
+        baths: formData.baths,
+        kitchens: formData.kitchens,
+        amenities: formData.amenities,
+        features: formData.features,
+        rules: formData.rules,
+        currency: formData.currency,
+        pricePerNight: formData.pricePerNight,
+        weekendPrice: formData.weekendPrice,
+        monthlyDiscount: formData.monthlyDiscount,
         latitude: formData.latitude,
         longitude: formData.longitude,
         minNights: formData.minNights,

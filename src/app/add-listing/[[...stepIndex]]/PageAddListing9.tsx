@@ -2,7 +2,7 @@
 
 import DatePickerCustomDay from "@/components/DatePickerCustomDay";
 import DatePickerCustomHeaderTwoMonth from "@/components/DatePickerCustomHeaderTwoMonth";
-import NcInputNumber from "@/components/NcInputNumber";
+import Input from "@/shared/Input";
 import React, { FC, useState } from "react";
 import DatePicker from "react-datepicker";
 import { useAddListing } from "@/contexts/AddListingContext";
@@ -11,11 +11,7 @@ export interface PageAddListing9Props {}
 
 const PageAddListing9: FC<PageAddListing9Props> = () => {
   const { formData, updateFormData } = useAddListing();
-  const [dates, setDates] = useState<number[]>([
-    new Date("2023/02/06").getTime(),
-    new Date("2023/02/09").getTime(),
-    new Date("2023/02/15").getTime(),
-  ]);
+  const [dates, setDates] = useState<number[]>(formData.blockedDates || []);
 
   return (
     <>
@@ -29,15 +25,32 @@ const PageAddListing9: FC<PageAddListing9Props> = () => {
       <div className="w-14 border-b border-neutral-200 dark:border-neutral-700"></div>
       {/* FORM */}
       <div className="space-y-7">
-        {/* ITEM - Note: NcInputNumber doesn't expose onChange, may need custom component */}
-        <NcInputNumber 
-          label="Nights min" 
-          defaultValue={formData.minNights || 1} 
-        />
-        <NcInputNumber 
-          label="Nights max" 
-          defaultValue={formData.maxNights || 99} 
-        />
+        {/* ITEM - Min Nights */}
+        <div>
+          <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+            Minimum nights per stay
+          </label>
+          <Input 
+            type="number"
+            placeholder="1"
+            value={formData.minNights || 1}
+            onChange={(e) => updateFormData({ minNights: parseInt(e.target.value) || 1 })}
+            min="1"
+          />
+        </div>
+        {/* ITEM - Max Nights */}
+        <div>
+          <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+            Maximum nights per stay
+          </label>
+          <Input 
+            type="number"
+            placeholder="365"
+            value={formData.maxNights || 365}
+            onChange={(e) => updateFormData({ maxNights: parseInt(e.target.value) || 365 })}
+            min="1"
+          />
+        </div>
       </div>
 
       {/*  */}
@@ -52,20 +65,20 @@ const PageAddListing9: FC<PageAddListing9Props> = () => {
       <div className="addListingDatePickerExclude">
         <DatePicker
           onChange={(date) => {
-            let newDates = [];
+            let newDates = [...dates];
 
             if (!date) {
               return;
             }
             const newTime = date.getTime();
-            if (dates.includes(newTime)) {
-              newDates = dates.filter((item) => item !== newTime);
+            if (newDates.includes(newTime)) {
+              newDates = newDates.filter((item) => item !== newTime);
             } else {
-              newDates = [...dates, newTime];
+              newDates = [...newDates, newTime];
             }
             setDates(newDates);
+            updateFormData({ blockedDates: newDates });
           }}
-          // selected={startDate}
           monthsShown={2}
           showPopperArrow={false}
           excludeDates={dates.filter(Boolean).map((item) => new Date(item))}

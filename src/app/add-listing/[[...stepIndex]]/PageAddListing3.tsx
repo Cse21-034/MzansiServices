@@ -19,7 +19,7 @@ const PageAddListing3: FC<PageAddListing3Props> = () => {
       <div className="space-y-8">
         {/* ITEM */}
         <FormItem label="Acreage (m2)">
-          <Select value={formData.features?.[0] || ""} onChange={(e) => updateFormData({ features: [e.target.value] })}>
+          <Select value={formData.acreage} onChange={(e) => updateFormData({ acreage: e.target.value })}>
             <option value="">Select size</option>
             <option value="100">100</option>
             <option value="200">200</option>
@@ -30,24 +30,28 @@ const PageAddListing3: FC<PageAddListing3Props> = () => {
         </FormItem>
         <NcInputNumber 
           label="Guests" 
-          defaultValue={1}
-          // Note: NcInputNumber component doesn't expose value/onChange, update if needed
+          defaultValue={formData.guests}
+          onChange={(value) => updateFormData({ guests: value })}
         />
         <NcInputNumber 
           label="Bedroom" 
           defaultValue={formData.beds}
+          onChange={(value) => updateFormData({ beds: value })}
         />
         <NcInputNumber 
           label="Beds" 
           defaultValue={formData.beds}
+          onChange={(value) => updateFormData({ beds: value })}
         />
         <NcInputNumber 
           label="Bathroom" 
           defaultValue={formData.baths}
+          onChange={(value) => updateFormData({ baths: value })}
         />
         <NcInputNumber 
           label="Kitchen" 
-          defaultValue={1}
+          defaultValue={formData.kitchens}
+          onChange={(value) => updateFormData({ kitchens: value })}
         />
       </div>
     </>

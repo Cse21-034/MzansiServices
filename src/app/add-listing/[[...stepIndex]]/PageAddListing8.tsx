@@ -26,12 +26,14 @@ const PageAddListing8: FC<PageAddListing8Props> = () => {
       <div className="space-y-8">
         {/* ITEM */}
         <FormItem label="Currency">
-          <Select value={formData.category || ""} onChange={(e) => updateFormData({ category: e.target.value })}>
+          <Select value={formData.currency} onChange={(e) => updateFormData({ currency: e.target.value })}>
             <option value="">Select currency</option>
-            <option value="USD">USD</option>
+            <option value="USD">USD (US Dollar)</option>
             <option value="BWP">BWP (Botswana Pula)</option>
             <option value="ZAR">ZAR (South African Rand)</option>
             <option value="EUR">EUR (Euro)</option>
+            <option value="GBP">GBP (British Pound)</option>
+            <option value="NAD">NAD (Namibian Dollar)</option>
           </Select>
         </FormItem>
         <FormItem label="Base price (Monday - Thursday)">
@@ -47,7 +49,7 @@ const PageAddListing8: FC<PageAddListing8Props> = () => {
               onChange={(e) => updateFormData({ pricePerNight: parseFloat(e.target.value) || 0 })}
             />
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              <span className="text-gray-500">USD</span>
+              <span className="text-gray-500">{formData.currency || "USD"}</span>
             </div>
           </div>
         </FormItem>
@@ -61,9 +63,11 @@ const PageAddListing8: FC<PageAddListing8Props> = () => {
               className="!pl-8 !pr-10" 
               placeholder="0.00"
               type="number"
+              value={formData.weekendPrice}
+              onChange={(e) => updateFormData({ weekendPrice: parseFloat(e.target.value) || 0 })}
             />
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              <span className="text-gray-500">USD</span>
+              <span className="text-gray-500">{formData.currency || "USD"}</span>
             </div>
           </div>
         </FormItem>
@@ -77,6 +81,8 @@ const PageAddListing8: FC<PageAddListing8Props> = () => {
               className="!pl-8 !pr-10" 
               placeholder="0.00"
               type="number"
+              value={formData.monthlyDiscount}
+              onChange={(e) => updateFormData({ monthlyDiscount: parseFloat(e.target.value) || 0 })}
             />
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
               <span className="text-gray-500">every month</span>
