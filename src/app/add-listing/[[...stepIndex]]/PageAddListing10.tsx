@@ -69,14 +69,13 @@ const PageAddListing10: FC<PageAddListing10Props> = () => {
           <div className="bg-neutral-50 dark:bg-neutral-900 p-6 rounded-lg">
             <h3 className="text-lg font-semibold mb-4">Amenities</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-              {formData.amenities.map((amenity, idx) => {
-                const amenityStr = typeof amenity === 'string' ? amenity : (amenity && amenity.name) || '';
-                return amenityStr ? (
+              {formData.amenities.map((amenity, idx) => 
+                amenity ? (
                   <span key={idx} className="text-sm bg-white dark:bg-neutral-800 px-3 py-1 rounded">
-                    {amenityStr}
+                    {amenity}
                   </span>
-                ) : null;
-              })}
+                ) : null
+              )}
             </div>
           </div>
         )}
