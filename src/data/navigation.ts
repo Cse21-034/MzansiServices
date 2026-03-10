@@ -31,11 +31,11 @@ export const NAVIGATION_DEMO: NavItemType[] = [
     href: "/listings",
     name: "Listings",
   },
-  {
-    id: ncNanoId(),
-    href: "/property-listings",
-    name: "Rentals",
-  },
+  // {
+  //   id: ncNanoId(),
+  //   href: "/property-listings",
+  //   name: "Rentals",
+  // },
   {
     id: ncNanoId(),
     href: "/promotions",
@@ -69,11 +69,11 @@ export const NAVIGATION_DEMO_2: NavItemType[] = [
     href: "/listings",
     name: "Listings",
   },
-  {
-    id: ncNanoId(),
-    href: "/property-listings",
-    name: "Rentals",
-  },
+  // {
+  //   id: ncNanoId(),
+  //   href: "/property-listings",
+  //   name: "Rentals",
+  // },
   {
     id: ncNanoId(),
     href: "/government-directory",
