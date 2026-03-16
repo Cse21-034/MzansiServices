@@ -86,6 +86,8 @@ const SectionClaimListing: FC<SectionClaimListingProps> = ({
           </div>
         </div>
 
+
+        {/*
         <button
           onClick={handleClaimClick}
           disabled={isSending}
@@ -93,6 +95,7 @@ const SectionClaimListing: FC<SectionClaimListingProps> = ({
         >
           {isSending ? "Redirecting..." : "Claim Your Listing Now"}
         </button>
+        */}
 
         <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-4">
           Already claimed? <a href="/login" className="text-burgundy-600 hover:underline">Sign in to manage</a>
