@@ -205,6 +205,19 @@ const EditListingPage: React.FC<EditListingPageProps> = () => {
             </p>
 
             {/* Current Image Preview */}
+            {/* Show logo as placeholder if no image */}
+            {(!currentImageUrl && !imagePreview) && (
+              <div className="mb-4">
+                <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                  No image uploaded. Using default logo:
+                </p>
+                <img
+                  src="/images/namibia-logo/squarelogo.PNG"
+                  alt="Default logo"
+                  className="w-32 h-32 object-cover rounded-lg border border-neutral-300 dark:border-neutral-600"
+                />
+              </div>
+            )}
             {currentImageUrl && !imagePreview && (
               <div className="mb-4">
                 <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">

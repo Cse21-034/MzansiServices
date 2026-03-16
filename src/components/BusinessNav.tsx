@@ -30,8 +30,8 @@ const BusinessNav: FC<BusinessNavProps> = ({ className = "", business }) => {
     photos: business?.photos || []
   };
 
-  // Get first photo URL safely
-  const firstPhotoUrl = safeBusiness.photos?.[0]?.url || "";
+  // Get first photo URL safely, fallback to logo
+  const firstPhotoUrl = safeBusiness.photos?.[0]?.url || "/images/namibia-logo/squarelogo.PNG";
 
   return (
     <div className={`nc-BusinessNav relative z-10 ${className}`}>

@@ -34,6 +34,8 @@ const CarCard: FC<CarCardProps> = ({
     seats,
     gearshift,
   } = data;
+  // Use logo as placeholder if no image
+  const displayImage = featuredImage || "/images/namibia-logo/squarelogo.PNG";
 
   const renderSliderGallery = () => {
     return (
@@ -41,7 +43,7 @@ const CarCard: FC<CarCardProps> = ({
         <div className="aspect-w-16 aspect-h-9 ">
           <Image
             fill
-            src={featuredImage}
+            src={displayImage}
             alt="car"
             sizes="(max-width: 640px) 100vw, 350px"
           />

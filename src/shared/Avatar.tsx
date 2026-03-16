@@ -20,7 +20,8 @@ const Avatar: FC<AvatarProps> = ({
   hasChecked,
   hasCheckedClass = "w-4 h-4 -top-0.5 -right-0.5",
 }) => {
-  const url = imgUrl || "";
+  // Use logo as fallback if no image
+  const url = imgUrl || "/images/namibia-logo/squarelogo.PNG";
   const name = userName || "John Doe";
   
   const _setBgColor = (name: string) => {
@@ -39,19 +40,19 @@ const Avatar: FC<AvatarProps> = ({
       style={{ backgroundColor: isValidImageUrl ? undefined : _setBgColor(name) }}
     >
       {isValidImageUrl ? (
-        // Use regular img tag without onError handler
         <img
           className={`absolute inset-0 w-full h-full object-cover ${radius}`}
           src={url}
           alt={name}
-          // REMOVED the onError handler completely
         />
-      ) : null}
-      
-      {/* Show initials if no image */}
-      <span className="wil-avatar__name z-10">
-        {name[0]}
-      </span>
+      ) : (
+        // Show initials only if not using logo fallback
+        url !== "/images/namibia-logo/squarelogo.PNG" && (
+          <span className="wil-avatar__name z-10">
+            {name[0]}
+          </span>
+        )
+      )}
 
       {hasChecked && (
         <span

@@ -30,6 +30,8 @@ const CarCardH: FC<CarCardHProps> = ({ className = "", data = DEMO_DATA }) => {
     author,
     featuredImage,
   } = data;
+  // Use logo as placeholder if no image
+  const displayImage = featuredImage || "/images/namibia-logo/squarelogo.PNG";
 
   const renderSliderGallery = () => {
     return (
@@ -38,7 +40,7 @@ const CarCardH: FC<CarCardHProps> = ({ className = "", data = DEMO_DATA }) => {
           <Image
             alt=""
             className="w-full"
-            src={featuredImage}
+            src={displayImage}
             sizes="(max-width: 640px) 100vw, 300px"
           />
         </div>
