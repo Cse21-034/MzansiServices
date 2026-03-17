@@ -104,7 +104,7 @@ export const categories: CategoryType[] = [
   },
   {
     name: 'Construction & Real Estate',
-    image: '/images/categories/constrution.jpg',
+    image: '/images/categories/construction.jpg',
     subcategories: [
       'Civil Engineering',
       'Architectural Services',
