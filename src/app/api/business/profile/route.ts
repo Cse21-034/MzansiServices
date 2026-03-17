@@ -50,7 +50,9 @@ export async function GET(req: Request) {
         },
         category: true,
         subcategory: true,
-        businessHours: true
+        businessHours: {
+          orderBy: { dayOfWeek: 'asc' }
+        }
       }
     });
 
@@ -241,6 +243,7 @@ export async function PUT(req: Request) {
       // Update business hours separately (delete old ones and create new ones)
       try {
         if (businessHours && Array.isArray(businessHours)) {
+          console.log('Updating business hours:', businessHours);
           // Delete existing hours
           await prisma.businessHours.deleteMany({
             where: { businessId: business.id }
@@ -249,17 +252,24 @@ export async function PUT(req: Request) {
           // Create new hours
           for (const hours of businessHours) {
             if (typeof hours.dayOfWeek === 'number') {
+              // Properly validate and trim time values
+              const openTime = hours.openTime && typeof hours.openTime === 'string' && hours.openTime.trim() ? hours.openTime.trim() : null;
+              const closeTime = hours.closeTime && typeof hours.closeTime === 'string' && hours.closeTime.trim() ? hours.closeTime.trim() : null;
+              
+              console.log(`Creating business hours for day ${hours.dayOfWeek}: ${openTime || 'Closed'} - ${closeTime || 'Closed'}`);
+              
               await prisma.businessHours.create({
                 data: {
                   businessId: business.id,
                   dayOfWeek: hours.dayOfWeek,
-                  openTime: (hours.openTime && hours.openTime.trim()) ? hours.openTime : null,
-                  closeTime: (hours.closeTime && hours.closeTime.trim()) ? hours.closeTime : null,
+                  openTime: openTime,
+                  closeTime: closeTime,
                   isClosed: Boolean(hours.isClosed)
                 }
               });
             }
           }
+          console.log('✅ Business hours updated successfully');
         }
       } catch (hoursError) {
         console.error('Error updating business hours:', hoursError);
@@ -327,19 +337,27 @@ export async function PUT(req: Request) {
       // Create business hours for new business
       try {
         if (businessHours && Array.isArray(businessHours)) {
+          console.log('Creating business hours for new business:', businessHours);
           for (const hours of businessHours) {
             if (typeof hours.dayOfWeek === 'number') {
+              // Properly validate and trim time values
+              const openTime = hours.openTime && typeof hours.openTime === 'string' && hours.openTime.trim() ? hours.openTime.trim() : null;
+              const closeTime = hours.closeTime && typeof hours.closeTime === 'string' && hours.closeTime.trim() ? hours.closeTime.trim() : null;
+              
+              console.log(`Creating business hours for day ${hours.dayOfWeek}: ${openTime || 'Closed'} - ${closeTime || 'Closed'}`);
+              
               await prisma.businessHours.create({
                 data: {
                   businessId: business.id,
                   dayOfWeek: hours.dayOfWeek,
-                  openTime: (hours.openTime && hours.openTime.trim()) ? hours.openTime : null,
-                  closeTime: (hours.closeTime && hours.closeTime.trim()) ? hours.closeTime : null,
+                  openTime: openTime,
+                  closeTime: closeTime,
                   isClosed: Boolean(hours.isClosed)
                 }
               });
             }
           }
+          console.log('✅ Business hours created successfully for new business');
         }
       } catch (hoursError) {
         console.error('Error creating business hours:', hoursError);
@@ -356,7 +374,9 @@ export async function PUT(req: Request) {
         },
         category: true,
         subcategory: true,
-        businessHours: true
+        businessHours: {
+          orderBy: { dayOfWeek: 'asc' }
+        }
       }
     });
 

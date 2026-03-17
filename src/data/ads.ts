@@ -60,8 +60,8 @@ export const ADS_LIST: AdConfig[] = [
   {
     id: 'ad-inline-1',
     title: 'Website Development',
-    image: '/images/ads3.jpg',
-    link: 'https://example-advertiser-6.com',
+    image: '/images/placeholder-business.jpg',
+    link: 'https://www.namibiaservices.com/advertise',
     alt: 'Website Development',
     type: 'inline',
     priority: 1,
