@@ -56,6 +56,13 @@ const LocationSearchInput: FC<LocationSearchInputProps> = ({
           // Find the nearest Namibian city to user's coordinates
           const nearestCity = findNearestCity(latitude, longitude);
           
+          if (!nearestCity) {
+            // User is outside Namibia
+            alert("⚠️ Our services are only available in Namibia. Please select a location within Namibia to continue searching.");
+            console.warn("User is outside Namibia - no service available");
+            return;
+          }
+          
           setInternalLocation(nearestCity);
           setSearchQuery(nearestCity);
           onLocationChange(nearestCity);

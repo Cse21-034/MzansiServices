@@ -9,6 +9,14 @@ interface NamibiaCity {
   longitude: number;
 }
 
+// Namibia approximate boundaries
+const NAMIBIA_BOUNDS = {
+  minLat: -28.5,
+  maxLat: -16.5,
+  minLon: 11.5,
+  maxLon: 25.5,
+};
+
 const NAMIBIA_CITIES: NamibiaCity[] = [
   { name: "Windhoek", latitude: -22.5597, longitude: 17.0832 },
   { name: "Walvis Bay", latitude: -22.9881, longitude: 14.5064 },
@@ -32,6 +40,21 @@ const NAMIBIA_CITIES: NamibiaCity[] = [
   { name: "Outjo", latitude: -20.1317, longitude: 16.1489 },
   { name: "Otavi", latitude: -19.6043, longitude: 17.2646 },
 ];
+
+/**
+ * Check if coordinates are within Namibia
+ * @param latitude - Geographic latitude
+ * @param longitude - Geographic longitude
+ * @returns true if coordinates are within Namibia bounds
+ */
+export function isWithinNamibia(latitude: number, longitude: number): boolean {
+  return (
+    latitude >= NAMIBIA_BOUNDS.minLat &&
+    latitude <= NAMIBIA_BOUNDS.maxLat &&
+    longitude >= NAMIBIA_BOUNDS.minLon &&
+    longitude <= NAMIBIA_BOUNDS.maxLon
+  );
+}
 
 /**
  * Calculate distance between two coordinates using Haversine formula
@@ -60,11 +83,19 @@ function calculateDistance(
  * Find the nearest Namibian city to given coordinates
  * @param latitude - User's latitude
  * @param longitude - User's longitude
- * @returns The name of the nearest Namibian city
+ * @returns The name of the nearest Namibian city, or null if user is outside Namibia
  */
-export function findNearestCity(latitude: number, longitude: number): string {
+export function findNearestCity(latitude: number, longitude: number): string | null {
   if (!latitude || !longitude) {
     return "Windhoek"; // Default fallback
+  }
+
+  // Check if user is within Namibia bounds
+  if (!isWithinNamibia(latitude, longitude)) {
+    console.warn(
+      `❌ User location (${latitude.toFixed(4)}, ${longitude.toFixed(4)}) is outside Namibia. No service available.`
+    );
+    return null;
   }
 
   let nearestCity = NAMIBIA_CITIES[0];
