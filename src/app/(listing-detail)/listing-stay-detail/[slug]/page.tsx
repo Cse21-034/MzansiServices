@@ -783,7 +783,7 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
       <header className="rounded-md sm:rounded-xl">
         <div className="relative grid grid-cols-3 sm:grid-cols-4 gap-1 sm:gap-2">
           <div
-            className="col-span-2 row-span-3 sm:row-span-2 relative rounded-md sm:rounded-xl overflow-hidden cursor-pointer"
+            className="col-span-2 row-span-3 sm:row-span-2 relative rounded-md sm:rounded-xl overflow-hidden cursor-pointer aspect-video"
             onClick={handleOpenModalImageGallery}
           >
             <Image
@@ -792,24 +792,23 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
               src={businessPhotos[0] || logoMobile}
               alt={business.name}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 50vw"
+              priority
             />
             <div className="absolute inset-0 bg-neutral-900 bg-opacity-20 opacity-0 hover:opacity-100 transition-opacity"></div>
           </div>
           {businessPhotos.filter((_: any, i: number) => i >= 1 && i < 5).map((item: string, index: number) => (
             <div
               key={index}
-              className={`relative rounded-md sm:rounded-xl overflow-hidden ${index >= 3 ? "hidden sm:block" : ""
+              className={`relative rounded-md sm:rounded-xl overflow-hidden aspect-square ${index >= 3 ? "hidden sm:block" : ""
                 }`}
             >
-              <div className="aspect-w-4 aspect-h-3 sm:aspect-w-6 sm:aspect-h-5">
-                <Image
-                  fill
-                  className="object-cover rounded-md sm:rounded-xl "
-                  src={item || logoMobile}
-                  alt={`${business.name} ${index + 1}`}
-                  sizes="400px"
-                />
-              </div>
+              <Image
+                fill
+                className="object-cover rounded-md sm:rounded-xl"
+                src={item || logoMobile}
+                alt={`${business.name} ${index + 1}`}
+                sizes="200px"
+              />
 
               <div
                 className="absolute inset-0 bg-neutral-900 bg-opacity-20 opacity-0 hover:opacity-100 transition-opacity cursor-pointer"

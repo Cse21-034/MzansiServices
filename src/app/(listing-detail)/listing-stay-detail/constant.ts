@@ -1,7 +1,8 @@
 import { ListingGalleryImage } from "@/components/listing-image-gallery/utils/types";
 
 export const PHOTOS: string[] = [
- 
+  "/images/placeholder-business.jpg",
+  "/images/placeholder-category.jpg",
 ];
 
 export const Amenities_demos = [
