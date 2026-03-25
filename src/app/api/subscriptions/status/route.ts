@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { getSubscriptionStatus, getTierInfo } from '@/lib/subscription-access';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
