@@ -411,12 +411,6 @@ const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = 
         <p className="text-gray-600 dark:text-gray-400 mb-6">
           🚀 All plans include free business listing. Upgrade anytime to unlock premium features.
         </p>
-        <Link
-          href="/namibiaservices"
-          className="inline-flex items-center gap-2 text-burgundy-600 dark:text-burgundy-400 font-semibold hover:underline"
-        >
-          Explore Directory →
-        </Link>
       </div>
 
       {/* Business Selection Modal */}
