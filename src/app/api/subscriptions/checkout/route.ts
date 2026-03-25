@@ -8,7 +8,7 @@ import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { payGate } from '@/lib/paygate';
 import { SUBSCRIPTION_TIERS, getTierInfo } from '@/lib/subscription-access';
-import { authOptions } from '../auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
