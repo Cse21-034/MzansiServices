@@ -72,7 +72,7 @@ export async function featureAccessMiddleware(
       {
         success: false,
         message: access.reason || 'Feature not available in your plan',
-        upgradeTier: getTierInfo(access.tier).name,
+        upgradeTier: getTierInfo(access.tier ?? null).name,
       },
       { status: 403 }
     );
