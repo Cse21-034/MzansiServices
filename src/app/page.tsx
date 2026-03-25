@@ -8,7 +8,6 @@ import SectionGridFeaturePlaces from "@/components/SectionGridFeaturePlaces";
 import SectionHowItWork from "@/components/SectionHowItWork";
 import SectionSubscriptionPackages from "@/components/SectionSubscriptionPackages";
 import SectionSubscribe2 from "@/components/SectionSubscribe2";
-import SectionGridCategoryBox from "@/components/SectionGridCategoryBox";
 import SectionBecomeAnAuthor from "@/components/SectionBecomeAnAuthor";
 import AdRotation from "@/components/ads/addemobanner";
 import RotatingBannerAd from "@/components/ads/RotatingBannerAd";
@@ -121,11 +120,6 @@ async function PageHome() {
         {/* Inline Ad - Minimal Style */}
         <div className="relative py-6">
           <InlineAd style="minimal" />
-        </div>
-
-        <div className="relative py-16">
-          <BackgroundSection className="bg-green-50 dark:bg-black dark:bg-opacity-20" />
-          <SectionGridCategoryBox />
         </div>
 
         <div className="relative py-16">
