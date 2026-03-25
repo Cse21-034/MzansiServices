@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getLimit, hasFeature, getTierInfo } from './subscription-access';
+import { getLimit, hasFeature, getTierInfo } from '@/lib/subscription-access';
 import { SubscriptionTier } from '@prisma/client';
 
 /**

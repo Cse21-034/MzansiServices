@@ -10,6 +10,7 @@ export const SUBSCRIPTION_TIERS = {
     name: 'WILD HORSES',
     tier: 'WILD_HORSES' as SubscriptionTier,
     monthlyPrice: 0,
+    currency: 'BWP',
     description: 'Establish your business presence quickly.',
     features: [
       'Free business listing',
