@@ -6,8 +6,10 @@ export const metadata = {
 };
 
 export default function PaymentSuccessPage({
+  params,
   searchParams,
 }: {
+  params: { id: string };
   searchParams: {
     reference?: string;
     status?: string;

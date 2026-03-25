@@ -6,11 +6,13 @@ export const metadata = {
 };
 
 export default function SubscriptionPlansPage({
+  params,
   searchParams,
 }: {
+  params: { id: string };
   searchParams: { businessId?: string };
 }) {
-  const businessId = searchParams?.businessId || '';
+  const businessId = searchParams?.businessId || params.id;
 
   return (
     <main className="min-h-screen">

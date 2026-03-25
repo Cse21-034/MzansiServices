@@ -8,11 +8,11 @@ export const metadata = {
 export default function SubscriptionPage({
   params,
 }: {
-  params: { businessId: string };
+  params: { id: string };
 }) {
   return (
     <main className="min-h-screen">
-      <SubscriptionManagement businessId={params.businessId} />
+      <SubscriptionManagement businessId={params.id} />
     </main>
   );
 }
