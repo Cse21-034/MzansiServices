@@ -166,6 +166,10 @@ model Business {
   membershipProvider  String?     @map("membership_provider")
   membershipUploadedAt DateTime?   @map("membership_uploaded_at")
   
+  // Subscription fields
+  subscriptionId      String?     @map("subscription_id")
+  subscription        Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  
   @@map("businesses")
 }
 
@@ -384,6 +388,67 @@ model Notification {
   @@map("notifications")
 }
 
+model SubscriptionPlan {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String
+  monthlyPrice Float    @map("monthly_price")
+  yearlyPrice Float?   @map("yearly_price")
+  tier        SubscriptionTier
+  features    String[] @default([])
+  maxPhotos   Int      @map("max_photos") @default(0)
+  maxPromotions Int    @map("max_promotions") @default(0)
+  maxBranches Int      @map("max_branches") @default(0)
+  features_enabled Json @default("{}") @map("features_enabled") // JSON object with feature flags
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  subscriptions Subscription[]
+  
+  @@map("subscription_plans")
+}
+
+model Subscription {
+  id              String   @id @default(cuid())
+  businessId      String   @unique @map("business_id")
+  planId          String   @map("plan_id")
+  status          SubscriptionStatus @default(ACTIVE) @map("status")
+  startDate       DateTime @default(now()) @map("start_date")
+  endDate         DateTime? @map("end_date")
+  renewalDate     DateTime? @map("renewal_date")
+  autoRenew       Boolean  @default(true) @map("auto_renew")
+  billingCycle    BillingCycle @default(MONTHLY) @map("billing_cycle")
+  currentPaymentId String?  @map("current_payment_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  
+  business        Business[]
+  plan            SubscriptionPlan @relation(fields: [planId], references: [id])
+  payments        Payment[]
+  
+  @@map("subscriptions")
+}
+
+model Payment {
+  id                String   @id @default(cuid())
+  subscriptionId    String   @map("subscription_id")
+  paymentGatewayId  String   @map("payment_gateway_id") // PayGate reference ID
+  amount            Float
+  currency          String   @default("BWP")
+  status            PaymentStatus @default(PENDING) @map("status")
+  paymentMethod     String?  @map("payment_method")
+  transactionRef    String?  @unique @map("transaction_ref") // PayGate transaction reference
+  failureReason     String?  @map("failure_reason")
+  paidAt            DateTime? @map("paid_at")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  subscription      Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  
+  @@map("payments")
+}
+
 // Enums
 enum UserRole {
   USER
@@ -454,4 +519,31 @@ enum PropertyListingStatus {
   APPROVED
   REJECTED
   SUSPENDED
+}
+
+enum SubscriptionTier {
+  WILD_HORSES
+  DESERT_ELEPHANTS
+  DESERT_LIONS
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  CANCELLED
+  EXPIRED
+  SUSPENDED
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+  REFUNDED
 }

@@ -6,6 +6,7 @@ import SectionSliderNewCategories from "@/components/SectionSliderNewCategories"
 import BackgroundSection from "@/components/BackgroundSection";
 import SectionGridFeaturePlaces from "@/components/SectionGridFeaturePlaces";
 import SectionHowItWork from "@/components/SectionHowItWork";
+import SectionSubscriptionPackages from "@/components/SectionSubscriptionPackages";
 import SectionSubscribe2 from "@/components/SectionSubscribe2";
 import SectionGridCategoryBox from "@/components/SectionGridCategoryBox";
 import SectionBecomeAnAuthor from "@/components/SectionBecomeAnAuthor";
@@ -108,6 +109,9 @@ async function PageHome() {
         />
 
         <SectionHowItWork />
+
+        {/* Subscription Packages Section */}
+        <SectionSubscriptionPackages />
 
         {/* Original Rotating Ad */}
         <div className="relative py-16">
