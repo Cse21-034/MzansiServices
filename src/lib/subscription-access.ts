@@ -122,7 +122,7 @@ export function hasFeature(
   feature: keyof SubscriptionLimits
 ): boolean {
   const tierInfo = getTierInfo(tier);
-  return tierInfo.limits[feature] || false;
+  return !!(tierInfo.limits[feature] || false);
 }
 
 /**
