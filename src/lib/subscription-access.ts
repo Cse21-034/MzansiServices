@@ -10,7 +10,8 @@ export const SUBSCRIPTION_TIERS = {
     name: 'WILD HORSES',
     tier: 'WILD_HORSES' as SubscriptionTier,
     monthlyPrice: 0,
-    currency: 'BWP',
+    currency: 'NAD',
+    yearlyDiscountPercentage: 15,
     description: 'Establish your business presence quickly.',
     features: [
       'Free business listing',
@@ -36,7 +37,8 @@ export const SUBSCRIPTION_TIERS = {
     name: 'DESERT ELEPHANTS',
     tier: 'DESERT_ELEPHANTS' as SubscriptionTier,
     monthlyPrice: 100,
-    currency: 'BWP',
+    currency: 'NAD',
+    yearlyDiscountPercentage: 15,
     description: 'Boost visibility and build customer trust.',
     features: [
       'Enhanced business profile',
@@ -66,7 +68,8 @@ export const SUBSCRIPTION_TIERS = {
     name: 'DESERT LIONS',
     tier: 'DESERT_LIONS' as SubscriptionTier,
     monthlyPrice: 200,
-    currency: 'BWP',
+    currency: 'NAD',
+    yearlyDiscountPercentage: 15,
     description: 'Unlock powerful tools for rapid growth.',
     features: [
       'Top search placement',
@@ -135,6 +138,34 @@ export function getLimit(
 ): any {
   const tierInfo = getTierInfo(tier);
   return tierInfo.limits[limitKey];
+}
+
+/**
+ * Calculate yearly price with discount
+ */
+export function getYearlyPrice(
+  tier: SubscriptionTier | null
+): number {
+  const tierInfo = getTierInfo(tier);
+  if (tierInfo.monthlyPrice === 0) return 0;
+  
+  const yearlyPrice = tierInfo.monthlyPrice * 12;
+  const discount = yearlyPrice * (tierInfo.yearlyDiscountPercentage / 100);
+  return yearlyPrice - discount;
+}
+
+/**
+ * Calculate the savings from yearly subscription
+ */
+export function getYearlySavings(
+  tier: SubscriptionTier | null
+): number {
+  const tierInfo = getTierInfo(tier);
+  if (tierInfo.monthlyPrice === 0) return 0;
+  
+  const yearlyPrice = tierInfo.monthlyPrice * 12;
+  const discount = yearlyPrice * (tierInfo.yearlyDiscountPercentage / 100);
+  return discount;
 }
 
 /**

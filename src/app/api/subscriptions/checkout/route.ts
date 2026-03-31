@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { payGate } from '@/lib/paygate';
-import { SUBSCRIPTION_TIERS, getTierInfo } from '@/lib/subscription-access';
+import { SUBSCRIPTION_TIERS, getTierInfo, getYearlyPrice } from '@/lib/subscription-access';
 import { authOptions } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
 
     // Calculate amount
     const amount = billingCycle === 'YEARLY' 
-      ? (plan.monthlyPrice * 12 * 0.9) // 10% discount for yearly
+      ? getYearlyPrice(planInfo.tier)
       : plan.monthlyPrice;
 
     if (amount === 0) {
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
     const checkoutData = payGate.createCheckout({
       reference,
       amount: amount * 100, // Convert to cents
-      currency: 'BWP',
+      currency: 'NAD',
       email: business.email,
       description: `${planInfo.name} Subscription - ${business.name}`,
       returnUrl: `${process.env.NEXTAUTH_URL}/business/${businessId}/subscription/success`,

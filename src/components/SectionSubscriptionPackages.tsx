@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { SUBSCRIPTION_TIERS, getAllTiers } from '@/lib/subscription-access';
+import { SUBSCRIPTION_TIERS, getAllTiers, getYearlyPrice, getYearlySavings } from '@/lib/subscription-access';
 import { SubscriptionTier } from '@prisma/client';
 import Heading from '@/shared/Heading';
 import ButtonPrimary from '@/shared/ButtonPrimary';
@@ -14,6 +14,8 @@ interface SectionSubscriptionPackagesProps {
   businessId?: string;
 }
 
+type BillingCycle = 'MONTHLY' | 'YEARLY';
+
 const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = ({ businessId = '' }) => {
   const { data: session } = useSession();
   const router = useRouter();
@@ -22,6 +24,7 @@ const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = 
   const [processingTier, setProcessingTier] = useState<string | null>(null);
   const [showBusinessSelector, setShowBusinessSelector] = useState(false);
   const [selectedPlanTier, setSelectedPlanTier] = useState<string | null>(null);
+  const [billingCycle, setBillingCycle] = useState<BillingCycle>('MONTHLY');
 
   useEffect(() => {
     if (businessId) {
@@ -65,7 +68,7 @@ const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = 
         body: JSON.stringify({
           planTier,
           businessId,
-          billingCycle: 'MONTHLY',
+          billingCycle: billingCycle,
         }),
       });
 
@@ -100,7 +103,7 @@ const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = 
           body: JSON.stringify({
             planTier: selectedPlanTier,
             businessId: selectedBusinessId,
-            billingCycle: 'MONTHLY',
+            billingCycle: billingCycle,
           }),
         });
 
@@ -140,6 +143,34 @@ const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = 
         <Heading isCenter desc="Choose the perfect plan for your business and unlock powerful features">
           Namibia Services Packages
         </Heading>
+      </div>
+
+      {/* Billing Cycle Toggle */}
+      <div className="mt-10 flex justify-center items-center gap-4">
+        <span className={`text-sm font-medium ${billingCycle === 'MONTHLY' ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>
+          Monthly
+        </span>
+        <button
+          onClick={() => setBillingCycle(billingCycle === 'MONTHLY' ? 'YEARLY' : 'MONTHLY')}
+          className="relative inline-flex h-8 w-14 items-center rounded-full bg-gray-300 dark:bg-gray-600 transition-colors"
+          style={{
+            backgroundColor: billingCycle === 'YEARLY' ? '#612C30' : '#d1d5db',
+          }}
+        >
+          <span
+            className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+              billingCycle === 'YEARLY' ? 'translate-x-7' : 'translate-x-1'
+            }`}
+          />
+        </button>
+        <span className={`text-sm font-medium ${billingCycle === 'YEARLY' ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>
+          Yearly
+        </span>
+        {billingCycle === 'YEARLY' && (
+          <span className="ml-2 inline-block bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 text-xs font-semibold px-3 py-1 rounded-full">
+            Save 15%
+          </span>
+        )}
       </div>
 
       {/* Packages Grid */}
@@ -212,7 +243,12 @@ const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = 
                           : 'text-gray-900 dark:text-white'
                       }`}
                     >
-                      {tier.monthlyPrice === 0 ? 'FREE' : `P${tier.monthlyPrice}`}
+                      {tier.monthlyPrice === 0 
+                        ? 'FREE' 
+                        : billingCycle === 'YEARLY'
+                        ? `N$${getYearlyPrice(tier.tier as any)}`
+                        : `N$${tier.monthlyPrice}`
+                      }
                     </span>
                     {tier.monthlyPrice > 0 && (
                       <span
@@ -222,10 +258,15 @@ const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = 
                             : 'text-gray-600 dark:text-gray-400'
                         }
                       >
-                        /month
+                        {billingCycle === 'YEARLY' ? '/year' : '/month'}
                       </span>
                     )}
                   </div>
+                  {billingCycle === 'YEARLY' && tier.monthlyPrice > 0 && (
+                    <p className={`text-sm mt-2 ${isPremium ? 'text-orange-100' : 'text-green-600 dark:text-green-400'} font-medium`}>
+                      Save N$${getYearlySavings(tier.tier as any)} per year
+                    </p>
+                  )}
                 </div>
 
                 {/* CTA Button */}

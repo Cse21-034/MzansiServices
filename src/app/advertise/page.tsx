@@ -19,7 +19,7 @@ const AdvertiseWithUsPage: FC = () => {
   const valueAddedPackages = [
     {
       name: "Package 1",
-      price: "P100–500",
+      price: "N$100–500",
       period: "p/m",
       description: "Basic membership with essential features",
       features: [
@@ -39,7 +39,7 @@ const AdvertiseWithUsPage: FC = () => {
     },
     {
       name: "Package 2",
-      price: "P1000",
+      price: "N$1000",
       period: "p/m",
       description: "Enhanced package with social media features",
       features: [
