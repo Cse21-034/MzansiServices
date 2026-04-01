@@ -26,6 +26,7 @@ export interface PayGateCheckoutResponse {
   redirect: string;
   checksum: string;
   sessionId: string;
+  payRequestId?: string;
 }
 
 export interface PayGateNotification {
@@ -44,21 +45,18 @@ class PayGateService {
 
   constructor(config: PayGateConfig) {
     this.config = config;
-    this.baseUrl =
-      config.environment === 'production'
-        ? 'https://secure.paygate.co.za'
-        : 'https://secure-test.paygate.co.za';
+    // Both test and production use the same domain (sandbox controlled by merchant credentials)
+    this.baseUrl = 'https://secure.paygate.co.za';
   }
 
   /**
-   * Generate checksum for PayGate requests
+   * Generate checksum for PayGate requests (MD5)
+   * All field values concatenated + merchant key, then MD5 hashed
    */
   private generateChecksum(data: string): string {
     const crypto = require('crypto');
-    return crypto
-      .createHmac('sha256', this.config.merchantKey)
-      .update(data)
-      .digest('hex');
+    const checksumString = data + this.config.merchantKey;
+    return crypto.createHash('md5').update(checksumString).digest('hex');
   }
 
   /**
@@ -70,51 +68,72 @@ class PayGateService {
   }
 
   /**
-   * Create a checkout session
-   * Returns URL to redirect user to PayGate
+   * Step 1: Server-side POST to initiate.trans
+   * This returns a PAY_REQUEST_ID which is used for the browser redirect
    */
-  createCheckout(request: PayGateCheckoutRequest): PayGateCheckoutResponse {
-    const sessionId = this.generateSessionId();
+  async createCheckout(request: PayGateCheckoutRequest): Promise<PayGateCheckoutResponse> {
+    const transactionDate = new Date()
+      .toISOString()
+      .replace('T', ' ')
+      .substring(0, 19);
 
-    // Build checksum data
-    const checksumData = [
-      this.config.merchantId,
-      sessionId,
-      request.reference,
-      request.amount,
-      request.currency,
-      request.email,
-      request.description || '',
-      request.customData ? JSON.stringify(request.customData) : '',
-    ]
-      .filter((v) => v !== undefined && v !== null)
-      .join('|');
-
-    const checksum = this.generateChecksum(checksumData);
-
-    const params = new URLSearchParams({
+    // Build form data for initiate.trans
+    const formData: Record<string, string> = {
       PAYGATE_ID: this.config.merchantId,
       REFERENCE: request.reference,
       AMOUNT: request.amount.toString(),
       CURRENCY: request.currency,
       RETURN_URL: request.returnUrl,
-      NOTIFY_URL: request.notifyUrl,
+      TRANSACTION_DATE: transactionDate,
+      LOCALE: 'en-za',
+      COUNTRY: 'NAM', // Namibia
       EMAIL: request.email,
-      SESSION_ID: sessionId,
-      CHECKSUM: checksum,
-    });
+      NOTIFY_URL: request.notifyUrl,
+    };
 
     if (request.description) {
-      params.append('DESCRIPTION', request.description);
+      formData.DESCRIPTION = request.description;
     }
 
-    const redirectUrl = `${this.baseUrl}/payweb3/initiate.trans?${params.toString()}`;
+    // Generate checksum: all values concatenated + merchant key, then MD5
+    const checksumString = Object.values(formData).join('');
+    const checksum = this.generateChecksum(checksumString);
+    formData.CHECKSUM = checksum;
 
-    return {
-      redirect: redirectUrl,
-      checksum,
-      sessionId,
-    };
+    try {
+      // Step 1: POST to initiate.trans (server-side)
+      const response = await fetch(`${this.baseUrl}/payweb3/initiate.trans`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams(formData).toString(),
+      });
+
+      const responseText = await response.text();
+
+      // Parse response: PAYGATE_ID=...&PAY_REQUEST_ID=...&REFERENCE=...&CHECKSUM=...
+      const params = new URLSearchParams(responseText);
+      const payRequestId = params.get('PAY_REQUEST_ID');
+      const responseChecksum = params.get('CHECKSUM');
+
+      if (!payRequestId) {
+        throw new Error(`Failed to initiate payment: ${responseText}`);
+      }
+
+      // Return data needed for Step 2 (browser redirect)
+      const sessionId = this.generateSessionId();
+
+      return {
+        redirect: `${this.baseUrl}/payweb3/process.trans`,
+        checksum: responseChecksum || checksum,
+        sessionId,
+        payRequestId,
+      };
+    } catch (error) {
+      console.error('PayGate initiate.trans error:', error);
+      throw error;
+    }
   }
 
   /**

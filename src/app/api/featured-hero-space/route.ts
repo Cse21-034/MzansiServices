@@ -170,7 +170,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Create checkout
-    const checkoutData = payGate.createCheckout({
+    const checkoutData = await payGate.createCheckout({
       reference,
       amount: amount * 100, // Convert to cents
       currency: 'NAD',
@@ -194,6 +194,8 @@ export async function POST(req: NextRequest) {
       checkout: {
         redirectUrl: checkoutData.redirect,
         sessionId: checkoutData.sessionId,
+        payRequestId: checkoutData.payRequestId,
+        checksum: checkoutData.checksum,
       },
     });
   } catch (error) {

@@ -126,8 +126,27 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
         throw new Error(result.error || "Failed to create featured space");
       }
 
-      if (result.checkout?.redirectUrl) {
-        window.location.href = result.checkout.redirectUrl;
+      // Step 2: Redirect to PayGate via form POST
+      if (result.checkout?.payRequestId && result.checkout?.checksum) {
+        // Create and auto-submit the form to PayGate process.trans endpoint
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = result.checkout.redirectUrl; // process.trans URL
+
+        const payRequestIdInput = document.createElement("input");
+        payRequestIdInput.type = "hidden";
+        payRequestIdInput.name = "PAY_REQUEST_ID";
+        payRequestIdInput.value = result.checkout.payRequestId;
+        form.appendChild(payRequestIdInput);
+
+        const checksumInput = document.createElement("input");
+        checksumInput.type = "hidden";
+        checksumInput.name = "CHECKSUM";
+        checksumInput.value = result.checkout.checksum;
+        form.appendChild(checksumInput);
+
+        document.body.appendChild(form);
+        form.submit();
       }
     } catch (error) {
       setModalTitle("Error");
