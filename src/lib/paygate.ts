@@ -113,6 +113,17 @@ class PayGateService {
   }
 
   /**
+   * Verify checksum from PayGate callback notifications
+   * Checksum is calculated from PAYGATE_ID|REFERENCE|TRANSACTION_ID|STATUS|AMOUNT|CURRENCY + KEY
+   */
+  verifyNotificationChecksum(paygate_id: string, reference: string, transaction_id: string, status: string, amount: string, currency: string, providedChecksum: string): boolean {
+    const checksumString = [paygate_id, reference, transaction_id, status, amount, currency].join('|') + this.config.merchantKey;
+    const crypto = require('crypto');
+    const calculatedChecksum = crypto.createHash('md5').update(checksumString).digest('hex');
+    return calculatedChecksum === providedChecksum;
+  }
+
+  /**
    * Step 1: Server-side POST to initiate.trans
    * This returns a PAY_REQUEST_ID which is used for the browser redirect
    */
@@ -220,19 +231,16 @@ class PayGateService {
     message: string;
   }> {
     try {
-      // Verify checksum
-      const checksumData = [
-        data.PAYGATE_ID,
-        data.REFERENCE,
-        data.TRANSACTION_ID,
-        data.STATUS,
-        data.AMOUNT,
-        data.CURRENCY,
-      ]
-        .filter((v) => v)
-        .join('|');
-
-      if (!this.verifyChecksum(checksumData, data.CHECKSUM)) {
+      // Verify notification checksum
+      if (!this.verifyNotificationChecksum(
+        data.PAYGATE_ID || '',
+        data.REFERENCE || '',
+        data.TRANSACTION_ID || '',
+        data.STATUS || '',
+        data.AMOUNT || '',
+        data.CURRENCY || '',
+        data.CHECKSUM || ''
+      )) {
         return {
           success: false,
           reference: data.REFERENCE || 'unknown',
