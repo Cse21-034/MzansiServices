@@ -26,8 +26,15 @@ export async function GET(req: NextRequest) {
 
     if (userSpacesOnly) {
       // Get user's featured spaces
+      if (!businessId) {
+        return NextResponse.json(
+          { error: 'businessId required' },
+          { status: 400 }
+        );
+      }
+
       const spaces = await prisma.featuredHeroSpace.findMany({
-        where: { businessId },
+        where: { businessId: businessId as string },
         orderBy: { createdAt: 'desc' },
       });
       return NextResponse.json({ success: true, data: spaces });
