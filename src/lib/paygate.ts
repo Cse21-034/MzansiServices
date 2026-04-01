@@ -72,6 +72,14 @@ class PayGateService {
    * This returns a PAY_REQUEST_ID which is used for the browser redirect
    */
   async createCheckout(request: PayGateCheckoutRequest): Promise<PayGateCheckoutResponse> {
+    // Validate merchant config
+    if (!this.config.merchantId) {
+      throw new Error('PayGate merchant ID not configured. Set PAYGATE_MERCHANT_ID environment variable.');
+    }
+    if (!this.config.merchantKey) {
+      throw new Error('PayGate merchant key not configured. Set PAYGATE_MERCHANT_KEY environment variable.');
+    }
+
     const transactionDate = new Date()
       .toISOString()
       .replace('T', ' ')
@@ -110,6 +118,11 @@ class PayGateService {
         body: new URLSearchParams(formData).toString(),
       });
 
+      if (!response.ok) {
+        const responseText = await response.text();
+        throw new Error(`PayGate HTTP ${response.status}: ${responseText}`);
+      }
+
       const responseText = await response.text();
 
       // Parse response: PAYGATE_ID=...&PAY_REQUEST_ID=...&REFERENCE=...&CHECKSUM=...
@@ -118,7 +131,7 @@ class PayGateService {
       const responseChecksum = params.get('CHECKSUM');
 
       if (!payRequestId) {
-        throw new Error(`Failed to initiate payment: ${responseText}`);
+        throw new Error(`Failed to get PAY_REQUEST_ID from PayGate. Response: ${responseText}`);
       }
 
       // Return data needed for Step 2 (browser redirect)

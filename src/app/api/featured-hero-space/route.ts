@@ -170,20 +170,30 @@ export async function POST(req: NextRequest) {
     });
 
     // Create checkout
-    const checkoutData = await payGate.createCheckout({
-      reference,
-      amount: amount * 100, // Convert to cents
-      currency: 'NAD',
-      email: business.email,
-      description: `Featured Hero Space - ${business.name} (${billingCycle})`,
-      returnUrl: `${process.env.NEXTAUTH_URL}/business/${businessId}/featured-hero/success`,
-      notifyUrl: `${process.env.NEXTAUTH_URL}/api/featured-hero-space/callback`,
-      customData: {
-        businessId,
-        spaceId: pendingSpace.id,
-        billingCycle,
-      },
-    });
+    let checkoutData;
+    try {
+      checkoutData = await payGate.createCheckout({
+        reference,
+        amount: amount * 100, // Convert to cents
+        currency: 'NAD',
+        email: business.email,
+        description: `Featured Hero Space - ${business.name} (${billingCycle})`,
+        returnUrl: `${process.env.NEXTAUTH_URL}/business/${businessId}/featured-hero/success`,
+        notifyUrl: `${process.env.NEXTAUTH_URL}/api/featured-hero-space/callback`,
+        customData: {
+          businessId,
+          spaceId: pendingSpace.id,
+          billingCycle,
+        },
+      });
+    } catch (paymentError) {
+      console.error('PayGate checkout error:', paymentError);
+      const errorMessage = paymentError instanceof Error ? paymentError.message : 'Payment gateway error';
+      return NextResponse.json(
+        { error: `Failed to initiate payment: ${errorMessage}` },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
@@ -200,8 +210,9 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error('Error creating featured hero space:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     return NextResponse.json(
-      { error: 'Failed to create featured space' },
+      { error: `Error: ${errorMessage}` },
       { status: 500 }
     );
   }

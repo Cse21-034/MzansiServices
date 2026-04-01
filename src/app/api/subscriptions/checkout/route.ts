@@ -120,36 +120,46 @@ export async function POST(request: NextRequest) {
     // Create reference for PayGate
     const reference = `NS_SUB_${businessId}_${Date.now()}`;
 
-    // Return checkout details
-    const checkoutData = await payGate.createCheckout({
-      reference,
-      amount: amount * 100, // Convert to cents
-      currency: 'NAD',
-      email: business.email,
-      description: `${planInfo.name} Subscription - ${business.name}`,
-      returnUrl: `${process.env.NEXTAUTH_URL}/business/${businessId}/subscription/success`,
-      notifyUrl: `${process.env.NEXTAUTH_URL}/api/subscriptions/callback`,
-      customData: {
-        businessId,
-        planId: plan.id,
-        billingCycle,
-      },
-    });
-
-    return NextResponse.json({
-      success: true,
-      checkout: {
-        redirectUrl: checkoutData.redirect,
-        payRequestId: checkoutData.payRequestId,
-        checksum: checkoutData.checksum,
+    try {
+      // Return checkout details
+      const checkoutData = await payGate.createCheckout({
         reference,
-        sessionId: checkoutData.sessionId,
-      },
-    });
+        amount: amount * 100, // Convert to cents
+        currency: 'NAD',
+        email: business.email,
+        description: `${planInfo.name} Subscription - ${business.name}`,
+        returnUrl: `${process.env.NEXTAUTH_URL}/business/${businessId}/subscription/success`,
+        notifyUrl: `${process.env.NEXTAUTH_URL}/api/subscriptions/callback`,
+        customData: {
+          businessId,
+          planId: plan.id,
+          billingCycle,
+        },
+      });
+
+      return NextResponse.json({
+        success: true,
+        checkout: {
+          redirectUrl: checkoutData.redirect,
+          payRequestId: checkoutData.payRequestId,
+          checksum: checkoutData.checksum,
+          reference,
+          sessionId: checkoutData.sessionId,
+        },
+      });
+    } catch (paymentError) {
+      console.error('PayGate checkout error:', paymentError);
+      const errorMessage = paymentError instanceof Error ? paymentError.message : 'Payment gateway error';
+      return NextResponse.json(
+        { message: `Failed to initiate payment: ${errorMessage}` },
+        { status: 500 }
+      );
+    }
   } catch (error) {
     console.error('Subscription checkout error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { message: `Error: ${errorMessage}` },
       { status: 500 }
     );
   }
