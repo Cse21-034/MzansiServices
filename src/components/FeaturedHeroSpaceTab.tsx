@@ -417,10 +417,10 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
                   {cycle === "MONTHLY" ? "Monthly" : "Yearly"}
                 </p>
                 <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                  N${PRICING[cycle].price}
+                  N${PRICING[cycle as "MONTHLY" | "YEARLY"].price}
                 </p>
                 <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-                  {PRICING[cycle].duration}
+                  {PRICING[cycle as "MONTHLY" | "YEARLY"].duration}
                   {cycle === "YEARLY" && ` • Save N$${PRICING.YEARLY.savings}`}
                 </p>
               </button>
