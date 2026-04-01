@@ -23,8 +23,7 @@ const CreatableSelect: React.FC<CreatableSelectProps> = ({
     value,
     onChange,
     isDisabled = false,
-    const placeholder = "Select or type to add...";
-    const placeholder = "Select or type to add...";
+    placeholder = "Select or type to add...",
     className = "",
     label
 }) => {
