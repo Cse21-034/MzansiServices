@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
     const reference = `NS_SUB_${businessId}_${Date.now()}`;
 
     // Return checkout details
-    const checkoutData = payGate.createCheckout({
+    const checkoutData = await payGate.createCheckout({
       reference,
       amount: amount * 100, // Convert to cents
       currency: 'NAD',
@@ -140,6 +140,8 @@ export async function POST(request: NextRequest) {
       success: true,
       checkout: {
         redirectUrl: checkoutData.redirect,
+        payRequestId: checkoutData.payRequestId,
+        checksum: checkoutData.checksum,
         reference,
         sessionId: checkoutData.sessionId,
       },

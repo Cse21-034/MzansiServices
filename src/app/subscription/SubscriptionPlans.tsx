@@ -63,9 +63,26 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ businessId }) => 
         if (data.subscriptionUrl) {
           // Free plan
           router.push(data.subscriptionUrl);
-        } else if (data.checkout?.redirectUrl) {
-          // Paid plan - redirect to PayGate
-          window.location.href = data.checkout.redirectUrl;
+        } else if (data.checkout?.payRequestId && data.checkout?.checksum) {
+          // Paid plan - Step 2: Submit form to PayGate process.trans
+          const form = document.createElement("form");
+          form.method = "POST";
+          form.action = data.checkout.redirectUrl; // process.trans URL
+
+          const payRequestIdInput = document.createElement("input");
+          payRequestIdInput.type = "hidden";
+          payRequestIdInput.name = "PAY_REQUEST_ID";
+          payRequestIdInput.value = data.checkout.payRequestId;
+          form.appendChild(payRequestIdInput);
+
+          const checksumInput = document.createElement("input");
+          checksumInput.type = "hidden";
+          checksumInput.name = "CHECKSUM";
+          checksumInput.value = data.checkout.checksum;
+          form.appendChild(checksumInput);
+
+          document.body.appendChild(form);
+          form.submit();
         }
       } else {
         alert('Failed to initiate subscription: ' + data.message);
