@@ -51,20 +51,65 @@ class PayGateService {
 
   /**
    * Generate checksum for PayGate requests (MD5)
-   * All field values concatenated + merchant key, then MD5 hashed
+   * CRITICAL: Fields MUST be in the exact order specified by PayGate docs
+   * Order: PAYGATE_ID + REFERENCE + AMOUNT + CURRENCY + RETURN_URL + TRANSACTION_DATE + 
+   *        LOCALE + COUNTRY + EMAIL + PAY_METHOD + PAY_METHOD_DETAIL + NOTIFY_URL + 
+   *        USER1 + USER2 + USER3 + VAULT + VAULT_ID + KEY
    */
-  private generateChecksum(data: string): string {
+  private generateChecksum(checksumData: {
+    paygate_id: string;
+    reference: string;
+    amount: string;
+    currency: string;
+    return_url: string;
+    transaction_date: string;
+    locale: string;
+    country: string;
+    email: string;
+    pay_method?: string;
+    pay_method_detail?: string;
+    notify_url?: string;
+    user1?: string;
+    user2?: string;
+    user3?: string;
+    vault?: string;
+    vault_id?: string;
+  }): string {
     const crypto = require('crypto');
-    const checksumString = data + this.config.merchantKey;
+    
+    // Concatenate in EXACT order required by PayGate
+    const checksumString = [
+      checksumData.paygate_id,
+      checksumData.reference,
+      checksumData.amount,
+      checksumData.currency,
+      checksumData.return_url,
+      checksumData.transaction_date,
+      checksumData.locale,
+      checksumData.country,
+      checksumData.email,
+      checksumData.pay_method || '',
+      checksumData.pay_method_detail || '',
+      checksumData.notify_url || '',
+      checksumData.user1 || '',
+      checksumData.user2 || '',
+      checksumData.user3 || '',
+      checksumData.vault || '',
+      checksumData.vault_id || '',
+    ].join('') + this.config.merchantKey;
+    
     return crypto.createHash('md5').update(checksumString).digest('hex');
   }
 
   /**
-   * Verify checksum from PayGate notifications
+   * Verify checksum from PayGate notifications (process.trans response)
+   * For redirect: PAYGATE_ID + PAY_REQUEST_ID + REFERENCE + KEY
    */
-  verifyChecksum(data: string, checksum: string): boolean {
-    const calculatedChecksum = this.generateChecksum(data);
-    return calculatedChecksum === checksum;
+  verifyRedirectChecksum(paygate_id: string, pay_request_id: string, reference: string, providedChecksum: string): boolean {
+    const checksumString = paygate_id + pay_request_id + reference + this.config.merchantKey;
+    const crypto = require('crypto');
+    const calculatedChecksum = crypto.createHash('md5').update(checksumString).digest('hex');
+    return calculatedChecksum === providedChecksum;
   }
 
   /**
@@ -103,9 +148,19 @@ class PayGateService {
       formData.DESCRIPTION = request.description;
     }
 
-    // Generate checksum: all values concatenated + merchant key, then MD5
-    const checksumString = Object.values(formData).join('');
-    const checksum = this.generateChecksum(checksumString);
+    // Generate checksum with fields in EXACT order required by PayGate
+    const checksum = this.generateChecksum({
+      paygate_id: this.config.merchantId,
+      reference: request.reference,
+      amount: request.amount.toString(),
+      currency: request.currency,
+      return_url: request.returnUrl,
+      transaction_date: transactionDate,
+      locale: 'en-za',
+      country: 'NAM',
+      email: request.email,
+      notify_url: request.notifyUrl,
+    });
     formData.CHECKSUM = checksum;
 
     try {
