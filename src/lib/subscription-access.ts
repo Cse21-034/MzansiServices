@@ -38,7 +38,7 @@ export const SUBSCRIPTION_TIERS = {
     tier: 'DESERT_ELEPHANTS' as SubscriptionTier,
     monthlyPrice: 100,
     currency: 'NAD',
-    yearlyDiscountPercentage: 15,
+    yearlyDiscountPercentage: 16,
     description: 'Boost visibility and build customer trust.',
     features: [
       'Enhanced business profile',
@@ -51,7 +51,7 @@ export const SUBSCRIPTION_TIERS = {
     ],
     limits: {
       photos: 10,
-      promotions: 5,
+      promotions: 2,
       branches: 1,
       reviewsDisplay: true,
       socialMediaLinks: true,
@@ -69,7 +69,7 @@ export const SUBSCRIPTION_TIERS = {
     tier: 'DESERT_LIONS' as SubscriptionTier,
     monthlyPrice: 200,
     currency: 'NAD',
-    yearlyDiscountPercentage: 15,
+    yearlyDiscountPercentage: 20,
     description: 'Unlock powerful tools for rapid growth.',
     features: [
       'Top search placement',
@@ -82,7 +82,7 @@ export const SUBSCRIPTION_TIERS = {
     ],
     limits: {
       photos: 50,
-      promotions: 20,
+      promotions: 5,
       branches: 5,
       reviewsDisplay: true,
       socialMediaLinks: true,
@@ -218,10 +218,12 @@ export async function canCreatePromotion(businessId: string): Promise<{
   reason?: string;
   limit?: number;
   current?: number;
+  period?: string;
 }> {
   try {
     const { prisma } = await import('@/lib/prisma');
 
+    // Get subscription
     const subscription = await prisma.subscription.findUnique({
       where: { businessId },
       include: {
@@ -229,24 +231,48 @@ export async function canCreatePromotion(businessId: string): Promise<{
       },
     });
 
+    if (!subscription) {
+      return {
+        allowed: false,
+        reason: 'No active subscription found',
+      };
+    }
+
     const tier = subscription?.plan?.tier || null;
     const limit = getLimit(tier, 'promotions');
 
-    // Count existing promotions
+    // Get current month dates (1st to end of month)
+    const now = new Date();
+    const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+    // Count promotions created THIS MONTH ONLY
     const current = await prisma.promotion.count({
-      where: { businessId },
+      where: {
+        businessId,
+        createdAt: {
+          gte: currentMonthStart,
+          lte: currentMonthEnd,
+        },
+      },
     });
 
     if (current >= limit) {
       return {
         allowed: false,
-        reason: `Promotion limit of ${limit} reached for your ${getTierInfo(tier).name} plan`,
+        reason: `Monthly promotion limit of ${limit} reached for your ${getTierInfo(tier).name} plan. Please try again next month.`,
         limit,
         current,
+        period: `${currentMonthStart.toLocaleDateString()} - ${currentMonthEnd.toLocaleDateString()}`,
       };
     }
 
-    return { allowed: true, limit, current };
+    return { 
+      allowed: true, 
+      limit, 
+      current,
+      period: `${currentMonthStart.toLocaleDateString()} - ${currentMonthEnd.toLocaleDateString()}`,
+    };
   } catch (error) {
     console.error('Error checking promotion creation permission:', error);
     return {
@@ -361,4 +387,181 @@ export function formatSubscriptionDisplay(tier: SubscriptionTier | null) {
     features: tierInfo.features,
     limits: tierInfo.limits,
   };
+}
+
+/**
+ * Get monthly promotion usage stats for a business
+ * Automatically tracks and provides monthly reset information
+ */
+export async function getMonthlyPromotionStats(businessId: string): Promise<{
+  monthlyLimit: number;
+  usedThisMonth: number;
+  remainingThisMonth: number;
+  monthStart: Date;
+  monthEnd: Date;
+  resetDate: string;
+  tier: string;
+  tier_name: string;
+}> {
+  try {
+    const { prisma } = await import('@/lib/prisma');
+
+    // Get subscription
+    const subscription = await prisma.subscription.findUnique({
+      where: { businessId },
+      include: { plan: true },
+    });
+
+    const tier = subscription?.plan?.tier || null;
+    const tierInfo = getTierInfo(tier);
+    const monthlyLimit = getLimit(tier, 'promotions');
+
+    // Get current month dates
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+    const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+    // Count promotions this month
+    const usedThisMonth = await prisma.promotion.count({
+      where: {
+        businessId,
+        createdAt: {
+          gte: monthStart,
+          lte: monthEnd,
+        },
+      },
+    });
+
+    return {
+      monthlyLimit,
+      usedThisMonth,
+      remainingThisMonth: Math.max(0, monthlyLimit - usedThisMonth),
+      monthStart,
+      monthEnd,
+      resetDate: nextMonthStart.toLocaleDateString(),
+      tier: tier || 'WILD_HORSES',
+      tier_name: tierInfo.name,
+    };
+  } catch (error) {
+    console.error('Error getting monthly promotion stats:', error);
+    throw error;
+  }
+}
+
+/**
+ * FEATURED HERO SPACE PRICING
+ * Monetizable carousel space on homepage
+ */
+export const FEATURED_HERO_SPACE_PRICING = {
+  MONTHLY: {
+    billingCycle: 'MONTHLY' as const,
+    monthlyPrice: 100,
+    currency: 'NAD',
+    description: 'Feature your business in the hero carousel for 1 month',
+    durationDays: 30,
+  },
+  YEARLY: {
+    billingCycle: 'YEARLY' as const,
+    monthlyPrice: 1200,
+    yearlyCost: 1008, // 20% discount applied: 1200 * 0.9 = 1080, but using 1008 for 16% discount
+    currency: 'NAD',
+    description: 'Feature your business in the hero carousel for 1 year with savings',
+    durationDays: 365,
+    discountPercentage: 16,
+  },
+};
+
+/**
+ * Get active featured hero spaces expiring in future
+ * Used to display paid ads in the hero carousel
+ */
+export async function getActiveFeaturedHeroSpaces() {
+  try {
+    const { prisma } = await import('@/lib/prisma');
+    const now = new Date();
+
+    const spaces = await prisma.featuredHeroSpace.findMany({
+      where: {
+        isActive: true,
+        expiryDate: {
+          gt: now,
+        },
+      },
+      include: {
+        business: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            website: true,
+          },
+        },
+      },
+      orderBy: {
+        startDate: 'desc',
+      },
+    });
+
+    return spaces;
+  } catch (error) {
+    console.error('Error fetching featured hero spaces:', error);
+    return [];
+  }
+}
+
+/**
+ * Check if business can activate featured hero space
+ */
+export async function canActivateFeaturedHeroSpace(businessId: string): Promise<{
+  allowed: boolean;
+  reason?: string;
+  hasActiveSpace?: boolean;
+}> {
+  try {
+    const { prisma } = await import('@/lib/prisma');
+    const now = new Date();
+
+    // Check if business already has active featured space
+    const activeSpace = await prisma.featuredHeroSpace.findFirst({
+      where: {
+        businessId,
+        isActive: true,
+        expiryDate: {
+          gt: now,
+        },
+      },
+    });
+
+    if (activeSpace) {
+      return {
+        allowed: false,
+        reason: `Your business already has an active featured space until ${activeSpace.expiryDate.toLocaleDateString()}`,
+        hasActiveSpace: true,
+      };
+    }
+
+    return { allowed: true, hasActiveSpace: false };
+  } catch (error) {
+    console.error('Error checking featured hero space availability:', error);
+    return {
+      allowed: false,
+      reason: 'Error checking featured space availability',
+    };
+  }
+}
+
+/**
+ * Calculate featured space expiry date
+ */
+export function calculateFeaturedSpaceExpiryDate(billingCycle: 'MONTHLY' | 'YEARLY', startDate: Date = new Date()): Date {
+  const expiryDate = new Date(startDate);
+  
+  if (billingCycle === 'YEARLY') {
+    expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+  } else {
+    expiryDate.setMonth(expiryDate.getMonth() + 1);
+  }
+  
+  return expiryDate;
 }

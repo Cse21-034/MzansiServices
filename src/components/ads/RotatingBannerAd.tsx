@@ -5,6 +5,14 @@ import Image from "next/image";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { AdConfig, getAdsByType } from "@/data/ads";
 
+interface FeaturedHeroSpace {
+  id: string;
+  imageUrl: string;
+  title: string;
+  description?: string;
+  linkUrl?: string;
+}
+
 interface RotatingBannerAdProps {
   className?: string;
   autoRotate?: boolean;
@@ -16,15 +24,45 @@ const RotatingBannerAd: React.FC<RotatingBannerAdProps> = ({
   autoRotate = true,
   rotationInterval = 5000
 }) => {
-  const [ads, setAds] = useState<AdConfig[]>([]);
+  const [ads, setAds] = useState<(AdConfig | FeaturedHeroSpace)[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
-    const bannerAds = getAdsByType('banner');
-    setAds(bannerAds);
-    setIsLoading(false);
+    const loadAds = async () => {
+      // Get static ads
+      const staticAds = getAdsByType('banner');
+      
+      // Fetch paid featured hero spaces
+      try {
+        const response = await fetch('/api/featured-hero-space');
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+          // Convert featured spaces to ad format
+          const featuredSpaces = result.data.map((space: any) => ({
+            image: space.imageUrl,
+            title: space.title,
+            alt: space.title,
+            link: space.linkUrl || '#',
+            isPaid: true,
+          }));
+
+          // Combine paid spaces (prioritized) with static ads
+          setAds([...featuredSpaces, ...staticAds]);
+        } else {
+          setAds(staticAds);
+        }
+      } catch (error) {
+        console.error('Error fetching featured hero spaces:', error);
+        setAds(staticAds);
+      }
+      
+      setIsLoading(false);
+    };
+
+    loadAds();
   }, []);
 
   useEffect(() => {
@@ -77,7 +115,9 @@ const RotatingBannerAd: React.FC<RotatingBannerAdProps> = ({
           {/* Text Overlay */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent flex items-center px-8">
             <div className="text-white">
-              <p className="text-sm font-bold uppercase tracking-widest opacity-90 mb-2">Featured Offer</p>
+              <p className={`text-sm font-bold uppercase tracking-widest opacity-90 mb-2 ${(currentAd as any).isPaid ? 'text-yellow-300' : ''}`}>
+                {(currentAd as any).isPaid ? '⭐ Featured Business' : 'Featured Offer'}
+              </p>
               <h2 className="text-2xl lg:text-3xl font-bold mb-3">{currentAd.title}</h2>
               <button
                 onClick={(e) => {
@@ -131,8 +171,12 @@ const RotatingBannerAd: React.FC<RotatingBannerAdProps> = ({
 
       {/* Advertisement Label */}
       <div className="text-center mt-3">
-        <span className="inline-block text-xs font-semibold text-neutral-500 dark:text-neutral-400 bg-white dark:bg-neutral-900 px-4 py-1.5 rounded-full border border-neutral-300 dark:border-neutral-700">
-          💡 Advertisement
+        <span className={`inline-block text-xs font-semibold px-4 py-1.5 rounded-full border ${
+          (currentAd as any).isPaid 
+            ? 'text-yellow-700 dark:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700'
+            : 'text-neutral-500 dark:text-neutral-400 bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700'
+        }`}>
+          {(currentAd as any).isPaid ? '⭐ Featured Business Listing' : '💡 Advertisement'}
         </span>
       </div>
     </div>
