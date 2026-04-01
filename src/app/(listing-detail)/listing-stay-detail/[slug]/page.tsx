@@ -841,7 +841,7 @@ const ListingStayDetailPage: FC<ListingStayDetailPageProps> = ({ }) => {
         {/* CENTER - Listing Details */}
         <div className="w-full lg:w-3/5 space-y-8 lg:space-y-10">
           {renderSection1()}
-          {memberships && memberships.length > 0 && (
+          {memberships && (
             <MembershipsDisplay memberships={memberships} />
           )}
           {renderSection2()}
