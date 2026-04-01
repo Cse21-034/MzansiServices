@@ -117,11 +117,18 @@ interface BusinessData {
   subcategory: string;
   description: string;
   phone: string;
+  mobileNumber?: string;
   email: string;
   website: string;
   address: string;
   establishedYear: string;
-  employees: string;
+  // Address fields - separate structure
+  country?: string;
+  city?: string;
+  streetName?: string;
+  plotNumber?: string;
+  unitShopBuilding?: string;
+  postalCode?: string;
   photos: { id: string; url: string; businessId: string; createdAt: Date; }[];
   ownerId?: string;
   status?: "DRAFT" | "PENDING" | "PUBLISHED" | "SUSPENDED";
@@ -155,7 +162,10 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
   const [activeTab, setActiveTab] = useState("overview");
   const [country, setCountry] = useState<string>("Namibia");
   const [city, setCity] = useState<Option | null>(null);
-  const [streetAddress, setStreetAddress] = useState("");
+  const [streetName, setStreetName] = useState("");
+  const [plotNumber, setPlotNumber] = useState("");
+  const [unitShopBuilding, setUnitShopBuilding] = useState("");
+  const [postalCode, setPostalCode] = useState("");
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
   const { data: session } = useSession();
@@ -193,11 +203,17 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
     subcategory: "",
     description: "",
     phone: "",
+    mobileNumber: "",
     email: "",
     website: "",
     address: "",
     establishedYear: "",
-    employees: "",
+    country: "Namibia",
+    city: "",
+    streetName: "",
+    plotNumber: "",
+    unitShopBuilding: "",
+    postalCode: "",
     photos: [],
     businessHours: Array.from({ length: 7 }, (_, i) => ({ dayOfWeek: i, isClosed: true })), // Default to closed
     services: [],
@@ -238,28 +254,13 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
           return existing || { dayOfWeek: i, isClosed: true };
         });
 
-        // Parse address string into new state variables
-        let parsedStreetAddress = "";
-        let parsedCity = "";
-        let parsedCountry = "Namibia";
-
-        if (data.address) {
-          const addressParts = data.address.split(',').map((part: string) => part.trim());
-          if (addressParts.length >= 3) {
-            parsedStreetAddress = addressParts[0];
-            parsedCity = addressParts[1];
-            parsedCountry = addressParts[2];
-          } else if (addressParts.length === 2) {
-            parsedStreetAddress = addressParts[0];
-            parsedCity = addressParts[1];
-          } else {
-            parsedStreetAddress = addressParts[0];
-          }
-        }
-
-        setCountry(parsedCountry);
-        setCity({ value: parsedCity, label: parsedCity });
-        setStreetAddress(parsedStreetAddress);
+        // Parse address and separate fields
+        setCountry(data.country || "Namibia");
+        setCity(data.city ? { value: data.city, label: data.city } : null);
+        setStreetName(data.streetName || "");
+        setPlotNumber(data.plotNumber || "");
+        setUnitShopBuilding(data.unitShopBuilding || "");
+        setPostalCode(data.postalCode || "");
 
         // Set latitude and longitude from fetched data
         setLatitude(data.latitude || null);
@@ -278,6 +279,12 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
             createdAt: new Date(photo.createdAt)
           })),
           establishedYear: data.establishedYear ? data.establishedYear.toString() : "",
+          country: data.country || "Namibia",
+          city: data.city || "",
+          streetName: data.streetName || "",
+          plotNumber: data.plotNumber || "",
+          unitShopBuilding: data.unitShopBuilding || "",
+          postalCode: data.postalCode || "",
         });
       }
     } catch (error) {
@@ -386,22 +393,22 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
         }));
       }
 
-      // Construct the address string from the new state variables
-      // Extract city value - city is now strictly an Option object or null
+      // Construct the full address from separate fields
       const cityStr = city?.value || '';
       const countryStr = country || 'Namibia';
       
-      let fullAddress = streetAddress?.trim() || '';
-      if (cityStr && cityStr.trim()) {
-        fullAddress += (fullAddress ? ", " : "") + cityStr.trim();
-      }
-      if (countryStr && countryStr.trim()) {
-        fullAddress += (fullAddress ? ", " : "") + countryStr.trim();
-      }
+      // Build address: Unit/Shop, Plot Number, Street Name, City, Country
+      const addressParts = [];
+      if (unitShopBuilding?.trim()) addressParts.push(unitShopBuilding.trim());
+      if (plotNumber?.trim()) addressParts.push(`Plot ${plotNumber.trim()}`);
+      if (streetName?.trim()) addressParts.push(streetName.trim());
+      if (cityStr?.trim()) addressParts.push(cityStr.trim());
+      if (countryStr?.trim()) addressParts.push(countryStr.trim());
       
-      // Fallback if no address provided
+      const fullAddress = addressParts.join(", ");
+
       if (!fullAddress.trim()) {
-        fullAddress = `${cityStr || ''}, ${countryStr || 'Namibia'}`.replace(/^,\s*/, '').trim();
+        throw new Error("Please provide at least a street name and plot number");
       }
 
       // Prepare business data (without photos array for the main update)
@@ -412,13 +419,18 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
         ...businessDataWithoutPhotos,
         category: { name: businessData.category },
         subcategory: { name: businessData.subcategory },
-        address: fullAddress, // Use the newly constructed address
-        city: cityStr, // Send city separately
-        country: countryStr, // Send country separately
-        latitude: latitude, // Send latitude for map
-        longitude: longitude, // Send longitude for map
+        address: fullAddress,
+        city: cityStr,
+        country: countryStr,
+        latitude: latitude,
+        longitude: longitude,
         businessHours: businessData.businessHours,
         services: businessData.services,
+        // Include separated address fields for storage
+        streetName: streetName,
+        plotNumber: plotNumber,
+        unitShopBuilding: unitShopBuilding,
+        postalCode: postalCode,
       };
       console.log('Sending data to API:', JSON.stringify(sendData, null, 2));
 
@@ -663,10 +675,10 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
               <div>
                 <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">Year Established</p>
                 <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mt-1">{businessData.establishedYear || '-'}</p>
-                <p className="text-xs text-green-600 font-medium mt-1">{businessData.employees ? `${businessData.employees} employees` : '-'}</p>
+                <p className="text-xs text-green-600 font-medium mt-1">{businessData.mobileNumber ? `${businessData.mobileNumber}` : 'No mobile provided'}</p>
               </div>
               <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-xl">
-                <UsersIcon className="w-6 h-6 text-green-600 dark:text-green-400" />
+                <PhoneIcon className="w-6 h-6 text-green-600 dark:text-green-400" />
               </div>
             </div>
           </div>
@@ -832,64 +844,116 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
               <Input name="phone" value={businessData.phone || ""} disabled className="w-full bg-neutral-100 dark:bg-neutral-800" />
             </div>
             <div>
+              <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">Mobile Number *</label>
+              <Input 
+                name="mobileNumber" 
+                value={businessData.mobileNumber || ""} 
+                onChange={handleInputChange} 
+                placeholder="+264..." 
+                className="w-full" 
+              />
+            </div>
+            <div>
               <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">Email Address *</label>
-              <Input name="email" type="email" value={businessData.email || ""} onChange={handleInputChange} placeholder="contact@yourbusiness.co.bw" className="w-full" />
+              <Input name="email" type="email" value={businessData.email || ""} onChange={handleInputChange} placeholder="contact@yourbusiness.com.na" className="w-full" />
             </div>
             <div>
               <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">Website</label>
-              <Input name="website" value={businessData.website || ""} onChange={handleInputChange} placeholder="www.yourbusiness.co.bw" className="w-full" />
+              <Input name="website" value={businessData.website || ""} onChange={handleInputChange} placeholder="www.yourbusiness.com.na" className="w-full" />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">Number of Employees</label>
-              <Input name="employees" value={businessData.employees || ""} onChange={handleInputChange} placeholder="e.g., 50-100" className="w-full" />
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">Country *</label>
-              <Select
-                name="country"
-                value={country}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setCountry(e.target.value)}
-                className="w-full"
-                disabled // Disable the select as it's always Namibia
-              >
-                <option value="Namibia">Namibia</option>
-              </Select>
-            </div>
-            <div className="md:col-span-2">
-              <CreatableSelect
-                label="City/Town/Village *"
-                options={NAMIBIA_LOCATIONS}
-                value={city}
-                onChange={setCity}
-                placeholder="Select or type a city/town/village"
-                className="w-full"
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">Plot Number / Street Address *</label>
-              <Input
-                name="streetAddress"
-                value={streetAddress}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStreetAddress(e.target.value)}
-                placeholder="e.g., Plot 123, Main Street"
-                className="w-full"
-              />                          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
-                Make it easy for customers to find you by entering your location clearly (e.g., Shop 5, Main Street, Windhoek)
-              </p>
-            </div>
+          </div>
 
-            {/* Map Picker for Location */}
-            <div className="md:col-span-2">
-              <MapPicker
-                latitude={latitude}
-                longitude={longitude}
-                address={streetAddress}
-                city={city?.value || "Windhoek"}
-                onCoordinatesChange={(lat, lng) => {
-                  setLatitude(lat);
-                  setLongitude(lng);
-                }}
-              />
+          {/* Business Address Section */}
+          <div className="mt-8 pt-8 border-t border-neutral-200 dark:border-neutral-700">
+            <h3 className="text-lg font-semibold flex items-center gap-2 mb-6">
+              <MapPinIcon className="w-5 h-5 text-primary-600" />
+              Business Address
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">Country *</label>
+                <Select
+                  name="country"
+                  value={country}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setCountry(e.target.value)}
+                  className="w-full"
+                  disabled
+                >
+                  <option value="Namibia">Namibia</option>
+                </Select>
+              </div>
+
+              <div className="md:col-span-2">
+                <CreatableSelect
+                  label="City / Town / Village *"
+                  options={NAMIBIA_LOCATIONS}
+                  value={city}
+                  onChange={setCity}
+                  placeholder="Select or type a city/town/village"
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">Street Name *</label>
+                <Input
+                  value={streetName}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStreetName(e.target.value)}
+                  placeholder="e.g., Main Street"
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">Plot Number *</label>
+                <Input
+                  value={plotNumber}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPlotNumber(e.target.value)}
+                  placeholder="e.g., 123"
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">Unit / Shop / Building</label>
+                <Input
+                  value={unitShopBuilding}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUnitShopBuilding(e.target.value)}
+                  placeholder="e.g., Shop 5"
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">Postal Code</label>
+                <Input
+                  value={postalCode}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPostalCode(e.target.value)}
+                  placeholder="e.g., 10123"
+                  className="w-full"
+                />
+              </div>
+
+              <div className="md:col-span-2 bg-neutral-50 dark:bg-neutral-900 rounded-lg p-4">
+                <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">📍 Your Complete Address:</p>
+                <p className="text-base font-semibold text-primary-600 dark:text-primary-400">
+                  {[unitShopBuilding, plotNumber, streetName, city?.value, country].filter(Boolean).join(", ")}
+                </p>
+              </div>
+
+              {/* Map Picker for Location */}
+              <div className="md:col-span-2">
+                <MapPicker
+                  latitude={latitude}
+                  longitude={longitude}
+                  address={[plotNumber, streetName].filter(Boolean).join(", ")}
+                  city={city?.value || "Windhoek"}
+                  onCoordinatesChange={(lat, lng) => {
+                    setLatitude(lat);
+                    setLongitude(lng);
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
