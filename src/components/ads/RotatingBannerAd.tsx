@@ -5,12 +5,12 @@ import Image from "next/image";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { AdConfig, getAdsByType } from "@/data/ads";
 
-interface FeaturedHeroSpace {
-  id: string;
-  imageUrl: string;
+interface NormalizedAd {
+  image: string;
   title: string;
-  description?: string;
-  linkUrl?: string;
+  alt: string;
+  link: string;
+  isPaid?: boolean;
 }
 
 interface RotatingBannerAdProps {
@@ -24,7 +24,7 @@ const RotatingBannerAd: React.FC<RotatingBannerAdProps> = ({
   autoRotate = true,
   rotationInterval = 5000
 }) => {
-  const [ads, setAds] = useState<(AdConfig | FeaturedHeroSpace)[]>([]);
+  const [ads, setAds] = useState<NormalizedAd[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
