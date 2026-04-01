@@ -23,7 +23,8 @@ const CreatableSelect: React.FC<CreatableSelectProps> = ({
     value,
     onChange,
     isDisabled = false,
-    placeholder = "Select or type to add...",
+    const placeholder = "Select or type to add...";
+    const placeholder = "Select or type to add...";
     className = "",
     label
 }) => {
@@ -75,7 +76,12 @@ const CreatableSelect: React.FC<CreatableSelectProps> = ({
 
     return (
         <div ref={containerRef} className={`relative ${className}`}>
-            {label && <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">{label}</label>}
+            {label && (
+                <div className="mb-2">
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">{label}</label>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">💡 Can't find what you want? Type to search or add your own option</p>
+                </div>
+            )}
 
             <div
                 onClick={() => !isDisabled && setIsOpen(true)}
@@ -87,7 +93,7 @@ const CreatableSelect: React.FC<CreatableSelectProps> = ({
                         ref={inputRef}
                         type="text"
                         className="w-full bg-transparent border-none p-0 focus:ring-0 text-sm placeholder-neutral-400"
-                        placeholder="Type to search or add..."
+                        placeholder="Search or type to add new..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         onKeyDown={(e) => {
@@ -103,7 +109,7 @@ const CreatableSelect: React.FC<CreatableSelectProps> = ({
                     />
                 ) : (
                     <span className={`text-sm ${!value ? 'text-neutral-400' : ''}`}>
-                        {value?.label || placeholder}
+                        {value?.label || placeholder || "Select or type to add..."}
                     </span>
                 )}
                 <ChevronDownIcon className={`w-4 h-4 text-neutral-500 transition-transform flex-shrink-0 ml-2 ${isOpen ? 'rotate-180' : ''}`} />
@@ -111,6 +117,12 @@ const CreatableSelect: React.FC<CreatableSelectProps> = ({
 
             {isOpen && (
                 <div className="absolute z-50 w-full mt-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-lg max-h-60 overflow-auto py-1">
+                    {filteredOptions.length === 0 && !showCreateOption && (
+                        <div className="px-3 py-3 text-sm text-neutral-500 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-700 text-center">
+                            <div className="text-2xl mb-1">📝</div>
+                            <span className="text-xs">No matches found. Type your own value!</span>
+                        </div>
+                    )}
                     {filteredOptions.length > 0 ? (
                         filteredOptions.map((option) => (
                             <button
@@ -136,10 +148,10 @@ const CreatableSelect: React.FC<CreatableSelectProps> = ({
                                 e.stopPropagation();
                                 handleCreate();
                             }}
-                            className="w-full text-left px-3 py-2 text-sm hover:bg-primary-50 dark:hover:bg-primary-900/20 text-primary-600 dark:text-primary-400 font-medium border-t border-neutral-100 dark:border-neutral-800 flex items-center gap-2"
+                            className="w-full text-left px-3 py-2.5 text-sm hover:bg-primary-100 dark:hover:bg-primary-900/40 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 font-semibold border-t border-neutral-100 dark:border-neutral-800 flex items-center gap-2 transition-colors"
                         >
-                            <PlusIcon className="w-4 h-4" />
-                            Add "{searchTerm}"
+                            <PlusIcon className="w-5 h-5" />
+                            <span>Add "{searchTerm}" as new option</span>
                         </button>
                     )}
                 </div>
