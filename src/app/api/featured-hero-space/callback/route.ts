@@ -10,8 +10,8 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    // Verify payment with PayGate
-    const verification = payGate.verifyPayment(body);
+    // Process payment notification with PayGate
+    const verification = await payGate.processNotification(body);
 
     if (!verification.success) {
       return NextResponse.json({
@@ -20,8 +20,21 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const { customData, transactionId } = verification;
-    const { spaceId } = customData;
+    const reference = verification.reference;
+    
+    // Extract custom data from the request
+    const customDataStr = body.CUSTOM_DATA || body.customData;
+    let customData = null;
+    
+    if (customDataStr) {
+      try {
+        customData = typeof customDataStr === 'string' ? JSON.parse(customDataStr) : customDataStr;
+      } catch (e) {
+        console.warn('Could not parse custom data:', customDataStr);
+      }
+    }
+
+    const spaceId = customData?.spaceId;
 
     if (!spaceId) {
       return NextResponse.json({
@@ -43,11 +56,11 @@ export async function POST(req: NextRequest) {
     await prisma.payment.create({
       data: {
         subscriptionId: 'featured_space', // You might want to track this differently
-        paymentGatewayId: transactionId,
-        amount: verification.amount / 100,
-        currency: 'NAD',
+        paymentGatewayId: reference,
+        amount: (body.AMOUNT ? parseInt(body.AMOUNT) : 0) / 100,
+        currency: body.CURRENCY || 'NAD',
         status: 'COMPLETED',
-        transactionRef: transactionId,
+        transactionRef: body.TRANSACTION_ID || reference,
         paidAt: new Date(),
       },
     });
