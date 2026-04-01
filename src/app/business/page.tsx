@@ -14,6 +14,7 @@ import Badge from "@/shared/Badge";
 import Modal from "@/shared/Modal";
 import BusinessNav from "@/components/BusinessNav";
 import MembershipsList from "@/components/MembershipsList";
+import FeaturedHeroSpaceTab from "@/components/FeaturedHeroSpaceTab";
 const defaultBusinessImage = "/images/namibia-logo/squarelogo.PNG";
 import {
   BuildingStorefrontIcon,
@@ -1441,6 +1442,7 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
                 { id: 'profile', name: 'Profile', icon: BuildingStorefrontIcon },
                 { id: 'products', name: 'Products & Listings', icon: DocumentTextIcon },
                 { id: 'property-listings', name: 'Property Listings', icon: HomeIcon },
+                { id: 'featured-ads', name: 'Featured Ads', icon: StarIcon },
                 { id: 'promotions', name: 'Promotions', icon: SparklesIcon },                { id: 'membership', name: 'Membership', icon: CheckCircleIcon },                { id: 'analytics', name: 'Analytics', icon: EyeIcon },
                 { id: 'branches', name: 'Branches', icon: BuildingOfficeIcon }
               ].map((tab) => (
@@ -1466,6 +1468,9 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
           {activeTab === 'profile' && renderProfileTab()}
           {activeTab === 'products' && renderListingsTab()} {/* Render the products & listings tab */}
           {activeTab === 'property-listings' && renderPropertyListingsTab()}
+          {activeTab === 'featured-ads' && businessData?.id && (
+            <FeaturedHeroSpaceTab businessId={businessData.id} />
+          )}
           {activeTab === 'promotions' && (
             <div className="text-center py-12">
               <SparklesIcon className="w-12 h-12 text-neutral-400 mx-auto mb-4" />
