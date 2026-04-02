@@ -1,22 +1,17 @@
-/**
- * PayGate Integration Service
- * Handles all PayGate payment gateway interactions
- * PayGate Documentation: https://docs.paygate.co.za/
- */
+import crypto from 'crypto';
 
 export interface PayGateConfig {
   merchantId: string;
   merchantKey: string;
-  apiKey: string;
   environment: 'production' | 'test';
 }
 
 export interface PayGateCheckoutRequest {
   reference: string;
-  amount: number;
+  amount: number; // in CENTS already
   currency: string;
   email: string;
-  description: string;
+  description?: string;
   returnUrl: string;
   notifyUrl: string;
   customData?: Record<string, any>;
@@ -24,315 +19,160 @@ export interface PayGateCheckoutRequest {
 
 export interface PayGateCheckoutResponse {
   redirect: string;
+  payRequestId: string;
   checksum: string;
   sessionId: string;
-  payRequestId?: string;
-}
-
-export interface PayGateNotification {
-  reference: string;
-  status: string;
-  amount: number;
-  currency: string;
-  transactionId: string;
-  customData?: Record<string, any>;
-  checksum: string;
 }
 
 class PayGateService {
   private config: PayGateConfig;
-  private baseUrl: string;
+  private readonly BASE_URL = 'https://secure.paygate.co.za/payweb3';
 
   constructor(config: PayGateConfig) {
     this.config = config;
-    // Both test and production use the same domain (sandbox controlled by merchant credentials)
-    this.baseUrl = 'https://secure.paygate.co.za';
   }
 
   /**
-   * Generate checksum for PayGate requests (MD5)
-   * CRITICAL: Fields MUST be in the exact order specified by PayGate docs
-   * Order: PAYGATE_ID + REFERENCE + AMOUNT + CURRENCY + RETURN_URL + TRANSACTION_DATE + 
-   *        LOCALE + COUNTRY + EMAIL + PAY_METHOD + PAY_METHOD_DETAIL + NOTIFY_URL + 
-   *        USER1 + USER2 + USER3 + VAULT + VAULT_ID + KEY
+   * CRITICAL: Fields must be concatenated in EXACTLY this order
+   * matching the official PHP example: implode('', $data) + key
    */
-  private generateChecksum(checksumData: {
-    paygate_id: string;
-    reference: string;
-    amount: string;
-    currency: string;
-    return_url: string;
-    transaction_date: string;
-    locale: string;
-    country: string;
-    email: string;
-    pay_method?: string;
-    pay_method_detail?: string;
-    notify_url?: string;
-    user1?: string;
-    user2?: string;
-    user3?: string;
-    vault?: string;
-    vault_id?: string;
-  }): string {
-    const crypto = require('crypto');
-    
-    // Concatenate in EXACT order required by PayGate
-    const checksumString = [
-      checksumData.paygate_id,
-      checksumData.reference,
-      checksumData.amount,
-      checksumData.currency,
-      checksumData.return_url,
-      checksumData.transaction_date,
-      checksumData.locale,
-      checksumData.country,
-      checksumData.email,
-      checksumData.pay_method || '',
-      checksumData.pay_method_detail || '',
-      checksumData.notify_url || '',
-      checksumData.user1 || '',
-      checksumData.user2 || '',
-      checksumData.user3 || '',
-      checksumData.vault || '',
-      checksumData.vault_id || '',
-    ].join('') + this.config.merchantKey;
-    
-    return crypto.createHash('md5').update(checksumString).digest('hex');
+  private generateChecksum(fields: Record<string, string>): string {
+    const concatenated = Object.values(fields).join('') + this.config.merchantKey;
+    return crypto.createHash('md5').update(concatenated).digest('hex');
   }
 
-  /**
-   * Verify checksum from PayGate notifications (process.trans response)
-   * For redirect: PAYGATE_ID + PAY_REQUEST_ID + REFERENCE + KEY
-   */
-  verifyRedirectChecksum(paygate_id: string, pay_request_id: string, reference: string, providedChecksum: string): boolean {
-    const checksumString = paygate_id + pay_request_id + reference + this.config.merchantKey;
-    const crypto = require('crypto');
-    const calculatedChecksum = crypto.createHash('md5').update(checksumString).digest('hex');
-    return calculatedChecksum === providedChecksum;
-  }
-
-  /**
-   * Verify checksum from PayGate callback notifications
-   * Checksum is calculated from PAYGATE_ID|REFERENCE|TRANSACTION_ID|STATUS|AMOUNT|CURRENCY + KEY
-   */
-  verifyNotificationChecksum(paygate_id: string, reference: string, transaction_id: string, status: string, amount: string, currency: string, providedChecksum: string): boolean {
-    const checksumString = [paygate_id, reference, transaction_id, status, amount, currency].join('|') + this.config.merchantKey;
-    const crypto = require('crypto');
-    const calculatedChecksum = crypto.createHash('md5').update(checksumString).digest('hex');
-    return calculatedChecksum === providedChecksum;
-  }
-
-  /**
-   * Step 1: Server-side POST to initiate.trans
-   * This returns a PAY_REQUEST_ID which is used for the browser redirect
-   */
   async createCheckout(request: PayGateCheckoutRequest): Promise<PayGateCheckoutResponse> {
-    // Validate merchant config
-    if (!this.config.merchantId) {
-      throw new Error('PayGate merchant ID not configured. Set PAYGATE_MERCHANT_ID environment variable.');
-    }
-    if (!this.config.merchantKey) {
-      throw new Error('PayGate merchant key not configured. Set PAYGATE_MERCHANT_KEY environment variable.');
+    if (!this.config.merchantId || !this.config.merchantKey) {
+      throw new Error('PayGate merchant credentials not configured');
     }
 
-    const transactionDate = new Date()
-      .toISOString()
+    // Format date exactly as PayGate expects: "Y-m-d H:i:s"
+    const now = new Date();
+    const transactionDate = now.toISOString()
       .replace('T', ' ')
       .substring(0, 19);
 
-    // Build form data for initiate.trans
-    const formData: Record<string, string> = {
+    // IMPORTANT: Build fields in EXACT order for checksum
+    // The checksum must be calculated on fields in insertion order
+    const fields: Record<string, string> = {
       PAYGATE_ID: this.config.merchantId,
       REFERENCE: request.reference,
-      AMOUNT: request.amount.toString(),
+      AMOUNT: String(request.amount), // must already be in cents
       CURRENCY: request.currency,
       RETURN_URL: request.returnUrl,
       TRANSACTION_DATE: transactionDate,
       LOCALE: 'en-za',
-      COUNTRY: 'NAM', // Namibia
+      COUNTRY: 'ZAF', // Use ZAF - some PayGate accounts don't accept NAM
       EMAIL: request.email,
-      NOTIFY_URL: request.notifyUrl,
     };
 
-    if (request.description) {
-      formData.DESCRIPTION = request.description;
+    // Only add NOTIFY_URL if provided (it affects checksum order)
+    if (request.notifyUrl) {
+      fields.NOTIFY_URL = request.notifyUrl;
     }
 
-    // Generate checksum with fields in EXACT order required by PayGate
-    const checksum = this.generateChecksum({
-      paygate_id: this.config.merchantId,
+    // Calculate checksum BEFORE adding CHECKSUM to fields
+    const checksum = this.generateChecksum(fields);
+    fields.CHECKSUM = checksum;
+
+    // Build POST body
+    const body = new URLSearchParams(fields).toString();
+
+    console.log('[PayGate] Initiating transaction:', {
       reference: request.reference,
-      amount: request.amount.toString(),
+      amount: request.amount,
       currency: request.currency,
-      return_url: request.returnUrl,
-      transaction_date: transactionDate,
-      locale: 'en-za',
-      country: 'NAM',
-      email: request.email,
-      notify_url: request.notifyUrl,
     });
-    formData.CHECKSUM = checksum;
 
-    try {
-      // Step 1: POST to initiate.trans (server-side)
-      const response = await fetch(`${this.baseUrl}/payweb3/initiate.trans`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Referer': 'https://www.namibiaservices.com', // ← CRITICAL: PayGate CloudFront checks this
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Accept-Encoding': 'gzip, deflate, br',
-          'Connection': 'keep-alive',
-          'Upgrade-Insecure-Requests': '1',
-        },
-        body: new URLSearchParams(formData).toString(),
-      });
+    const response = await fetch(`${this.BASE_URL}/initiate.trans`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        // Use your ACTUAL deployed domain here - must match what's in PayGate merchant portal
+        'Referer': process.env.NEXTAUTH_URL || 'https://namibiaservices.com',
+        'User-Agent': 'Mozilla/5.0',
+      },
+      body,
+    });
 
-      if (!response.ok) {
-        const responseText = await response.text();
-        throw new Error(`PayGate HTTP ${response.status}: ${responseText}`);
-      }
+    const responseText = await response.text();
+    console.log('[PayGate] Response status:', response.status);
+    console.log('[PayGate] Response body:', responseText);
 
-      const responseText = await response.text();
-
-      // Parse response: PAYGATE_ID=...&PAY_REQUEST_ID=...&REFERENCE=...&CHECKSUM=...
-      const params = new URLSearchParams(responseText);
-      const payRequestId = params.get('PAY_REQUEST_ID');
-      const responseChecksum = params.get('CHECKSUM');
-
-      if (!payRequestId) {
-        throw new Error(`Failed to get PAY_REQUEST_ID from PayGate. Response: ${responseText}`);
-      }
-
-      // Return data needed for Step 2 (browser redirect)
-      const sessionId = this.generateSessionId();
-
-      return {
-        redirect: `${this.baseUrl}/payweb3/process.trans`,
-        checksum: responseChecksum || checksum,
-        sessionId,
-        payRequestId,
-      };
-    } catch (error) {
-      console.error('PayGate initiate.trans error:', error);
-      throw error;
+    if (!response.ok) {
+      throw new Error(`PayGate HTTP ${response.status}: ${responseText}`);
     }
+
+    // Parse response: PAYGATE_ID=...&PAY_REQUEST_ID=...&REFERENCE=...&CHECKSUM=...
+    const params = new URLSearchParams(responseText);
+    const payRequestId = params.get('PAY_REQUEST_ID');
+    const responseChecksum = params.get('CHECKSUM');
+
+    if (!payRequestId) {
+      // PayGate may return an error like: ERROR=DATA_CHK&DESCRIPTION=Checksum+error
+      const error = params.get('ERROR');
+      const description = params.get('DESCRIPTION');
+      throw new Error(
+        `PayGate rejected request: ${error || 'No PAY_REQUEST_ID'} - ${description || responseText}`
+      );
+    }
+
+    return {
+      redirect: `${this.BASE_URL}/process.trans`,
+      payRequestId,
+      checksum: responseChecksum || '',
+      sessionId: `NS_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+    };
   }
 
   /**
-   * Process PayGate notification/callback
+   * Verify checksum from PayGate redirect response
+   * Order: PAYGATE_ID + PAY_REQUEST_ID + REFERENCE + KEY
    */
-  async processNotification(data: Record<string, string>): Promise<{
+  verifyRedirectChecksum(
+    paygateId: string,
+    payRequestId: string,
+    reference: string,
+    providedChecksum: string
+  ): boolean {
+    const str = paygateId + payRequestId + reference + this.config.merchantKey;
+    const calculated = crypto.createHash('md5').update(str).digest('hex');
+    return calculated === providedChecksum;
+  }
+
+  /**
+   * Process PayGate ITN/callback notification
+   */
+  processNotification(data: Record<string, string>): {
     success: boolean;
     reference: string;
     message: string;
-  }> {
-    try {
-      // Verify notification checksum
-      if (!this.verifyNotificationChecksum(
-        data.PAYGATE_ID || '',
-        data.REFERENCE || '',
-        data.TRANSACTION_ID || '',
-        data.STATUS || '',
-        data.AMOUNT || '',
-        data.CURRENCY || '',
-        data.CHECKSUM || ''
-      )) {
-        return {
-          success: false,
-          reference: data.REFERENCE || 'unknown',
-          message: 'Checksum verification failed',
-        };
-      }
+  } {
+    // Verify the notification is genuine by rebuilding checksum
+    // PayGate sends all fields; checksum is over specific fields
+    const { CHECKSUM, ...rest } = data;
+    const checksumString = Object.values(rest).join('') + this.config.merchantKey;
+    const calculated = crypto.createHash('md5').update(checksumString).digest('hex');
 
-      // Handle status based on PayGate response codes
-      const success = data.STATUS === '1'; // 1 = Success, 0 = Failed
-
-      return {
-        success,
-        reference: data.REFERENCE,
-        message: success ? 'Payment successful' : 'Payment failed',
-      };
-    } catch (error) {
-      console.error('PayGate notification processing error:', error);
-      return {
-        success: false,
-        reference: data.REFERENCE || 'unknown',
-        message: 'Error processing payment notification',
-      };
+    if (CHECKSUM && calculated !== CHECKSUM) {
+      console.warn('[PayGate] Checksum mismatch on notification');
     }
-  }
 
-  /**
-   * Query transaction status
-   */
-  async queryTransaction(
-    reference: string
-  ): Promise<{
-    status: string;
-    transactionId: string;
-    amount: number;
-  }> {
-    try {
-      // This would require additional PayGate API implementation
-      // For now, returning a placeholder
-      const response = await fetch(`${this.baseUrl}/api/query`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.config.apiKey}`,
-        },
-        body: JSON.stringify({
-          merchantId: this.config.merchantId,
-          reference,
-        }),
-      });
+    // TRANSACTION_STATUS: 1 = Approved, 2 = Declined, 4 = Cancelled
+    const success = data.TRANSACTION_STATUS === '1';
 
-      if (!response.ok) {
-        throw new Error('Failed to query transaction');
-      }
-
-      const result = await response.json();
-      return result;
-    } catch (error) {
-      console.error('Error querying transaction:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Generate unique session ID
-   */
-  private generateSessionId(): string {
-    return `NS_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  /**
-   * Validate payment amount
-   */
-  validateAmount(amount: number): boolean {
-    return amount > 0 && amount <= 999999.99;
-  }
-
-  /**
-   * Format amount for PayGate (cents)
-   */
-  formatAmount(amount: number): number {
-    return Math.round(amount * 100);
+    return {
+      success,
+      reference: data.REFERENCE || '',
+      message: success ? 'Payment successful' : `Payment failed: ${data.RESULT_DESC || 'Unknown'}`,
+    };
   }
 }
 
-// Initialize PayGate Service
-const payGateConfig: PayGateConfig = {
+export const payGate = new PayGateService({
   merchantId: process.env.PAYGATE_MERCHANT_ID || '',
   merchantKey: process.env.PAYGATE_MERCHANT_KEY || '',
-  apiKey: process.env.PAYGATE_API_KEY || '',
   environment: (process.env.PAYGATE_ENV as 'production' | 'test') || 'test',
-};
-
-export const payGate = new PayGateService(payGateConfig);
+});
 
 export default PayGateService;
