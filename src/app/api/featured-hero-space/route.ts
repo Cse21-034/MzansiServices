@@ -169,28 +169,24 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Create checkout
-    let checkoutData;
+    // Create checkout with browser-side PayGate call
+    let params;
     try {
-      checkoutData = await payGate.createCheckout({
+      // Build signed params — browser will POST these directly to PayGate
+      // This avoids the server-side 403 from PayGate's CloudFront WAF blocking datacenter IPs
+      params = payGate.buildInitiateParams({
         reference,
         amount: amount * 100, // Convert to cents
         currency: 'NAD',
         email: business.email,
-        description: `Featured Hero Space - ${business.name} (${billingCycle})`,
-        returnUrl: `${process.env.NEXTAUTH_URL}/business/${businessId}/featured-hero/success`,
+        returnUrl: `${process.env.NEXTAUTH_URL}/business/${businessId}/featured-hero/success?reference=${reference}`,
         notifyUrl: `${process.env.NEXTAUTH_URL}/api/featured-hero-space/callback`,
-        customData: {
-          businessId,
-          spaceId: pendingSpace.id,
-          billingCycle,
-        },
       });
     } catch (paymentError) {
-      console.error('PayGate checkout error:', paymentError);
+      console.error('PayGate params error:', paymentError);
       const errorMessage = paymentError instanceof Error ? paymentError.message : 'Payment gateway error';
       return NextResponse.json(
-        { error: `Failed to initiate payment: ${errorMessage}` },
+        { error: `Failed to build payment params: ${errorMessage}` },
         { status: 500 }
       );
     }
@@ -202,10 +198,9 @@ export async function POST(req: NextRequest) {
         reference,
       },
       checkout: {
-        redirectUrl: checkoutData.redirect,
-        sessionId: checkoutData.sessionId,
-        payRequestId: checkoutData.payRequestId,
-        checksum: checkoutData.checksum,
+        initiateUrl: payGate.INITIATE_URL,
+        processUrl: payGate.PROCESS_URL,
+        params,
       },
     });
   } catch (error) {

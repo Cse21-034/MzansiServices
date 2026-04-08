@@ -126,27 +126,56 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
         throw new Error(result.error || "Failed to create featured space");
       }
 
-      // Step 2: Redirect to PayGate via form POST
-      if (result.checkout?.payRequestId && result.checkout?.checksum) {
-        // Create and auto-submit the form to PayGate process.trans endpoint
+      // Step 2: Browser calls PayGate initiate.trans with signed params
+      // This avoids the server-side 403 from PayGate's CloudFront WAF blocking datacenter IPs
+      if (result.checkout?.params && result.checkout?.initiateUrl) {
+        console.log("[Featured Space] Calling PayGate initiate.trans from browser...");
+
+        const initiateBody = new URLSearchParams(result.checkout.params).toString();
+        const initiateRes = await fetch(result.checkout.initiateUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: initiateBody,
+        });
+
+        const initiateText = await initiateRes.text();
+
+        if (!initiateRes.ok) {
+          throw new Error(`PayGate initiate failed: HTTP ${initiateRes.status}`);
+        }
+
+        // Parse response: PAYGATE_ID=...&PAY_REQUEST_ID=...&CHECKSUM=...
+        const initiateParams = new URLSearchParams(initiateText);
+        const payRequestId = initiateParams.get("PAY_REQUEST_ID");
+        const checksum = initiateParams.get("CHECKSUM");
+
+        if (!payRequestId) {
+          const errCode = initiateParams.get("ERROR");
+          const errDesc = initiateParams.get("DESCRIPTION");
+          throw new Error(`PayGate rejected: ${errCode} - ${errDesc || initiateText}`);
+        }
+
+        console.log("[Featured Space] PayGate initiate successful, PAY_REQUEST_ID:", payRequestId);
+
+        // Step 3: Submit form to PayGate process.trans — browser redirect
         const form = document.createElement("form");
         form.method = "POST";
-        form.action = result.checkout.redirectUrl; // process.trans URL
+        form.action = result.checkout.processUrl; // process.trans URL
 
         const payRequestIdInput = document.createElement("input");
         payRequestIdInput.type = "hidden";
         payRequestIdInput.name = "PAY_REQUEST_ID";
-        payRequestIdInput.value = result.checkout.payRequestId;
+        payRequestIdInput.value = payRequestId;
         form.appendChild(payRequestIdInput);
 
         const checksumInput = document.createElement("input");
         checksumInput.type = "hidden";
         checksumInput.name = "CHECKSUM";
-        checksumInput.value = result.checkout.checksum;
+        checksumInput.value = checksum || "";
         form.appendChild(checksumInput);
 
         document.body.appendChild(form);
-        form.submit();
+        form.submit(); // Browser navigates to PayGate payment page
       }
     } catch (error) {
       setModalTitle("Error");
