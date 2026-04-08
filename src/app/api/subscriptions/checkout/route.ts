@@ -145,8 +145,9 @@ export async function POST(request: NextRequest) {
         where: { businessId },
       });
 
+      let subscription;
       if (existingSubscription) {
-        await prisma.subscription.update({
+        subscription = await prisma.subscription.update({
           where: { id: existingSubscription.id },
           data: {
             planId: plan.id,
@@ -155,7 +156,7 @@ export async function POST(request: NextRequest) {
           },
         });
       } else {
-        await prisma.subscription.create({
+        subscription = await prisma.subscription.create({
           data: {
             businessId,
             planId: plan.id,
@@ -165,7 +166,19 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      console.log('[Checkout] Returning signed params for reference:', reference);
+      // Create payment record for callback to find and update
+      await prisma.payment.create({
+        data: {
+          subscriptionId: subscription.id,
+          paymentGatewayId: '', // Will be filled in by callback with TRANSACTION_ID
+          amount,
+          currency: 'NAD',
+          status: 'PENDING',
+          transactionRef: reference, // PayGate reference: NS_SUB_${businessId}_${timestamp}
+        },
+      });
+
+      console.log('[Checkout] Created payment record for reference:', reference);
 
       return NextResponse.json({
         success: true,
