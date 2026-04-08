@@ -75,29 +75,26 @@ const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = 
       const data = await response.json();
 
       if (data.success) {
-        if (data.subscriptionUrl) {
+        if (data.free) {
           // Free plan
-          router.push(data.subscriptionUrl);
-        } else if (data.checkout?.payRequestId && data.checkout?.checksum) {
-          // Paid plan - Step 2: Submit form to PayGate process.trans
+          router.push(`/business/${businessId}/subscription`);
+        } else if (data.checkout?.params && data.checkout?.initiateUrl) {
+          // Paid plan - Submit form to PayGate initiate.trans
           const form = document.createElement("form");
           form.method = "POST";
-          form.action = data.checkout.redirectUrl; // process.trans URL
+          form.action = data.checkout.initiateUrl;
 
-          const payRequestIdInput = document.createElement("input");
-          payRequestIdInput.type = "hidden";
-          payRequestIdInput.name = "PAY_REQUEST_ID";
-          payRequestIdInput.value = data.checkout.payRequestId;
-          form.appendChild(payRequestIdInput);
-
-          const checksumInput = document.createElement("input");
-          checksumInput.type = "hidden";
-          checksumInput.name = "CHECKSUM";
-          checksumInput.value = data.checkout.checksum;
-          form.appendChild(checksumInput);
+          // Add all PayGate params to form
+          Object.entries(data.checkout.params).forEach(([key, value]) => {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = key;
+            input.value = String(value);
+            form.appendChild(input);
+          });
 
           document.body.appendChild(form);
-          form.submit();
+          form.submit(); // Browser navigates to PayGate initiate.trans
         }
       } else {
         alert('Failed to initiate subscription: ' + data.message);
@@ -127,29 +124,26 @@ const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = 
         const data = await response.json();
 
         if (data.success) {
-          if (data.subscriptionUrl) {
+          if (data.free) {
             // Free plan
-            router.push(data.subscriptionUrl);
-          } else if (data.checkout?.payRequestId && data.checkout?.checksum) {
-            // Paid plan - Step 2: Submit form to PayGate process.trans
+            router.push(`/business/${selectedBusinessId}/subscription`);
+          } else if (data.checkout?.params && data.checkout?.initiateUrl) {
+            // Paid plan - Submit form to PayGate initiate.trans
             const form = document.createElement("form");
             form.method = "POST";
-            form.action = data.checkout.redirectUrl; // process.trans URL
+            form.action = data.checkout.initiateUrl;
 
-            const payRequestIdInput = document.createElement("input");
-            payRequestIdInput.type = "hidden";
-            payRequestIdInput.name = "PAY_REQUEST_ID";
-            payRequestIdInput.value = data.checkout.payRequestId;
-            form.appendChild(payRequestIdInput);
-
-            const checksumInput = document.createElement("input");
-            checksumInput.type = "hidden";
-            checksumInput.name = "CHECKSUM";
-            checksumInput.value = data.checkout.checksum;
-            form.appendChild(checksumInput);
+            // Add all PayGate params to form
+            Object.entries(data.checkout.params).forEach(([key, value]) => {
+              const input = document.createElement("input");
+              input.type = "hidden";
+              input.name = key;
+              input.value = String(value);
+              form.appendChild(input);
+            });
 
             document.body.appendChild(form);
-            form.submit();
+            form.submit(); // Browser navigates to PayGate initiate.trans
           }
         } else {
           alert('Failed to initiate subscription: ' + data.message);
