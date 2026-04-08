@@ -72,12 +72,18 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ businessId }) => 
         return;
       }
 
+      console.log('[Payment] Full response:', data);
+      console.log('[Payment] Checkout object:', data.checkout);
+      
       const { initiateUrl, processUrl, params } = data.checkout;
+      
+      console.log('[Payment] Extracted initiateUrl:', initiateUrl);
+      console.log('[Payment] Extracted params:', params);
 
       // Step 2 & 3: Submit combined form directly to initiate.trans
       // PayGate will handle the internal redirect to process.trans
       // Using traditional form submission avoids CORS issues with fetch
-      console.log('[Payment] Submitting to PayGate initiate.trans...');
+      console.log('[Payment] Creating form...');
       
       const form = document.createElement('form');
       form.method = 'POST';
@@ -90,11 +96,20 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ businessId }) => 
         input.name = key;
         input.value = String(value);
         form.appendChild(input);
+        console.log(`[Payment] Added field: ${key} = ${value}`);
       });
 
+      console.log('[Payment] Appending form to body...');
       document.body.appendChild(form);
-      console.log('[Payment] Redirecting to PayGate...');
-      form.submit(); // Browser navigates directly to PayGate initiate.trans
+      
+      console.log('[Payment] Form HTML:', form.outerHTML);
+      console.log('[Payment] About to submit to:', form.action);
+      
+      // Ensure submission happens
+      setTimeout(() => {
+        console.log('[Payment] Submitting form now...');
+        form.submit();
+      }, 100);
 
     } catch (error) {
       console.error('Subscription error:', error);
