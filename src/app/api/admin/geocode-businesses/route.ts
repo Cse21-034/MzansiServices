@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { geocodeWithFallback } from "@/utils/geocoding";
 
+export const dynamic = 'force-dynamic';
+
 /**
  * Admin endpoint to geocode all businesses that don't have coordinates
  * GET /api/admin/geocode-businesses

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getMonthlyPromotionStats } from "@/lib/subscription-access";
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/promotions/monthly-stats?businessId=xxx
  * Get monthly promotion usage stats for a business

@@ -9,6 +9,8 @@ import { prisma } from '@/lib/prisma';
 import { getSubscriptionStatus, getTierInfo } from '@/lib/subscription-access';
 import { authOptions } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
