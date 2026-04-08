@@ -72,58 +72,29 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ businessId }) => 
         return;
       }
 
-      const { initiateUrl, params } = data.checkout;
+      const { initiateUrl, processUrl, params } = data.checkout;
 
-      // Step 2: POST params to PayGate initiate.trans FROM THE BROWSER
-      // This avoids the server-side 403 WAF block from PayGate's CloudFront
-      console.log('[Payment] Calling PayGate initiate.trans from browser...');
+      // Step 2 & 3: Submit combined form directly to initiate.trans
+      // PayGate will handle the internal redirect to process.trans
+      // Using traditional form submission avoids CORS issues with fetch
+      console.log('[Payment] Submitting to PayGate initiate.trans...');
       
-      const initiateBody = new URLSearchParams(params).toString();
-      const initiateRes = await fetch(initiateUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: initiateBody,
-      });
-
-      const initiateText = await initiateRes.text();
-
-      if (!initiateRes.ok) {
-        throw new Error(`PayGate initiate failed: HTTP ${initiateRes.status}`);
-      }
-
-      // Parse response: PAYGATE_ID=...&PAY_REQUEST_ID=...&CHECKSUM=...
-      const initiateParams = new URLSearchParams(initiateText);
-      const payRequestId = initiateParams.get('PAY_REQUEST_ID');
-      const checksum = initiateParams.get('CHECKSUM');
-
-      if (!payRequestId) {
-        const errCode = initiateParams.get('ERROR');
-        const errDesc = initiateParams.get('DESCRIPTION');
-        throw new Error(`PayGate rejected: ${errCode} - ${errDesc || initiateText}`);
-      }
-
-      console.log('[Payment] PayGate initiate successful, PAY_REQUEST_ID:', payRequestId);
-
-      // Step 3: Submit form to PayGate process.trans — browser redirect
-      // This completes the payment flow by redirecting to PayGate payment page
       const form = document.createElement('form');
       form.method = 'POST';
-      form.action = data.checkout.processUrl; // process.trans URL
+      form.action = initiateUrl; // First submit to initiate.trans
 
-      const payRequestIdInput = document.createElement('input');
-      payRequestIdInput.type = 'hidden';
-      payRequestIdInput.name = 'PAY_REQUEST_ID';
-      payRequestIdInput.value = payRequestId;
-      form.appendChild(payRequestIdInput);
-
-      const checksumInput = document.createElement('input');
-      checksumInput.type = 'hidden';
-      checksumInput.name = 'CHECKSUM';
-      checksumInput.value = checksum || '';
-      form.appendChild(checksumInput);
+      // Add all PayGate params to form
+      Object.entries(params).forEach(([key, value]) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = String(value);
+        form.appendChild(input);
+      });
 
       document.body.appendChild(form);
-      form.submit(); // Browser navigates to PayGate payment page
+      console.log('[Payment] Redirecting to PayGate...');
+      form.submit(); // Browser navigates directly to PayGate initiate.trans
 
     } catch (error) {
       console.error('Subscription error:', error);
