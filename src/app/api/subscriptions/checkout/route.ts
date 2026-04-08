@@ -126,6 +126,9 @@ export async function POST(request: NextRequest) {
     const amountInCents = Math.round(amount * 100);
 
     try {
+      // Get the request origin dynamically from headers (works in production)
+      const origin = request.headers.get('origin') || request.nextUrl.origin || process.env.NEXTAUTH_URL || 'https://www.namibiaservices.com';
+      
       // Build signed params — browser will POST these directly to PayGate
       // This avoids the server-side 403 from PayGate's CloudFront WAF blocking datacenter IPs
       const params = payGate.buildInitiateParams({
@@ -133,8 +136,8 @@ export async function POST(request: NextRequest) {
         amount: amountInCents,
         currency: 'NAD',
         email: business.email,
-        returnUrl: `${process.env.NEXTAUTH_URL}/business/${businessId}/subscription/success?reference=${reference}`,
-        notifyUrl: `${process.env.NEXTAUTH_URL}/api/subscriptions/callback`,
+        returnUrl: `${origin}/business/${businessId}/subscription/success?reference=${reference}`,
+        notifyUrl: `${origin}/api/subscriptions/callback`,
       });
 
       // Save pending subscription record for callback to activate

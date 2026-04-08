@@ -172,6 +172,9 @@ export async function POST(req: NextRequest) {
     // Create checkout with browser-side PayGate call
     let params;
     try {
+      // Get the request origin dynamically from headers (works in production)
+      const origin = req.headers.get('origin') || req.nextUrl.origin || process.env.NEXTAUTH_URL || 'https://www.namibiaservices.com';
+      
       // Build signed params — browser will POST these directly to PayGate
       // This avoids the server-side 403 from PayGate's CloudFront WAF blocking datacenter IPs
       params = payGate.buildInitiateParams({
@@ -179,8 +182,8 @@ export async function POST(req: NextRequest) {
         amount: amount * 100, // Convert to cents
         currency: 'NAD',
         email: business.email,
-        returnUrl: `${process.env.NEXTAUTH_URL}/business/${businessId}/featured-hero/success?reference=${reference}`,
-        notifyUrl: `${process.env.NEXTAUTH_URL}/api/featured-hero-space/callback`,
+        returnUrl: `${origin}/business/${businessId}/featured-hero/success?reference=${reference}`,
+        notifyUrl: `${origin}/api/featured-hero-space/callback`,
       });
     } catch (paymentError) {
       console.error('PayGate params error:', paymentError);
