@@ -1,14 +1,17 @@
 /**
  * POST /api/subscriptions/checkout
- * Initiate a PayGate checkout session for subscription
+ * Build and return PayGate checkout params (signed but not submitted)
+ * The browser will make the actual initiate.trans call to avoid CloudFront WAF blocking
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { payGate } from '@/lib/paygate';
-import { SUBSCRIPTION_TIERS, getTierInfo, getYearlyPrice } from '@/lib/subscription-access';
+import { SUBSCRIPTION_TIERS, getYearlyPrice } from '@/lib/subscription-access';
 import { authOptions } from '@/lib/auth';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
@@ -112,46 +115,71 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
+        free: true,
         message: 'Free plan activated',
-        subscriptionUrl: `/business/${businessId}/subscription`,
+        redirectUrl: `/business/${businessId}/subscription`,
       });
     }
 
     // Create reference for PayGate
     const reference = `NS_SUB_${businessId}_${Date.now()}`;
+    const amountInCents = Math.round(amount * 100);
 
     try {
-      // Return checkout details
-      const checkoutData = await payGate.createCheckout({
+      // Build signed params — browser will POST these directly to PayGate
+      // This avoids the server-side 403 from PayGate's CloudFront WAF blocking datacenter IPs
+      const params = payGate.buildInitiateParams({
         reference,
-        amount: amount * 100, // Convert to cents
+        amount: amountInCents,
         currency: 'NAD',
         email: business.email,
-        description: `${planInfo.name} Subscription - ${business.name}`,
-        returnUrl: `${process.env.NEXTAUTH_URL}/business/${businessId}/subscription/success`,
+        returnUrl: `${process.env.NEXTAUTH_URL}/business/${businessId}/subscription/success?reference=${reference}`,
         notifyUrl: `${process.env.NEXTAUTH_URL}/api/subscriptions/callback`,
-        customData: {
-          businessId,
-          planId: plan.id,
-          billingCycle,
-        },
       });
+
+      // Save pending subscription record for callback to activate
+      const existingSubscription = await prisma.subscription.findUnique({
+        where: { businessId },
+      });
+
+      if (existingSubscription) {
+        await prisma.subscription.update({
+          where: { id: existingSubscription.id },
+          data: {
+            planId: plan.id,
+            status: 'INACTIVE', // Will be activated by callback after payment
+            billingCycle: billingCycle as any,
+          },
+        });
+      } else {
+        await prisma.subscription.create({
+          data: {
+            businessId,
+            planId: plan.id,
+            status: 'INACTIVE', // Will be activated by callback after payment
+            billingCycle: billingCycle as any,
+          },
+        });
+      }
+
+      console.log('[Checkout] Returning signed params for reference:', reference);
 
       return NextResponse.json({
         success: true,
+        free: false,
+        // Return the params and URLs — browser makes the calls to PayGate
         checkout: {
-          redirectUrl: checkoutData.redirect,
-          payRequestId: checkoutData.payRequestId,
-          checksum: checkoutData.checksum,
+          initiateUrl: payGate.INITIATE_URL,
+          processUrl: payGate.PROCESS_URL,
+          params, // signed fields for browser to POST
           reference,
-          sessionId: checkoutData.sessionId,
         },
       });
     } catch (paymentError) {
-      console.error('PayGate checkout error:', paymentError);
+      console.error('PayGate params error:', paymentError);
       const errorMessage = paymentError instanceof Error ? paymentError.message : 'Payment gateway error';
       return NextResponse.json(
-        { message: `Failed to initiate payment: ${errorMessage}` },
+        { message: `Failed to build checkout: ${errorMessage}` },
         { status: 500 }
       );
     }
