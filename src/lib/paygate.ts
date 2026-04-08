@@ -88,11 +88,21 @@ class PayGateService {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        // Use your ACTUAL deployed domain here - must match what's in PayGate merchant portal
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': '*/*',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+        'Origin': process.env.NEXTAUTH_URL || 'https://namibiaservices.com',
         'Referer': process.env.NEXTAUTH_URL || 'https://namibiaservices.com',
-        'User-Agent': 'Mozilla/5.0',
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'cross-site',
       },
       body,
+      // Add timeout and retry logic
+      signal: AbortSignal.timeout(30000), // 30 second timeout
     });
 
     const responseText = await response.text();
