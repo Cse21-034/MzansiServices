@@ -87,6 +87,34 @@ class PayGateService {
     return calculated === CHECKSUM;
   }
 
+  /**
+   * Build checksum for redirect to process.trans
+   * Checksum = MD5(PAYGATE_ID + PAY_REQUEST_ID + REFERENCE + KEY)
+   */
+  buildProcessChecksum(payRequestId: string, reference: string): string {
+    const checksumString = this.config.merchantId + payRequestId + reference + this.config.merchantKey;
+    return crypto.createHash('md5').update(checksumString).digest('hex');
+  }
+
+  /**
+   * Verify checksum from PayGate callback (Notify URL)
+   * Extracts CHECKSUM field and verifies it matches the calculated value
+   */
+  verifyNotifyChecksum(data: Record<string, string>): boolean {
+    const { CHECKSUM, ...rest } = data;
+    if (!CHECKSUM) return false;
+    
+    // Notify checksum is calculated from all fields concatenated + key
+    // Same as initiate checksum - all fields in order
+    const checksumString = Object.keys(rest)
+      .sort()
+      .map(key => String(rest[key]))
+      .join('') + this.config.merchantKey;
+    
+    const calculated = crypto.createHash('md5').update(checksumString).digest('hex');
+    return calculated === CHECKSUM;
+  }
+
   processNotification(data: Record<string, string>): {
     success: boolean;
     reference: string;

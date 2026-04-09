@@ -11,6 +11,13 @@ export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
 
+    // ⚠️ CRITICAL: Verify checksum before processing any data
+    if (!payGate.verifyNotifyChecksum(data)) {
+      console.error('Invalid checksum in PayGate notification:', data);
+      // Still respond with OK to prevent retries, but don't process
+      return new NextResponse('OK');
+    }
+
     // Process PayGate notification
     const result = await payGate.processNotification(data);
 
@@ -33,10 +40,8 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      return NextResponse.json({
-        success: false,
-        message: result.message,
-      });
+      // Response with plain text OK for PayGate (required by documentation)
+      return new NextResponse('OK');
     }
 
     // Get payment details
@@ -53,10 +58,8 @@ export async function POST(request: NextRequest) {
 
     if (!payment) {
       console.error('Payment record not found:', data.REFERENCE);
-      return NextResponse.json({
-        success: false,
-        message: 'Payment record not found',
-      });
+      // Still return OK to prevent PayGate retries
+      return new NextResponse('OK');
     }
 
     // Update payment status
@@ -91,19 +94,12 @@ export async function POST(request: NextRequest) {
     // Log successful activation
     console.log(`✓ Subscription activated for business: ${subscription.businessId}`);
 
-    return NextResponse.json({
-      success: true,
-      message: 'Payment processed successfully',
-      subscriptionId: subscription.id,
-    });
+    // IMPORTANT: Respond with plain text OK (required by PayGate documentation)
+    return new NextResponse('OK');
   } catch (error) {
     console.error('Subscription callback error:', error);
-    return NextResponse.json(
-      {
-        success: false,
-        message: 'Error processing payment callback',
-      },
-      { status: 500 }
-    );
+    // Even on error, return OK to prevent PayGate retries
+    // Log the error for manual investigation
+    return new NextResponse('OK');
   }
 }
