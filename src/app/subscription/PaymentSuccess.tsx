@@ -70,7 +70,7 @@ const PaymentSuccess: React.FC<PaymentSuccessProps> = ({ searchParams }) => {
                 </Link>
               )}
               <Link
-                href="/namibiaservices"
+                href="/"
                 className="block bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-lg transition"
               >
                 Return to Home

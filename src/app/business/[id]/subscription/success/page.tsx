@@ -32,14 +32,14 @@ export default function PaymentSuccessPage({
                   href={`/business/${searchParams.businessId}`}
                   className="text-gray-600 hover:text-gray-900 font-medium"
                 >
-                  Dashboard
+                  My Dashboard
                 </Link>
               )}
               <Link 
-                href="/namibiaservices"
+                href="/"
                 className="text-gray-600 hover:text-gray-900 font-medium"
               >
-                Services
+                Home
               </Link>
             </div>
           </div>

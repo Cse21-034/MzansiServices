@@ -97,7 +97,35 @@ class PayGateService {
   }
 
   /**
-   * Verify checksum from PayGate callback (Notify URL)
+   * Verify checksum from PayGate RETURN_URL (client-side redirect after payment)
+   * Checksum = MD5(PAYGATE_ID + PAY_REQUEST_ID + TRANSACTION_STATUS + REFERENCE + KEY)
+   * Per PayGate documentation: different from NOTIFY_URL checksum
+   */
+  verifyReturnChecksum(data: Record<string, string>): boolean {
+    const { CHECKSUM, ...rest } = data;
+    if (!CHECKSUM) return false;
+
+    // Return checksum: PAYGATE_ID + PAY_REQUEST_ID + TRANSACTION_STATUS + REFERENCE + KEY
+    const payGateId = rest.PAYGATE_ID || this.config.merchantId;
+    const payRequestId = rest.PAY_REQUEST_ID || '';
+    const transactionStatus = rest.TRANSACTION_STATUS || '';
+    const reference = rest.REFERENCE || '';
+
+    const checksumString = payGateId + payRequestId + transactionStatus + reference + this.config.merchantKey;
+    const calculated = crypto.createHash('md5').update(checksumString).digest('hex');
+    
+    console.log('[PayGate] Return checksum verification:', {
+      expected: CHECKSUM,
+      calculated,
+      match: calculated === CHECKSUM,
+      source: `${payGateId}${payRequestId}${transactionStatus}${reference}[KEY]`,
+    });
+
+    return calculated === CHECKSUM;
+  }
+
+  /**
+   * Verify checksum from PayGate callback (Notify URL - server-side)
    * Extracts CHECKSUM field and verifies it matches the calculated value
    */
   verifyNotifyChecksum(data: Record<string, string>): boolean {

@@ -26,12 +26,13 @@ export async function POST(request: NextRequest) {
       hasChecksum: !!data.CHECKSUM,
     });
 
-    // ⚠️ Verify checksum to ensure data integrity
-    if (!payGate.verifyNotifyChecksum(data)) {
+    // ⚠️ Verify checksum to ensure data integrity (use RETURN checksum, not NOTIFY)
+    if (!payGate.verifyReturnChecksum(data)) {
       console.error('[Return Handler] Invalid checksum, data may be tampered with');
-      // Still redirect, but without trusting the data
+      console.error('[Return Handler] Received data:', data);
+      // Don't trust the data - redirect to home with error
       return NextResponse.redirect(
-        new URL('/namibiaservices?error=invalid_checksum', request.nextUrl.origin),
+        new URL('/?error=invalid_checksum', request.nextUrl.origin),
         { status: 303 }
       );
     }
