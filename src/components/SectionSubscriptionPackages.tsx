@@ -80,84 +80,72 @@ const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = 
           router.push(`/business/${businessId}/subscription`);
         } else if (data.checkout?.params && data.checkout?.initiateUrl && data.checkout?.reference) {
           // Paid plan - Two-step PayGate flow per documentation
-          // Step 1: Submit initiate params to PayGate
-          const initiateForm = document.createElement("form");
-          initiateForm.method = "POST";
-          initiateForm.action = data.checkout.initiateUrl;
-          initiateForm.id = "paygate-initiate-form";
+          try {
+            console.log('[Subscription] Step 1: Posting to PayGate initiate.trans');
+            
+            // Step 1: POST to PayGate initiate.trans and capture response
+            const initiateResponse = await fetch(data.checkout.initiateUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: new URLSearchParams(data.checkout.params as Record<string, string>).toString(),
+            });
 
-          Object.entries(data.checkout.params).forEach(([key, value]) => {
-            const input = document.createElement("input");
-            input.type = "hidden";
-            input.name = key;
-            input.value = String(value);
-            initiateForm.appendChild(input);
-          });
+            const initiateText = await initiateResponse.text();
+            console.log('[Subscription] Step 2: Received from initiate.trans:', initiateText);
 
-          // Step 2: After initiate.trans responds, extract PAY_REQUEST_ID and auto-submit to process.trans
-          const handleInitiateResponse = async () => {
-            try {
-              // Wait a moment for PayGate to process
-              await new Promise(resolve => setTimeout(resolve, 2000));
+            // Parse the response: "PAYGATE_ID=...&PAY_REQUEST_ID=...&REFERENCE=...&CHECKSUM=..."
+            const params = new URLSearchParams(initiateText);
+            const payRequestId = params.get('PAY_REQUEST_ID');
+            const reference = data.checkout.reference;
 
-              // Extract PAY_REQUEST_ID from the response page
-              const payRequestIdInput = document.querySelector('input[name="PAY_REQUEST_ID"]') as HTMLInputElement;
-              const checksumInput = document.querySelector('input[name="CHECKSUM"]') as HTMLInputElement;
+            if (!payRequestId) {
+              console.error('No PAY_REQUEST_ID in response:', initiateText);
+              alert('Error: PayGate did not return a request ID. Please try again.');
+              return;
+            }
 
-              if (!payRequestIdInput || !checksumInput) {
-                console.error('PAY_REQUEST_ID or CHECKSUM not found in PayGate response');
-                // PayGate page should have loaded with these fields
-                return;
-              }
+            console.log('[Subscription] Step 3: Extracted PAY_REQUEST_ID:', payRequestId);
 
-              const payRequestId = payRequestIdInput.value;
-              const reference = data.checkout.reference;
+            // Step 2: Call our backend to calculate process.trans checksum
+            const processResponse = await fetch('/api/subscriptions/process', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                payRequestId,
+                reference,
+              }),
+            });
 
-              // Call our backend to calculate process.trans checksum
-              const processResponse = await fetch('/api/subscriptions/process', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  payRequestId,
-                  reference,
-                }),
+            const processData = await processResponse.json();
+            console.log('[Subscription] Step 4: Got process params from backend');
+
+            if (processData.success && processData.params) {
+              // Step 3: Submit to process.trans to show payment form
+              console.log('[Subscription] Step 5: Submitting to process.trans');
+              const processForm = document.createElement("form");
+              processForm.method = "POST";
+              processForm.action = processData.processUrl;
+
+              Object.entries(processData.params).forEach(([key, value]) => {
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = key;
+                input.value = String(value);
+                processForm.appendChild(input);
               });
 
-              const processData = await processResponse.json();
-
-              if (processData.success && processData.params) {
-                // Step 3: Submit to process.trans
-                const processForm = document.createElement("form");
-                processForm.method = "POST";
-                processForm.action = processData.processUrl;
-
-                Object.entries(processData.params).forEach(([key, value]) => {
-                  const input = document.createElement("input");
-                  input.type = "hidden";
-                  input.name = key;
-                  input.value = String(value);
-                  processForm.appendChild(input);
-                });
-
-                document.body.appendChild(processForm);
-                processForm.submit();
-              } else {
-                console.error('Failed to get process params:', processData);
-                alert('Error redirecting to payment. Please try again.');
-              }
-            } catch (error) {
-              console.error('Error in payment flow:', error);
-              alert('Error processing payment. Please try again.');
-            } finally {
-              setProcessingTier(null);
+              document.body.appendChild(processForm);
+              processForm.submit();
+            } else {
+              console.error('Failed to get process params:', processData);
+              alert('Error: Could not prepare payment redirect. Please try again.');
             }
-          };
-
-          document.body.appendChild(initiateForm);
-          initiateForm.submit();
-
-          // Start monitoring for the PayGate response
-          handleInitiateResponse();
+          } catch (error) {
+            console.error('[Subscription] Error in payment flow:', error);
+            alert('Error processing payment: ' + (error instanceof Error ? error.message : 'Unknown error'));
+          } finally {
+            setProcessingTier(null);
+          }
         }
       } else {
         alert('Failed to initiate subscription: ' + data.message);
@@ -192,84 +180,72 @@ const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = 
             router.push(`/business/${selectedBusinessId}/subscription`);
           } else if (data.checkout?.params && data.checkout?.initiateUrl && data.checkout?.reference) {
             // Paid plan - Two-step PayGate flow per documentation
-            // Step 1: Submit initiate params to PayGate
-            const initiateForm = document.createElement("form");
-            initiateForm.method = "POST";
-            initiateForm.action = data.checkout.initiateUrl;
-            initiateForm.id = "paygate-initiate-form";
+            try {
+              console.log('[Subscription] Step 1: Posting to PayGate initiate.trans');
+              
+              // Step 1: POST to PayGate initiate.trans and capture response
+              const initiateResponse = await fetch(data.checkout.initiateUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(data.checkout.params as Record<string, string>).toString(),
+              });
 
-            Object.entries(data.checkout.params).forEach(([key, value]) => {
-              const input = document.createElement("input");
-              input.type = "hidden";
-              input.name = key;
-              input.value = String(value);
-              initiateForm.appendChild(input);
-            });
+              const initiateText = await initiateResponse.text();
+              console.log('[Subscription] Step 2: Received from initiate.trans:', initiateText);
 
-            // Step 2: After initiate.trans responds, extract PAY_REQUEST_ID and auto-submit to process.trans
-            const handleInitiateResponse = async () => {
-              try {
-                // Wait a moment for PayGate to process
-                await new Promise(resolve => setTimeout(resolve, 2000));
+              // Parse the response: "PAYGATE_ID=...&PAY_REQUEST_ID=...&REFERENCE=...&CHECKSUM=..."
+              const params = new URLSearchParams(initiateText);
+              const payRequestId = params.get('PAY_REQUEST_ID');
+              const reference = data.checkout.reference;
 
-                // Extract PAY_REQUEST_ID from the response page
-                const payRequestIdInput = document.querySelector('input[name="PAY_REQUEST_ID"]') as HTMLInputElement;
-                const checksumInput = document.querySelector('input[name="CHECKSUM"]') as HTMLInputElement;
+              if (!payRequestId) {
+                console.error('No PAY_REQUEST_ID in response:', initiateText);
+                alert('Error: PayGate did not return a request ID. Please try again.');
+                return;
+              }
 
-                if (!payRequestIdInput || !checksumInput) {
-                  console.error('PAY_REQUEST_ID or CHECKSUM not found in PayGate response');
-                  // PayGate page should have loaded with these fields
-                  return;
-                }
+              console.log('[Subscription] Step 3: Extracted PAY_REQUEST_ID:', payRequestId);
 
-                const payRequestId = payRequestIdInput.value;
-                const reference = data.checkout.reference;
+              // Step 2: Call our backend to calculate process.trans checksum
+              const processResponse = await fetch('/api/subscriptions/process', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  payRequestId,
+                  reference,
+                }),
+              });
 
-                // Call our backend to calculate process.trans checksum
-                const processResponse = await fetch('/api/subscriptions/process', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    payRequestId,
-                    reference,
-                  }),
+              const processData = await processResponse.json();
+              console.log('[Subscription] Step 4: Got process params from backend');
+
+              if (processData.success && processData.params) {
+                // Step 3: Submit to process.trans to show payment form
+                console.log('[Subscription] Step 5: Submitting to process.trans');
+                const processForm = document.createElement("form");
+                processForm.method = "POST";
+                processForm.action = processData.processUrl;
+
+                Object.entries(processData.params).forEach(([key, value]) => {
+                  const input = document.createElement("input");
+                  input.type = "hidden";
+                  input.name = key;
+                  input.value = String(value);
+                  processForm.appendChild(input);
                 });
 
-                const processData = await processResponse.json();
-
-                if (processData.success && processData.params) {
-                  // Step 3: Submit to process.trans
-                  const processForm = document.createElement("form");
-                  processForm.method = "POST";
-                  processForm.action = processData.processUrl;
-
-                  Object.entries(processData.params).forEach(([key, value]) => {
-                    const input = document.createElement("input");
-                    input.type = "hidden";
-                    input.name = key;
-                    input.value = String(value);
-                    processForm.appendChild(input);
-                  });
-
-                  document.body.appendChild(processForm);
-                  processForm.submit();
-                } else {
-                  console.error('Failed to get process params:', processData);
-                  alert('Error redirecting to payment. Please try again.');
-                }
-              } catch (error) {
-                console.error('Error in payment flow:', error);
-                alert('Error processing payment. Please try again.');
-              } finally {
-                setProcessingTier(null);
+                document.body.appendChild(processForm);
+                processForm.submit();
+              } else {
+                console.error('Failed to get process params:', processData);
+                alert('Error: Could not prepare payment redirect. Please try again.');
               }
-            };
-
-            document.body.appendChild(initiateForm);
-            initiateForm.submit();
-
-            // Start monitoring for the PayGate response
-            handleInitiateResponse();
+            } catch (error) {
+              console.error('[Subscription] Error in payment flow:', error);
+              alert('Error processing payment: ' + (error instanceof Error ? error.message : 'Unknown error'));
+            } finally {
+              setProcessingTier(null);
+            }
           }
         } else {
           alert('Failed to initiate subscription: ' + data.message);
