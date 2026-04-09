@@ -24,11 +24,11 @@ export async function POST(request: NextRequest) {
     const checksum = payGate.buildProcessChecksum(payRequestId, reference);
 
     // Return params for process.trans redirect
+    // NOTE: Only PAY_REQUEST_ID and CHECKSUM are posted to process.trans (not PAYGATE_ID)
     return NextResponse.json({
       success: true,
       processUrl: payGate.PROCESS_URL,
       params: {
-        PAYGATE_ID: process.env.PAYGATE_MERCHANT_ID,
         PAY_REQUEST_ID: payRequestId,
         CHECKSUM: checksum,
       },
