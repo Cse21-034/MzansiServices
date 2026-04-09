@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
         amount: amountInCents,
         currency: 'NAD',
         email: business.email,
-        returnUrl: `${origin}/business/${businessId}/subscription/success?reference=${reference}`,
+        returnUrl: `${origin}/api/subscriptions/return`,
         notifyUrl: `${origin}/api/subscriptions/callback`,
       });
 
