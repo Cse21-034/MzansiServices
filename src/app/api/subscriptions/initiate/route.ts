@@ -44,42 +44,56 @@ export async function POST(request: NextRequest) {
 
     console.log('[Initiate] Response status:', response.status);
     
-    const html = await response.text();
-    console.log('[Initiate] Response length:', html.length);
-    console.log('[Initiate] Response preview:', html.substring(0, 200));
+    const responseText = await response.text();
+    console.log('[Initiate] Response length:', responseText.length);
+    console.log('[Initiate] Response preview:', responseText.substring(0, 200));
 
     // Extract PAY_REQUEST_ID from response
     let payRequestId: string | null = null;
 
-    // Try HTML form field first
-    const htmlMatch = html.match(
-      /name=['"]PAY_REQUEST_ID['"][\s\S]*?value=['"]([^'"]+)['"]/i
-    );
-    if (htmlMatch?.[1]) {
-      payRequestId = htmlMatch[1];
-      console.log('[Initiate] ✅ Extracted PAY_REQUEST_ID from HTML:', payRequestId);
-    } else {
-      // Try JSON response
+    // Try URLSearchParams first (PayGate's actual response format)
+    try {
+      const params = new URLSearchParams(responseText);
+      payRequestId = params.get('PAY_REQUEST_ID');
+      if (payRequestId) {
+        console.log('[Initiate] ✅ Extracted PAY_REQUEST_ID from URLSearchParams:', payRequestId);
+      }
+    } catch (e) {
+      console.warn('[Initiate] Failed to parse as URLSearchParams:', e);
+    }
+
+    // If not found, try HTML form field
+    if (!payRequestId) {
+      const htmlMatch = responseText.match(
+        /name=['"]PAY_REQUEST_ID['"][\s\S]*?value=['"]([^'"]+)['"]/i
+      );
+      if (htmlMatch?.[1]) {
+        payRequestId = htmlMatch[1];
+        console.log('[Initiate] ✅ Extracted PAY_REQUEST_ID from HTML:', payRequestId);
+      }
+    }
+
+    // If still not found, try JSON
+    if (!payRequestId) {
       try {
         console.log('[Initiate] Trying JSON parse...');
-        const jsonResponse = JSON.parse(html);
+        const jsonResponse = JSON.parse(responseText);
         payRequestId = jsonResponse.PAY_REQUEST_ID;
         console.log('[Initiate] ✅ Extracted PAY_REQUEST_ID from JSON:', payRequestId);
       } catch (e) {
-        console.warn('[Initiate] Response is neither HTML form nor JSON');
-        console.warn('[Initiate] Response first 500 chars:', html.substring(0, 500));
+        console.warn('[Initiate] Response is not JSON');
       }
     }
 
     if (!payRequestId) {
       console.error('[Initiate] ❌ Failed to extract PAY_REQUEST_ID');
-      console.error('[Initiate] Full response:', html);
+      console.error('[Initiate] Full response:', responseText);
       return NextResponse.json({
         success: false,
         message: 'Failed to extract PAY_REQUEST_ID from PayGate',
         debug: {
-          responseLength: html.length,
-          responsePreview: html.substring(0, 300),
+          responseLength: responseText.length,
+          responsePreview: responseText.substring(0, 300),
         }
       }, { status: 400 });
     }
