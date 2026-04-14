@@ -14,7 +14,10 @@ export async function POST(request: NextRequest) {
   try {
     const { payRequestId, reference } = await request.json();
 
+    console.log('[Save PAY_REQUEST_ID] Received request:', { payRequestId, reference });
+
     if (!payRequestId || !reference) {
+      console.error('[Save PAY_REQUEST_ID] Missing required fields:', { payRequestId, reference });
       return NextResponse.json(
         { message: 'Missing required fields: payRequestId, reference' },
         { status: 400 }
@@ -27,26 +30,33 @@ export async function POST(request: NextRequest) {
     });
 
     if (!payment) {
-      console.warn('[Save PAY_REQUEST_ID] Payment not found for reference:', reference);
-      // Don't fail here - payment will be created/updated in callback
+      console.error('[Save PAY_REQUEST_ID] Payment not found for reference:', reference);
+      console.error('[Save PAY_REQUEST_ID] This means the payment record was never created during checkout');
       return NextResponse.json({
-        success: true,
-        message: 'PAY_REQUEST_ID saved (payment will be created in callback)',
-      });
+        success: false,
+        message: 'Payment record not found. Checkout endpoint may have failed.',
+      }, { status: 404 });
     }
 
+    console.log('[Save PAY_REQUEST_ID] Found payment:', payment.id);
+    
     // Update the payment record to store the PAY_REQUEST_ID
-    await prisma.payment.update({
-      where: { id: payment.id },
-      data: { payRequestId },
-    });
+    try {
+      await prisma.payment.update({
+        where: { id: payment.id },
+        data: { payRequestId },
+      });
+      
+      console.log('[Save PAY_REQUEST_ID] Successfully saved for reference:', reference, 'payRequestId:', payRequestId);
 
-    console.log('[Save PAY_REQUEST_ID] Saved for reference:', reference, 'payRequestId:', payRequestId);
-
-    return NextResponse.json({
-      success: true,
-      message: 'PAY_REQUEST_ID saved successfully',
-    });
+      return NextResponse.json({
+        success: true,
+        message: 'PAY_REQUEST_ID saved successfully',
+      });
+    } catch (updateError) {
+      console.error('[Save PAY_REQUEST_ID] Failed to update payment:', updateError);
+      throw updateError;
+    }
   } catch (error) {
     console.error('[Save PAY_REQUEST_ID] Error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Save failed';

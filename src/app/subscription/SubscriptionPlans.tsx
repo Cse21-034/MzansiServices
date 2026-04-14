@@ -79,91 +79,46 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ businessId }) => 
       console.log('[Payment Flow] Step 1 Complete: Received params and URLs');
       console.log('[Payment Flow] Reference:', reference);
 
-      // ========== STEP 2: Submit to initiate.trans and CAPTURE response ==========
-      console.log('[Payment Flow] Step 2: Submitting to initiate.trans...');
+      // ========== STEP 2 & 3: Submit to initiate.trans via server proxy ==========
+      // The server-side proxy handles PayGate communication and saves PAY_REQUEST_ID
+      console.log('[Payment Flow] Step 2 & 3: Submitting to server proxy...');
 
-      // Build FormData for initiate.trans submission
-      const initiateFormData = new FormData();
-      Object.entries(params).forEach(([key, value]) => {
-        initiateFormData.append(key, String(value));
-      });
-
-      // IMPORTANT: Use fetch to capture response (not form.submit())
       let payRequestId: string | null = null;
       
       try {
-        const initiateResponse = await fetch(initiateUrl, {
-          method: 'POST',
-          body: initiateFormData,
-        });
-
-        // Get response as text/HTML
-        const initiateHtml = await initiateResponse.text();
-        console.log('[Payment Flow] Received initiate.trans response');
-
-        // Extract PAY_REQUEST_ID from HTML response
-        // PayGate returns HTML with hidden form fields
-        const idMatch = initiateHtml.match(
-          /name=['"]PAY_REQUEST_ID['"][\s\S]*?value=['"]([^'"]+)['"]/i
-        );
-        
-        if (!idMatch || !idMatch[1]) {
-          // Fallback: try to find it in JSON response if PayGate returns JSON
-          try {
-            const jsonResponse = JSON.parse(initiateHtml);
-            payRequestId = jsonResponse.PAY_REQUEST_ID;
-          } catch (e) {
-            // Not JSON
-          }
-        } else {
-          payRequestId = idMatch[1];
-        }
-
-        if (!payRequestId) {
-          console.error('[Payment Flow] Failed to extract PAY_REQUEST_ID');
-          console.error('[Payment Flow] Response excerpt:', initiateHtml.substring(0, 500));
-          alert('Payment error: Failed to get payment request ID from PayGate');
-          setProcessingTier(null);
-          return;
-        }
-
-        console.log('[Payment Flow] Step 2 Complete: Extracted PAY_REQUEST_ID:', payRequestId);
-      } catch (fetchError) {
-        console.error('[Payment Flow] initiate.trans fetch error:', fetchError);
-        
-        // If fetch fails (CORS etc), fall back to form submission
-        // But we won't get PAY_REQUEST_ID this way ❌
-        console.warn('[Payment Flow] Falling back to form submission (PAY_REQUEST_ID will be lost)');
-        alert('Warning: Payment flow may be incomplete due to browser restrictions');
-        setProcessingTier(null);
-        return;
-      }
-
-      // ========== STEP 3: Save PAY_REQUEST_ID to database ==========
-      console.log('[Payment Flow] Step 3: Saving PAY_REQUEST_ID to database...');
-
-      try {
-        const saveResponse = await fetch('/api/subscriptions/save-pay-request', {
+        const initiateResponse = await fetch('/api/subscriptions/initiate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            payRequestId,
+            params,
             reference,
           }),
         });
 
-        const saveData = await saveResponse.json();
+        const initiateData = await initiateResponse.json();
         
-        if (!saveData.success) {
-          console.error('[Payment Flow] Failed to save PAY_REQUEST_ID:', saveData.message);
-          // Don't fail completely - payment might still work via callback
-          // But return URL will fail
-        } else {
-          console.log('[Payment Flow] Step 3 Complete: PAY_REQUEST_ID saved');
+        if (!initiateData.success) {
+          console.error('[Payment Flow] Initiate failed:', initiateData.message);
+          alert('Payment error: ' + initiateData.message);
+          setProcessingTier(null);
+          return;
         }
-      } catch (saveError) {
-        console.error('[Payment Flow] save-pay-request error:', saveError);
-        // Continue anyway - callback will still process payment
+
+        payRequestId = initiateData.payRequestId;
+        
+        if (!payRequestId) {
+          console.error('[Payment Flow] No PAY_REQUEST_ID in response');
+          alert('Payment error: Failed to get payment request ID');
+          setProcessingTier(null);
+          return;
+        }
+
+        console.log('[Payment Flow] Step 2 & 3 Complete: PAY_REQUEST_ID extracted and saved:', payRequestId);
+      } catch (error) {
+        console.error('[Payment Flow] Server proxy error:', error);
+        alert('Payment error: ' + (error instanceof Error ? error.message : 'Server error'));
+        setProcessingTier(null);
+        return;
       }
 
       // ========== STEP 4: Get process.trans params ==========

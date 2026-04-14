@@ -1,21 +1,24 @@
 /**
  * POST /api/subscriptions/return
  * Handles PayGate's RETURN_URL POST redirect after payment
- * This is different from the NOTIFY_URL - this is the user-facing redirect
+ * 
+ * Per PayGate documentation:
+ * - This is CLIENT-SIDE redirect (not for final reconciliation)
+ * - Always use NOTIFY_URL callback for payment confirmation
+ * - Fields: PAY_REQUEST_ID, TRANSACTION_STATUS, CHECKSUM
+ * - Checksum formula: MD5(PAYGATE_ID + PAY_REQUEST_ID + REFERENCE + KEY)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { payGate } from '@/lib/paygate';
-import { Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
+    // Parse form data from PayGate
     const formData = await request.formData();
-    
-    // Convert FormData to object
     const data: Record<string, string> = {};
     formData.forEach((value, key) => {
       data[key] = String(value);
@@ -25,83 +28,106 @@ export async function POST(request: NextRequest) {
     const transactionStatus = data.TRANSACTION_STATUS || '0';
     const checksum = data.CHECKSUM || '';
 
-    console.log('[Return Handler] Received from PayGate:', {
-      payRequestId,
-      transactionStatus,
-      hasChecksum: !!checksum,
-    });
+    console.log('[Return] ===== START =====');
+    console.log('[Return] Received from PayGate');
+    console.log('[Return] PAY_REQUEST_ID:', payRequestId);
+    console.log('[Return] TRANSACTION_STATUS:', transactionStatus, '(1=success, 0=failed)');
 
+    // Validate required fields
     if (!payRequestId) {
-      console.error('[Return Handler] Missing PAY_REQUEST_ID');
+      console.error('[Return] ❌ Missing PAY_REQUEST_ID');
       return NextResponse.redirect(
         new URL('/?error=missing_pay_request_id', request.nextUrl.origin),
         { status: 303 }
       );
     }
 
-    // Look up the payment record by payRequestId to get the REFERENCE
-    // Using raw query due to Prisma type generation issue with payRequestId field
-    const payments = await prisma.$queryRaw<any[]>(
-      Prisma.sql`SELECT p.*, s."businessId" FROM payments p 
-                  LEFT JOIN subscriptions s ON p."subscription_id" = s.id 
-                  WHERE p."pay_request_id" = ${payRequestId}`
-    );
-
-    const payment = payments?.[0];
-
-    if (!payment) {
-      console.error('[Return Handler] Payment not found for payRequestId:', payRequestId);
-      return NextResponse.redirect(
-        new URL('/?error=payment_not_found', request.nextUrl.origin),
-        { status: 303 }
-      );
-    }
-
-    const reference = payment.transaction_ref || '';
-    const businessId = payment.businessId;
-
-    if (!reference) {
-      console.error('[Return Handler] No transaction reference found for payment:', payment.id);
-      return NextResponse.redirect(
-        new URL('/?error=invalid_transaction', request.nextUrl.origin),
-        { status: 303 }
-      );
-    }
-
-    if (!businessId) {
-      console.error('[Return Handler] No business ID found for payment:', payment.id);
-      return NextResponse.redirect(
-        new URL('/?error=invalid_transaction', request.nextUrl.origin),
-        { status: 303 }
-      );
-    }
-
-    console.log('[Return Handler] Retrieved reference:', reference, 'for payRequestId:', payRequestId);
-
-    // ⚠️ Verify checksum using the correct formula from PayGate docs
-    // Checksum = MD5(PAYGATE_ID + PAY_REQUEST_ID + REFERENCE + KEY)
-    if (!payGate.verifyReturnChecksum(payRequestId, reference, checksum)) {
-      console.error('[Return Handler] Invalid checksum, data may be tampered with');
-      console.error('[Return Handler] Checksum verification failed:', {
-        payRequestId,
-        reference,
-        receivedChecksum: checksum,
-      });
-      // Don't trust the data - redirect to home with error
+    if (!checksum) {
+      console.error('[Return] ❌ Missing CHECKSUM');
       return NextResponse.redirect(
         new URL('/?error=invalid_checksum', request.nextUrl.origin),
         { status: 303 }
       );
     }
 
-    // Determine success based on TRANSACTION_STATUS
-    // 1 = Success, 0 = Failed
+    // Look up payment by payRequestId
+    console.log('[Return] Looking up payment record...');
+    
+    // Type workaround due to Prisma client generation issue
+    const payment = await (prisma.payment as any).findUnique({
+      where: { payRequestId },
+      select: {
+        id: true,
+        status: true,
+        transactionRef: true,
+        subscriptionId: true,
+      },
+    });
+
+    if (!payment) {
+      console.warn('[Return] ⚠️ Payment not found for payRequestId:', payRequestId);
+      console.warn('[Return] Possible causes:');
+      console.warn('[Return]   - save-pay-request endpoint not called');
+      console.warn('[Return]   - Payment record doesn\'t exist');
+      console.warn('[Return]   - PayGate is retrying old transaction');
+      return NextResponse.redirect(
+        new URL('/?error=payment_not_found', request.nextUrl.origin),
+        { status: 303 }
+      );
+    }
+
+    console.log('[Return] ✅ Payment found. Status:', payment.status);
+
+    const reference = payment.transactionRef;
+    if (!reference) {
+      console.error('[Return] ❌ No transaction reference in payment record');
+      return NextResponse.redirect(
+        new URL('/?error=invalid_transaction', request.nextUrl.origin),
+        { status: 303 }
+      );
+    }
+
+    // Get subscription and business info
+    console.log('[Return] Getting business info...');
+    
+    const subscription = await prisma.subscription.findUnique({
+      where: { id: payment.subscriptionId },
+      select: { businessId: true },
+    });
+
+    if (!subscription?.businessId) {
+      console.error('[Return] ❌ No business ID found');
+      return NextResponse.redirect(
+        new URL('/?error=invalid_transaction', request.nextUrl.origin),
+        { status: 303 }
+      );
+    }
+
+    const businessId = subscription.businessId;
+    console.log('[Return] ✅ Business ID:', businessId);
+
+    // Verify checksum authenticity (per PayGate docs)
+    console.log('[Return] Verifying checksum authenticity...');
+    
+    if (!payGate.verifyReturnChecksum(payRequestId, reference, checksum)) {
+      console.error('[Return] ❌ CHECKSUM MISMATCH - Potential tampering');
+      return NextResponse.redirect(
+        new URL('/?error=invalid_checksum', request.nextUrl.origin),
+        { status: 303 }
+      );
+    }
+
+    console.log('[Return] ✅ Checksum valid - data is authentic');
+
+    // Determine if payment succeeded
     const isSuccess = transactionStatus === '1';
+    console.log('[Return] Transaction result:', isSuccess ? '✅ SUCCESS (1)' : '❌ FAILED (0)');
 
-    console.log(`[Return Handler] Transaction ${reference}: ${isSuccess ? 'SUCCESS' : 'FAILED'}`);
-
-    // Update the payment status based on transaction result
+    // Update payment status (callback may have already done this)
+    console.log('[Return] Updating payment record...');
+    
     if (isSuccess) {
+      // Payment succeeded
       await prisma.payment.update({
         where: { id: payment.id },
         data: {
@@ -111,12 +137,15 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      // Activate the subscription
+      // Activate subscription
       await prisma.subscription.update({
-        where: { businessId },
+        where: { id: payment.subscriptionId },
         data: { status: 'ACTIVE' },
       });
+
+      console.log('[Return] ✅ Payment COMPLETED and subscription ACTIVE');
     } else {
+      // Payment failed
       await prisma.payment.update({
         where: { id: payment.id },
         data: {
@@ -125,9 +154,11 @@ export async function POST(request: NextRequest) {
           failureReason: `PayGate returned TRANSACTION_STATUS=${transactionStatus}`,
         },
       });
+
+      console.log('[Return] ⚠️ Payment FAILED - user can retry');
     }
 
-    // Build redirect URL with query parameters
+    // Redirect to success/failure page with status details
     const redirectUrl = new URL(
       `/business/${businessId}/subscription/success`,
       request.nextUrl.origin
@@ -138,12 +169,20 @@ export async function POST(request: NextRequest) {
     redirectUrl.searchParams.set('businessId', businessId);
     redirectUrl.searchParams.set('payRequestId', payRequestId);
 
-    console.log(`[Return Handler] Redirecting to: ${redirectUrl.pathname}?${redirectUrl.searchParams}`);
+    console.log('[Return] ✅ Redirecting to:', redirectUrl.toString());
+    console.log('[Return] ===== END (SUCCESS) =====');
 
-    // Use 303 (See Other) so browser follows with GET request
     return NextResponse.redirect(redirectUrl, { status: 303 });
+
   } catch (error) {
-    console.error('[Return Handler] Error:', error);
+    console.error('[Return] ===== EXCEPTION =====');
+    console.error('[Return] ERROR TYPE:', error?.constructor?.name || 'Unknown');
+    console.error('[Return] ERROR MESSAGE:', error instanceof Error ? error.message : String(error));
+    if (error instanceof Error) {
+      console.error('[Return] STACK:', error.stack?.split('\n').slice(0, 5).join('\n'));
+    }
+    console.error('[Return] ===== END EXCEPTION =====');
+
     return NextResponse.redirect(
       new URL('/?error=redirect_failed', request.nextUrl.origin),
       { status: 303 }
