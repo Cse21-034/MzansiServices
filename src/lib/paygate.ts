@@ -134,54 +134,64 @@ class PayGateService {
 
   /**
    * Verify checksum from PayGate callback (Notify URL - server-side)
-   * Per PayGate docs: MD5(all fields + KEY)
    * 
-   * ⚠️ Special handling: Exclude CHECKSUM itself, include all others
+   * ⚠️ CRITICAL: PayGate NOTIFY_URL sends fields in specific order (NOT alphabetically)
+   * Formula: MD5(fields in PayGate order + KEY)
+   * 
+   * Order from PayGate docs callback example:
+   * PAYGATE_ID + PAY_REQUEST_ID + REFERENCE + TRANSACTION_STATUS + RESULT_CODE + 
+   * CURRENCY + AMOUNT + RESULT_DESC + TRANSACTION_ID + RISK_INDICATOR + 
+   * PAY_METHOD + PAY_METHOD_DETAIL + KEY
+   * 
+   * Note: All fields concatenated with NO delimiters in the order received
    */
   verifyNotifyChecksum(data: Record<string, string>): boolean {
     const { CHECKSUM, ...rest } = data;
     if (!CHECKSUM) return false;
     
     console.log('[PayGate] ===== CALLBACK CHECKSUM VERIFICATION =====');
-    console.log('[PayGate] Fields to verify (count=' + Object.keys(rest).length + '):');
-    Object.keys(rest).sort().forEach(k => {
-      console.log(`[PayGate]   ${k}=${rest[k]}`);
-    });
     
-    // Per PayGate docs: All fields in alphabetical order + KEY
-    const sortedFields = Object.keys(rest).sort();
-    const checksumString = sortedFields.map(k => rest[k] || '').join('') + this.config.merchantKey;
+    // PayGate callback field order (per their docs + verified from testing)
+    const fieldOrder = [
+      'PAYGATE_ID',
+      'PAY_REQUEST_ID',
+      'REFERENCE',
+      'TRANSACTION_STATUS',
+      'RESULT_CODE',
+      'CURRENCY',
+      'AMOUNT',
+      'RESULT_DESC',
+      'TRANSACTION_ID',
+      'RISK_INDICATOR',
+      'PAY_METHOD',
+      'PAY_METHOD_DETAIL',
+    ];
+    
+    // Build checksum string in correct order
+    const checksumString = fieldOrder
+      .map(field => rest[field] || '')
+      .join('') + this.config.merchantKey;
+    
     const calculated = crypto.createHash('md5').update(checksumString).digest('hex');
     
+    console.log('[PayGate] Fields (in correct order):');
+    fieldOrder.forEach(field => {
+      console.log(`[PayGate]   ${field}=${rest[field] || '(empty)'}`);
+    });
     console.log('[PayGate] Checksum calculation:');
     console.log('[PayGate]   String:', checksumString);
     console.log('[PayGate]   Received:', CHECKSUM);
     console.log('[PayGate]   Calculated:', calculated);
     console.log('[PayGate]   Match:', calculated === CHECKSUM);
     
-    if (calculated === CHECKSUM) {
-      console.log('[PayGate] ✅ CHECKSUM VALID');
-      return true;
+    const isValid = calculated === CHECKSUM;
+    if (isValid) {
+      console.log('[PayGate] ✅ CHECKSUM VALID - Callback is authentic');
+    } else {
+      console.log('[PayGate] ❌ CHECKSUM MISMATCH - Potential tampering, rejecting');
     }
     
-    // If mismatch, try without sorting (in case PayGate doesn't sort)
-    console.log('[PayGate] First attempt failed - trying without sorting...');
-    const unsortedString = Object.keys(rest).map(k => rest[k] || '').join('') + this.config.merchantKey;
-    const calculated2 = crypto.createHash('md5').update(unsortedString).digest('hex');
-    
-    console.log('[PayGate]   Unsorted string:', unsortedString);
-    console.log('[PayGate]   Calculated:', calculated2);
-    console.log('[PayGate]   Match:', calculated2 === CHECKSUM);
-    
-    if (calculated2 === CHECKSUM) {
-      console.log('[PayGate] ✅ CHECKSUM VALID (unsorted)');
-      return true;
-    }
-    
-    console.log('[PayGate] ❌ CHECKSUM VERIFICATION FAILED');
-    console.log('[PayGate] Merchant Key configured:', this.config.merchantKey);
-    
-    return false;
+    return isValid;
   }
 
   processNotification(data: Record<string, string>): {
