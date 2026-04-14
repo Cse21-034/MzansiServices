@@ -15,6 +15,8 @@ import Modal from "@/shared/Modal";
 import BusinessNav from "@/components/BusinessNav";
 import MembershipsList from "@/components/MembershipsList";
 import FeaturedHeroSpaceTab from "@/components/FeaturedHeroSpaceTab";
+import SubscriptionManagement from "@/app/subscription/SubscriptionManagement";
+import SubscriptionPlans from "@/app/subscription/SubscriptionPlans";
 const defaultBusinessImage = "/images/namibia-logo/squarelogo.PNG";
 import {
   BuildingStorefrontIcon,
@@ -36,7 +38,9 @@ import {
   BuildingOfficeIcon,
   SparklesIcon,
   PencilIcon,
-  HomeIcon
+  HomeIcon,
+  CreditCardIcon,
+  ShoppingBagIcon
 } from "@heroicons/react/24/outline";
 import { categories } from "@/data/categories";
 import CreatableSelect from "@/components/CreatableSelect";
@@ -1477,14 +1481,13 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
     <div className="nc-BusinessDashboardPage bg-neutral-50 dark:bg-neutral-900 min-h-screen">
       {/* Business Navigation Header */}
       <BusinessNav business={{
-        id: businessData.id,
         name: businessData.name,
         category: { name: businessData.category },
         email: session?.user?.email || businessData.email,
         photos: businessData.photos && businessData.photos.length > 0 
           ? businessData.photos 
           : [{ id: 'default', url: defaultBusinessImage, businessId: '', createdAt: new Date() }],
-      }} businessId={businessData.id} />
+      }} />
 
       {/* Main Content */}
       <main className="lg:container mx-auto px-4 py-8">
@@ -1508,7 +1511,11 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
                 { id: 'products', name: 'Products & Listings', icon: DocumentTextIcon },
                 { id: 'property-listings', name: 'Property Listings', icon: HomeIcon },
                 { id: 'featured-ads', name: 'Featured Ads', icon: StarIcon },
-                { id: 'promotions', name: 'Promotions', icon: SparklesIcon },                { id: 'membership', name: 'Membership', icon: CheckCircleIcon },                { id: 'analytics', name: 'Analytics', icon: EyeIcon },
+                { id: 'promotions', name: 'Promotions', icon: SparklesIcon },                
+                { id: 'membership', name: 'Membership', icon: CheckCircleIcon },
+                { id: 'subscription', name: 'My Subscription', icon: CreditCardIcon },
+                { id: 'upgrade-plans', name: 'Upgrade Plans', icon: ShoppingBagIcon },
+                { id: 'analytics', name: 'Analytics', icon: EyeIcon },
                 { id: 'branches', name: 'Branches', icon: BuildingOfficeIcon }
               ].map((tab) => (
                 <button
@@ -1563,6 +1570,12 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
                 onRefresh={fetchBusinessData}
               />
             </div>
+          )}
+          {activeTab === 'subscription' && businessData?.id && (
+            <SubscriptionManagement businessId={businessData.id} />
+          )}
+          {activeTab === 'upgrade-plans' && businessData?.id && (
+            <SubscriptionPlans businessId={businessData.id} />
           )}
           {activeTab === 'analytics' && (
             <div className="text-center py-12">
