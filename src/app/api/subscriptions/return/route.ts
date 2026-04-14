@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 import { payGate } from '@/lib/paygate';
 
 export const dynamic = 'force-dynamic';
@@ -19,17 +20,64 @@ export async function POST(request: NextRequest) {
       data[key] = String(value);
     });
 
+    const payRequestId = data.PAY_REQUEST_ID || '';
+    const transactionStatus = data.TRANSACTION_STATUS || '0';
+    const checksum = data.CHECKSUM || '';
+
     console.log('[Return Handler] Received from PayGate:', {
-      PAY_REQUEST_ID: data.PAY_REQUEST_ID,
-      REFERENCE: data.REFERENCE,
-      TRANSACTION_STATUS: data.TRANSACTION_STATUS,
-      hasChecksum: !!data.CHECKSUM,
+      payRequestId,
+      transactionStatus,
+      hasChecksum: !!checksum,
     });
 
-    // ⚠️ Verify checksum to ensure data integrity (use RETURN checksum, not NOTIFY)
-    if (!payGate.verifyReturnChecksum(data)) {
+    if (!payRequestId) {
+      console.error('[Return Handler] Missing PAY_REQUEST_ID');
+      return NextResponse.redirect(
+        new URL('/?error=missing_pay_request_id', request.nextUrl.origin),
+        { status: 303 }
+      );
+    }
+
+    // Look up the payment record by payRequestId to get the REFERENCE
+    const payment = await prisma.payment.findUnique({
+      where: { payRequestId },
+      include: {
+        subscription: {
+          select: { businessId: true },
+        },
+      },
+    });
+
+    if (!payment) {
+      console.error('[Return Handler] Payment not found for payRequestId:', payRequestId);
+      return NextResponse.redirect(
+        new URL('/?error=payment_not_found', request.nextUrl.origin),
+        { status: 303 }
+      );
+    }
+
+    const reference = payment.transactionRef || '';
+    const businessId = payment.subscription.businessId;
+
+    if (!reference) {
+      console.error('[Return Handler] No transaction reference found for payment:', payment.id);
+      return NextResponse.redirect(
+        new URL('/?error=invalid_transaction', request.nextUrl.origin),
+        { status: 303 }
+      );
+    }
+
+    console.log('[Return Handler] Retrieved reference:', reference, 'for payRequestId:', payRequestId);
+
+    // ⚠️ Verify checksum using the correct formula from PayGate docs
+    // Checksum = MD5(PAYGATE_ID + PAY_REQUEST_ID + REFERENCE + KEY)
+    if (!payGate.verifyReturnChecksum(payRequestId, reference, checksum)) {
       console.error('[Return Handler] Invalid checksum, data may be tampered with');
-      console.error('[Return Handler] Received data:', data);
+      console.error('[Return Handler] Checksum verification failed:', {
+        payRequestId,
+        reference,
+        receivedChecksum: checksum,
+      });
       // Don't trust the data - redirect to home with error
       return NextResponse.redirect(
         new URL('/?error=invalid_checksum', request.nextUrl.origin),
@@ -37,19 +85,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const reference = data.REFERENCE || '';
-    const transactionStatus = data.TRANSACTION_STATUS || '0';
-    const payRequestId = data.PAY_REQUEST_ID || '';
-
     // Determine success based on TRANSACTION_STATUS
     // 1 = Success, 0 = Failed
     const isSuccess = transactionStatus === '1';
 
     console.log(`[Return Handler] Transaction ${reference}: ${isSuccess ? 'SUCCESS' : 'FAILED'}`);
 
-    // Extract businessId from reference: NS_SUB_{businessId}_{timestamp}
-    const referenceParts = reference.split('_');
-    const businessId = referenceParts[2] || '';
+    // Update the payment status based on transaction result
+    if (isSuccess) {
+      await prisma.payment.update({
+        where: { id: payment.id },
+        data: {
+          status: 'COMPLETED',
+          paymentGatewayId: payRequestId,
+          paidAt: new Date(),
+        },
+      });
+
+      // Activate the subscription
+      await prisma.subscription.update({
+        where: { businessId },
+        data: { status: 'ACTIVE' },
+      });
+    } else {
+      await prisma.payment.update({
+        where: { id: payment.id },
+        data: {
+          status: 'FAILED',
+          paymentGatewayId: payRequestId,
+          failureReason: `PayGate returned TRANSACTION_STATUS=${transactionStatus}`,
+        },
+      });
+    }
 
     // Build redirect URL with query parameters
     const redirectUrl = new URL(

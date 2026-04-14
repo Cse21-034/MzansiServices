@@ -98,30 +98,38 @@ class PayGateService {
 
   /**
    * Verify checksum from PayGate RETURN_URL (client-side redirect after payment)
-   * Checksum = MD5(PAYGATE_ID + PAY_REQUEST_ID + TRANSACTION_STATUS + REFERENCE + KEY)
-   * Per PayGate documentation: different from NOTIFY_URL checksum
+   * 
+   * Per PayGate documentation, the return checksum is calculated as:
+   * MD5(PAYGATE_ID + PAY_REQUEST_ID + REFERENCE + KEY)
+   * 
+   * Note: The return POST from PayGate only contains PAY_REQUEST_ID, TRANSACTION_STATUS, and CHECKSUM
+   * The PAYGATE_ID must come from config, and REFERENCE must be looked up from the database
+   * 
+   * @param payRequestId - PAY_REQUEST_ID from PayGate return POST
+   * @param reference - REFERENCE that was originally sent to PayGate (looked up from database)
+   * @param checksum - CHECKSUM from PayGate return POST
+   * @returns true if checksum is valid
    */
-  verifyReturnChecksum(data: Record<string, string>): boolean {
-    const { CHECKSUM, ...rest } = data;
-    if (!CHECKSUM) return false;
+  verifyReturnChecksum(
+    payRequestId: string,
+    reference: string,
+    checksum: string
+  ): boolean {
+    if (!checksum) return false;
 
-    // Return checksum: PAYGATE_ID + PAY_REQUEST_ID + TRANSACTION_STATUS + REFERENCE + KEY
-    const payGateId = rest.PAYGATE_ID || this.config.merchantId;
-    const payRequestId = rest.PAY_REQUEST_ID || '';
-    const transactionStatus = rest.TRANSACTION_STATUS || '';
-    const reference = rest.REFERENCE || '';
-
-    const checksumString = payGateId + payRequestId + transactionStatus + reference + this.config.merchantKey;
+    // Return checksum: PAYGATE_ID + PAY_REQUEST_ID + REFERENCE + KEY
+    const checksumString =
+      this.config.merchantId + payRequestId + reference + this.config.merchantKey;
     const calculated = crypto.createHash('md5').update(checksumString).digest('hex');
-    
+
     console.log('[PayGate] Return checksum verification:', {
-      expected: CHECKSUM,
+      expected: checksum,
       calculated,
-      match: calculated === CHECKSUM,
-      source: `${payGateId}${payRequestId}${transactionStatus}${reference}[KEY]`,
+      match: calculated === checksum,
+      source: `${this.config.merchantId}${payRequestId}${reference}[KEY]`,
     });
 
-    return calculated === CHECKSUM;
+    return calculated === checksum;
   }
 
   /**

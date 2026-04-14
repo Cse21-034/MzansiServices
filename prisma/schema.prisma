@@ -435,11 +435,12 @@ model Payment {
   id                String   @id @default(cuid())
   subscriptionId    String   @map("subscription_id")
   paymentGatewayId  String   @map("payment_gateway_id") // PayGate reference ID
+  payRequestId      String?  @unique @map("pay_request_id") // PayGate PAY_REQUEST_ID from initiate.trans
   amount            Float
   currency          String   @default("BWP")
   status            PaymentStatus @default(PENDING) @map("status")
   paymentMethod     String?  @map("payment_method")
-  transactionRef    String?  @unique @map("transaction_ref") // PayGate transaction reference
+  transactionRef    String?  @unique @map("transaction_ref") // PayGate transaction reference (REFERENCE sent to PayGate)
   failureReason     String?  @map("failure_reason")
   paidAt            DateTime? @map("paid_at")
   createdAt         DateTime @default(now()) @map("created_at")

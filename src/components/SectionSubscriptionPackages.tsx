@@ -106,6 +106,23 @@ const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = 
 
             console.log('[Subscription] Step 3: Extracted PAY_REQUEST_ID:', payRequestId);
 
+            // Step 1.5: Save PAY_REQUEST_ID to our database for return checksum verification
+            try {
+              const saveResponse = await fetch('/api/subscriptions/save-pay-request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  payRequestId,
+                  reference,
+                }),
+              });
+              const saveData = await saveResponse.json();
+              console.log('[Subscription] Step 3.5: Saved PAY_REQUEST_ID to database:', saveData);
+            } catch (saveError) {
+              console.warn('[Subscription] Warning: Could not save PAY_REQUEST_ID:', saveError);
+              // Continue anyway - the callback can still work
+            }
+
             // Step 2: Call our backend to calculate process.trans checksum
             const processResponse = await fetch('/api/subscriptions/process', {
               method: 'POST',
