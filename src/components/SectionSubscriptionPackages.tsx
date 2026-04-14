@@ -106,8 +106,10 @@ const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = 
 
             console.log('[Subscription] Step 3: Extracted PAY_REQUEST_ID:', payRequestId);
 
-            // Step 1.5: Save PAY_REQUEST_ID to our database for return checksum verification
+            // Step 1.5: CRITICAL - Save PAY_REQUEST_ID to our database IMMEDIATELY!
+            // This MUST succeed before proceeding, or return handler will fail
             try {
+              console.log('[Subscription] Step 3.5: SAVING PAY_REQUEST_ID to database...');
               const saveResponse = await fetch('/api/subscriptions/save-pay-request', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -117,7 +119,14 @@ const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = 
                 }),
               });
               const saveData = await saveResponse.json();
-              console.log('[Subscription] Step 3.5: Saved PAY_REQUEST_ID to database:', saveData);
+              
+              if (!saveData.success) {
+                console.error('[Subscription] ❌ FAILED to save PAY_REQUEST_ID:', saveData.message);
+                alert('Critical error: Failed to save payment request. Please contact support.');
+                return;
+              }
+              
+              console.log('[Subscription] ✅ Step 3.5: Saved PAY_REQUEST_ID to database:', saveData);
             } catch (saveError) {
               console.warn('[Subscription] Warning: Could not save PAY_REQUEST_ID:', saveError);
               // Continue anyway - the callback can still work
