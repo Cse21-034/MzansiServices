@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { payGate } from '@/lib/paygate';
+import { Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,14 +40,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Look up the payment record by payRequestId to get the REFERENCE
-    const payment = await prisma.payment.findUnique({
-      where: { payRequestId },
-      include: {
-        subscription: {
-          select: { businessId: true },
-        },
-      },
-    });
+    // Using raw query due to Prisma type generation issue with payRequestId field
+    const payments = await prisma.$queryRaw<any[]>(
+      Prisma.sql`SELECT p.*, s."businessId" FROM payments p 
+                  LEFT JOIN subscriptions s ON p."subscription_id" = s.id 
+                  WHERE p."pay_request_id" = ${payRequestId}`
+    );
+
+    const payment = payments?.[0];
 
     if (!payment) {
       console.error('[Return Handler] Payment not found for payRequestId:', payRequestId);
@@ -56,11 +57,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const reference = payment.transactionRef || '';
-    const businessId = payment.subscription.businessId;
+    const reference = payment.transaction_ref || '';
+    const businessId = payment.businessId;
 
     if (!reference) {
       console.error('[Return Handler] No transaction reference found for payment:', payment.id);
+      return NextResponse.redirect(
+        new URL('/?error=invalid_transaction', request.nextUrl.origin),
+        { status: 303 }
+      );
+    }
+
+    if (!businessId) {
+      console.error('[Return Handler] No business ID found for payment:', payment.id);
       return NextResponse.redirect(
         new URL('/?error=invalid_transaction', request.nextUrl.origin),
         { status: 303 }
@@ -136,7 +145,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('[Return Handler] Error:', error);
     return NextResponse.redirect(
-      new URL('/namibiaservices?error=redirect_failed', request.nextUrl.origin),
+      new URL('/?error=redirect_failed', request.nextUrl.origin),
       { status: 303 }
     );
   }

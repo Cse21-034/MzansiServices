@@ -47,8 +47,10 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ businessId }) => 
     setProcessingTier(planTier);
 
     try {
-      // Step 1: Get signed params from your API (server-side)
-      const response = await fetch('/api/subscriptions/checkout', {
+      // ========== STEP 1: Get checkout params ==========
+      console.log('[Payment Flow] Step 1: Getting checkout params...');
+      
+      const checkoutResponse = await fetch('/api/subscriptions/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -58,61 +60,166 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ businessId }) => 
         }),
       });
 
-      const data = await response.json();
+      const checkoutData = await checkoutResponse.json();
 
-      if (!data.success) {
-        alert('Failed: ' + data.message);
+      if (!checkoutData.success) {
+        alert('Failed: ' + checkoutData.message);
         setProcessingTier(null);
         return;
       }
 
-      // Free plan — redirect directly
-      if (data.free) {
-        router.push(data.redirectUrl);
+      // Free plan - handle separately
+      if (checkoutData.free) {
+        router.push(checkoutData.redirectUrl);
         return;
       }
 
-      console.log('[Payment] Full response:', data);
-      console.log('[Payment] Checkout object:', data.checkout);
-      
-      const { initiateUrl, processUrl, params } = data.checkout;
-      
-      console.log('[Payment] Extracted initiateUrl:', initiateUrl);
-      console.log('[Payment] Extracted params:', params);
+      const { initiateUrl, processUrl, params, reference } = checkoutData.checkout;
 
-      // Step 2 & 3: Submit combined form directly to initiate.trans
-      // PayGate will handle the internal redirect to process.trans
-      // Using traditional form submission avoids CORS issues with fetch
-      console.log('[Payment] Creating form...');
-      
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = initiateUrl; // First submit to initiate.trans
+      console.log('[Payment Flow] Step 1 Complete: Received params and URLs');
+      console.log('[Payment Flow] Reference:', reference);
 
-      // Add all PayGate params to form
+      // ========== STEP 2: Submit to initiate.trans and CAPTURE response ==========
+      console.log('[Payment Flow] Step 2: Submitting to initiate.trans...');
+
+      // Build FormData for initiate.trans submission
+      const initiateFormData = new FormData();
       Object.entries(params).forEach(([key, value]) => {
+        initiateFormData.append(key, String(value));
+      });
+
+      // IMPORTANT: Use fetch to capture response (not form.submit())
+      let payRequestId: string | null = null;
+      
+      try {
+        const initiateResponse = await fetch(initiateUrl, {
+          method: 'POST',
+          body: initiateFormData,
+        });
+
+        // Get response as text/HTML
+        const initiateHtml = await initiateResponse.text();
+        console.log('[Payment Flow] Received initiate.trans response');
+
+        // Extract PAY_REQUEST_ID from HTML response
+        // PayGate returns HTML with hidden form fields
+        const idMatch = initiateHtml.match(
+          /name=['"]PAY_REQUEST_ID['"][\s\S]*?value=['"]([^'"]+)['"]/i
+        );
+        
+        if (!idMatch || !idMatch[1]) {
+          // Fallback: try to find it in JSON response if PayGate returns JSON
+          try {
+            const jsonResponse = JSON.parse(initiateHtml);
+            payRequestId = jsonResponse.PAY_REQUEST_ID;
+          } catch (e) {
+            // Not JSON
+          }
+        } else {
+          payRequestId = idMatch[1];
+        }
+
+        if (!payRequestId) {
+          console.error('[Payment Flow] Failed to extract PAY_REQUEST_ID');
+          console.error('[Payment Flow] Response excerpt:', initiateHtml.substring(0, 500));
+          alert('Payment error: Failed to get payment request ID from PayGate');
+          setProcessingTier(null);
+          return;
+        }
+
+        console.log('[Payment Flow] Step 2 Complete: Extracted PAY_REQUEST_ID:', payRequestId);
+      } catch (fetchError) {
+        console.error('[Payment Flow] initiate.trans fetch error:', fetchError);
+        
+        // If fetch fails (CORS etc), fall back to form submission
+        // But we won't get PAY_REQUEST_ID this way ❌
+        console.warn('[Payment Flow] Falling back to form submission (PAY_REQUEST_ID will be lost)');
+        alert('Warning: Payment flow may be incomplete due to browser restrictions');
+        setProcessingTier(null);
+        return;
+      }
+
+      // ========== STEP 3: Save PAY_REQUEST_ID to database ==========
+      console.log('[Payment Flow] Step 3: Saving PAY_REQUEST_ID to database...');
+
+      try {
+        const saveResponse = await fetch('/api/subscriptions/save-pay-request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            payRequestId,
+            reference,
+          }),
+        });
+
+        const saveData = await saveResponse.json();
+        
+        if (!saveData.success) {
+          console.error('[Payment Flow] Failed to save PAY_REQUEST_ID:', saveData.message);
+          // Don't fail completely - payment might still work via callback
+          // But return URL will fail
+        } else {
+          console.log('[Payment Flow] Step 3 Complete: PAY_REQUEST_ID saved');
+        }
+      } catch (saveError) {
+        console.error('[Payment Flow] save-pay-request error:', saveError);
+        // Continue anyway - callback will still process payment
+      }
+
+      // ========== STEP 4: Get process.trans params ==========
+      console.log('[Payment Flow] Step 4: Getting process.trans parameters...');
+
+      const processResponse = await fetch('/api/subscriptions/process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          payRequestId,
+          reference,
+        }),
+      });
+
+      const processData = await processResponse.json();
+
+      if (!processData.success) {
+        console.error('[Payment Flow] Process endpoint error:', processData.message);
+        alert('Payment error: Failed to process payment request');
+        setProcessingTier(null);
+        return;
+      }
+
+      console.log('[Payment Flow] Step 4 Complete: Received process params');
+      console.log('[Payment Flow] Process URL:', processData.processUrl);
+
+      // ========== STEP 5: Submit to process.trans ==========
+      console.log('[Payment Flow] Step 5: Submitting to process.trans...');
+
+      const processForm = document.createElement('form');
+      processForm.method = 'POST';
+      processForm.action = processData.processUrl;
+
+      // Add process parameters to form
+      Object.entries(processData.params).forEach(([key, value]) => {
         const input = document.createElement('input');
         input.type = 'hidden';
         input.name = key;
         input.value = String(value);
-        form.appendChild(input);
-        console.log(`[Payment] Added field: ${key} = ${value}`);
+        processForm.appendChild(input);
+        console.log(`[Payment Flow] Added field: ${key}`);
       });
 
-      console.log('[Payment] Appending form to body...');
-      document.body.appendChild(form);
-      
-      console.log('[Payment] Form HTML:', form.outerHTML);
-      console.log('[Payment] About to submit to:', form.action);
-      
-      // Ensure submission happens
+      document.body.appendChild(processForm);
+
+      console.log('[Payment Flow] Step 5: Submitting form to process.trans...');
+      console.log('[Payment Flow] Form HTML:', processForm.outerHTML);
+
+      // Submit the form to PayGate's process.trans
+      // User will be redirected to PayGate hosted payment page
       setTimeout(() => {
-        console.log('[Payment] Submitting form now...');
-        form.submit();
+        processForm.submit();
       }, 100);
 
     } catch (error) {
-      console.error('Subscription error:', error);
+      console.error('[Payment Flow] Unexpected error:', error);
       alert('Payment error: ' + (error instanceof Error ? error.message : 'Unknown error'));
       setProcessingTier(null);
     }
