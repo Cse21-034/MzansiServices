@@ -7,13 +7,17 @@ import Avatar from "@/shared/Avatar";
 import { 
   ChartBarIcon,
   Cog6ToothIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
+  CreditCardIcon,
+  ShoppingBagIcon
 } from "@heroicons/react/24/outline";
 import { signOut } from "next-auth/react";
 
 export interface BusinessNavProps {
   className?: string;
+  businessId?: string;
   business?: {
+    id?: string;
     name?: string;
     category?: { name?: string };
     email?: string;
@@ -21,7 +25,9 @@ export interface BusinessNavProps {
   };
 }
 
-const BusinessNav: FC<BusinessNavProps> = ({ className = "", business }) => {
+const BusinessNav: FC<BusinessNavProps> = ({ className = "", business, businessId }) => {
+  // Get business ID from props or business object
+  const bid = businessId || business?.id;
   // Safe business data with fallbacks
   const safeBusiness = {
     name: business?.name || "Business Name",
@@ -95,6 +101,28 @@ const BusinessNav: FC<BusinessNavProps> = ({ className = "", business }) => {
                     <ChartBarIcon className="w-5 h-5" />
                     <span>Business Profile</span>
                   </a>
+                  
+                  {/* Subscription Links */}
+                  {bid && (
+                    <>
+                      <div className="border-t border-neutral-200 dark:border-neutral-700 my-2"></div>
+                      <a
+                        href={`/business/${bid}/subscription`}
+                        className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300"
+                      >
+                        <CreditCardIcon className="w-5 h-5" />
+                        <span>Subscription Status</span>
+                      </a>
+                      <a
+                        href={`/business/${bid}/subscription/plans`}
+                        className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300"
+                      >
+                        <ShoppingBagIcon className="w-5 h-5" />
+                        <span>Upgrade Plans</span>
+                      </a>
+                    </>
+                  )}
+                  
                   <div className="border-t border-neutral-200 dark:border-neutral-700 my-2"></div>
                   <button
                     className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-red-600 w-full text-left"

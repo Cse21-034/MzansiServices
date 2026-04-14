@@ -1477,13 +1477,14 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
     <div className="nc-BusinessDashboardPage bg-neutral-50 dark:bg-neutral-900 min-h-screen">
       {/* Business Navigation Header */}
       <BusinessNav business={{
+        id: businessData.id,
         name: businessData.name,
         category: { name: businessData.category },
         email: session?.user?.email || businessData.email,
         photos: businessData.photos && businessData.photos.length > 0 
           ? businessData.photos 
           : [{ id: 'default', url: defaultBusinessImage, businessId: '', createdAt: new Date() }],
-      }} />
+      }} businessId={businessData.id} />
 
       {/* Main Content */}
       <main className="lg:container mx-auto px-4 py-8">
