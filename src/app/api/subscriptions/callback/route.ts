@@ -20,9 +20,21 @@ export async function POST(request: NextRequest) {
     });
 
     console.log('[Callback] Received notification');
-    console.log('[Callback] REFERENCE:', data.REFERENCE);
-    console.log('[Callback] TRANSACTION_ID:', data.TRANSACTION_ID);
-    console.log('[Callback] TRANSACTION_STATUS:', data.TRANSACTION_STATUS);
+    
+    // Log ALL fields for checksum debugging
+    const allFields = Object.entries(data)
+      .filter(([k]) => k !== 'CHECKSUM')
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([k, v]) => `${k}=${v}`);
+    console.log('[Callback] ALL FIELDS (excluding CHECKSUM):');
+    allFields.forEach(f => console.log('[Callback]   ' + f));
+    console.log('[Callback] CHECKSUM:', data.CHECKSUM);
+    
+    // Log field count and names
+    const fieldCount = Object.keys(data).length;
+    const fieldNames = Object.keys(data).sort().join(', ');
+    console.log('[Callback] Total fields: ' + fieldCount);
+    console.log('[Callback] Field names: ' + fieldNames);
 
     // ⚠️ CRITICAL: Verify checksum before processing any data
     if (!payGate.verifyNotifyChecksum(data)) {

@@ -134,32 +134,54 @@ class PayGateService {
 
   /**
    * Verify checksum from PayGate callback (Notify URL - server-side)
-   * Extracts CHECKSUM field and verifies it matches the calculated value
+   * Per PayGate docs: MD5(all fields + KEY)
+   * 
+   * ⚠️ Special handling: Exclude CHECKSUM itself, include all others
    */
   verifyNotifyChecksum(data: Record<string, string>): boolean {
     const { CHECKSUM, ...rest } = data;
     if (!CHECKSUM) return false;
     
-    // PayGate Callback Checksum = MD5(PAYGATE_ID + PAY_REQUEST_ID + REFERENCE + TRANSACTION_STATUS + TRANSACTION_ID + KEY)
-    // These fields in this EXACT order - not alphabetical
-    const checksumString = `${rest.PAYGATE_ID || ''}${rest.PAY_REQUEST_ID || ''}${rest.REFERENCE || ''}${rest.TRANSACTION_STATUS || ''}${rest.TRANSACTION_ID || ''}${this.config.merchantKey}`;
-    
-    console.log('[PayGate] Checksum verification:');
-    console.log('[PayGate]   Fields:', {
-      PAYGATE_ID: rest.PAYGATE_ID,
-      PAY_REQUEST_ID: rest.PAY_REQUEST_ID,
-      REFERENCE: rest.REFERENCE,
-      TRANSACTION_STATUS: rest.TRANSACTION_STATUS,
-      TRANSACTION_ID: rest.TRANSACTION_ID,
+    console.log('[PayGate] ===== CALLBACK CHECKSUM VERIFICATION =====');
+    console.log('[PayGate] Fields to verify (count=' + Object.keys(rest).length + '):');
+    Object.keys(rest).sort().forEach(k => {
+      console.log(`[PayGate]   ${k}=${rest[k]}`);
     });
-    console.log('[PayGate]   String for hash:', checksumString);
     
+    // Per PayGate docs: All fields in alphabetical order + KEY
+    const sortedFields = Object.keys(rest).sort();
+    const checksumString = sortedFields.map(k => rest[k] || '').join('') + this.config.merchantKey;
     const calculated = crypto.createHash('md5').update(checksumString).digest('hex');
-    console.log('[PayGate]   Received checksum: ', CHECKSUM);
-    console.log('[PayGate]   Calculated checksum:', calculated);
+    
+    console.log('[PayGate] Checksum calculation:');
+    console.log('[PayGate]   String:', checksumString);
+    console.log('[PayGate]   Received:', CHECKSUM);
+    console.log('[PayGate]   Calculated:', calculated);
     console.log('[PayGate]   Match:', calculated === CHECKSUM);
     
-    return calculated === CHECKSUM;
+    if (calculated === CHECKSUM) {
+      console.log('[PayGate] ✅ CHECKSUM VALID');
+      return true;
+    }
+    
+    // If mismatch, try without sorting (in case PayGate doesn't sort)
+    console.log('[PayGate] First attempt failed - trying without sorting...');
+    const unsortedString = Object.keys(rest).map(k => rest[k] || '').join('') + this.config.merchantKey;
+    const calculated2 = crypto.createHash('md5').update(unsortedString).digest('hex');
+    
+    console.log('[PayGate]   Unsorted string:', unsortedString);
+    console.log('[PayGate]   Calculated:', calculated2);
+    console.log('[PayGate]   Match:', calculated2 === CHECKSUM);
+    
+    if (calculated2 === CHECKSUM) {
+      console.log('[PayGate] ✅ CHECKSUM VALID (unsorted)');
+      return true;
+    }
+    
+    console.log('[PayGate] ❌ CHECKSUM VERIFICATION FAILED');
+    console.log('[PayGate] Merchant Key configured:', this.config.merchantKey);
+    
+    return false;
   }
 
   processNotification(data: Record<string, string>): {
