@@ -103,12 +103,32 @@ const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({
 
   const tierInfo = getTierInfo(subscription.tier);
   const display = formatSubscriptionDisplay(subscription.tier);
-  const isActive = subscription.status === 'ACTIVE';
+  
+  // Use statusDisplay if available, otherwise use status
+  const displayStatus = subscription.statusDisplay || subscription.status || 'UNKNOWN';
+  const isActive = displayStatus === 'ACTIVE' || displayStatus === 'FREE';
+  
+  // Determine the status color
+  const getStatusColor = (status: string) => {
+    if (status === 'ACTIVE' || status === 'FREE') return 'bg-green-100 text-green-800';
+    if (status === 'INACTIVE' || status === 'PENDING') return 'bg-yellow-100 text-yellow-800';
+    if (status === 'CANCELLED') return 'bg-red-100 text-red-800';
+    return 'bg-gray-100 text-gray-800';
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-8">
+          {/* Status Banner */}
+          {displayStatus === 'INACTIVE' && subscription.tier !== 'WILD_HORSES' && (
+            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-yellow-800">
+                ⚠️ Your subscription payment is pending. Please complete the payment to activate your subscription.
+              </p>
+            </div>
+          )}
+
           {/* Header */}
           <div className="flex justify-between items-start mb-8 pb-8 border-b border-gray-200">
             <div>
@@ -119,12 +139,8 @@ const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({
                 Manage your {display.name} subscription
               </p>
             </div>
-            <div className={`px-4 py-2 rounded-lg font-semibold ${
-              isActive
-                ? 'bg-green-100 text-green-800'
-                : 'bg-red-100 text-red-800'
-            }`}>
-              {subscription.status}
+            <div className={`px-4 py-2 rounded-lg font-semibold ${getStatusColor(displayStatus)}`}>
+              {displayStatus}
             </div>
           </div>
 
@@ -217,18 +233,27 @@ const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({
           </div>
 
           {/* Actions */}
-          <div className="flex gap-4">
+          <div className="flex gap-4 flex-wrap">
             <Link
               href={`/business/${businessId}/subscription/plans`}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition"
+              className="flex-1 min-w-[200px] bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition"
             >
               View All Plans
             </Link>
 
-            {isActive && subscription.tier !== 'WILD_HORSES' && (
+            {displayStatus === 'INACTIVE' && subscription.tier !== 'WILD_HORSES' && (
+              <Link
+                href={`/business/${businessId}/subscription/plans`}
+                className="flex-1 min-w-[200px] bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition"
+              >
+                Complete Payment
+              </Link>
+            )}
+
+            {(displayStatus === 'ACTIVE' || displayStatus === 'FREE') && subscription.tier !== 'WILD_HORSES' && (
               <button
                 onClick={() => setShowCancelConfirm(true)}
-                className="flex-1 bg-red-100 hover:bg-red-200 text-red-700 font-semibold py-3 px-6 rounded-lg transition"
+                className="flex-1 min-w-[200px] bg-red-100 hover:bg-red-200 text-red-700 font-semibold py-3 px-6 rounded-lg transition"
               >
                 Cancel Subscription
               </button>

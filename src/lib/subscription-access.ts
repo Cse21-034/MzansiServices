@@ -344,7 +344,7 @@ export async function getSubscriptionStatus(businessId: string) {
         plan: true,
         payments: {
           orderBy: { createdAt: 'desc' },
-          take: 1,
+          take: 5, // Get last 5 payments to check for recent successful ones
         },
       },
     });
@@ -352,14 +352,36 @@ export async function getSubscriptionStatus(businessId: string) {
     if (!subscription) {
       return {
         tier: 'WILD_HORSES',
-        status: 'free',
+        status: 'INACTIVE',
+        statusDisplay: 'FREE',
         plan: getTierInfo(null),
       };
     }
 
+    // Determine actual status based on subscription and payment records
+    let actualStatus = subscription.status;
+    let statusDisplay: string = subscription.status;
+    
+    // If subscription is INACTIVE, check if there's a recent COMPLETED payment
+    if (subscription.status === 'INACTIVE' && subscription.payments.length > 0) {
+      const recentCompleted = subscription.payments.find(p => p.status === 'COMPLETED');
+      if (recentCompleted) {
+        actualStatus = 'ACTIVE';
+        statusDisplay = 'ACTIVE';
+      } else {
+        statusDisplay = 'PENDING';
+      }
+    }
+
+    // If subscription is INACTIVE and free plan, display as FREE
+    if (subscription.status === 'INACTIVE' && subscription.plan?.tier === 'WILD_HORSES') {
+      statusDisplay = 'FREE';
+    }
+
     return {
       tier: subscription.plan.tier,
-      status: subscription.status,
+      status: actualStatus,
+      statusDisplay,
       plan: getTierInfo(subscription.plan.tier),
       subscription,
     };
@@ -367,7 +389,8 @@ export async function getSubscriptionStatus(businessId: string) {
     console.error('Error getting subscription status:', error);
     return {
       tier: 'WILD_HORSES',
-      status: 'error',
+      status: 'INACTIVE',
+      statusDisplay: 'ERROR',
       plan: getTierInfo(null),
     };
   }
