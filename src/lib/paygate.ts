@@ -113,20 +113,22 @@ class PayGateService {
   verifyReturnChecksum(
     payRequestId: string,
     reference: string,
-    checksum: string
+    checksum: string,
+    transactionStatus: string = '0'
   ): boolean {
     if (!checksum) return false;
 
-    // Return checksum: PAYGATE_ID + PAY_REQUEST_ID + REFERENCE + KEY
+    // Return checksum: PAYGATE_ID + PAY_REQUEST_ID + REFERENCE + TRANSACTION_STATUS + KEY
+    // (includes TRANSACTION_STATUS like the callback checksum does)
     const checksumString =
-      this.config.merchantId + payRequestId + reference + this.config.merchantKey;
+      this.config.merchantId + payRequestId + reference + transactionStatus + this.config.merchantKey;
     const calculated = crypto.createHash('md5').update(checksumString).digest('hex');
 
     console.log('[PayGate] Return checksum verification:', {
       expected: checksum,
       calculated,
       match: calculated === checksum,
-      source: `${this.config.merchantId}${payRequestId}${reference}[KEY]`,
+      source: `${this.config.merchantId}${payRequestId}${reference}${transactionStatus}[KEY]`,
     });
 
     return calculated === checksum;

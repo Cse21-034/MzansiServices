@@ -30,6 +30,16 @@ export async function POST(request: NextRequest) {
 
     console.log('[Return] ===== START =====');
     console.log('[Return] Received from PayGate');
+    
+    // Log all fields received for debugging
+    console.log('[Return] ALL FIELDS FROM PAYGATE:');
+    Object.entries(data).forEach(([key, value]) => {
+      if (key !== 'CHECKSUM') {
+        console.log(`[Return]   ${key}=${value}`);
+      }
+    });
+    console.log('[Return] CHECKSUM (received):', checksum);
+    
     console.log('[Return] PAY_REQUEST_ID:', payRequestId);
     console.log('[Return] TRANSACTION_STATUS:', transactionStatus, '(1=success, 0=failed)');
 
@@ -168,7 +178,7 @@ export async function POST(request: NextRequest) {
     // Verify checksum authenticity (per PayGate docs)
     console.log('[Return] Verifying checksum authenticity...');
     
-    if (!payGate.verifyReturnChecksum(payRequestId, reference, checksum)) {
+    if (!payGate.verifyReturnChecksum(payRequestId, reference, checksum, transactionStatus)) {
       console.error('[Return] ❌ CHECKSUM MISMATCH - Potential tampering');
       return NextResponse.redirect(
         new URL('/?error=invalid_checksum', request.nextUrl.origin),
