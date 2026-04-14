@@ -93,15 +93,16 @@ export async function POST(request: NextRequest) {
     // Payment successful - update payment record
     console.log('[Callback] Payment successful - updating records...');
 
-    await prisma.payment.update({
-      where: { id: payment.id },
-      data: {
-        status: 'COMPLETED',
-        paidAt: new Date(),
-        paymentGatewayId: data.TRANSACTION_ID || '',
-        payRequestId: data.PAY_REQUEST_ID || undefined,
-      },
-    });
+    await (prisma as any).$executeRaw`
+      UPDATE "payments"
+      SET 
+        "status" = 'COMPLETED',
+        "paid_at" = NOW(),
+        "payment_gateway_id" = ${data.TRANSACTION_ID || ''},
+        "pay_request_id" = ${data.PAY_REQUEST_ID || null},
+        "updated_at" = NOW()
+      WHERE "id" = ${payment.id}
+    `;
 
     console.log('[Callback] ✅ Payment marked as COMPLETED');
 

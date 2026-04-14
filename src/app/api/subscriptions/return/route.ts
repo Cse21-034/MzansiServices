@@ -50,19 +50,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Look up payment by payRequestId
+    // Look up payment by payRequestId using raw SQL to avoid type issues
     console.log('[Return] Looking up payment record...');
     
-    // Type workaround due to Prisma client generation issue
-    const payment = await (prisma.payment as any).findUnique({
-      where: { payRequestId },
-      select: {
-        id: true,
-        status: true,
-        transactionRef: true,
-        subscriptionId: true,
-      },
-    });
+    const payments = await (prisma as any).$queryRaw`
+      SELECT id, status, "transaction_ref" as "transactionRef", "subscription_id" as "subscriptionId"
+      FROM "payments"
+      WHERE "pay_request_id" = ${payRequestId}
+      LIMIT 1
+    `;
+    
+    const payment = payments.length > 0 ? payments[0] : null;
 
     if (!payment) {
       console.warn('[Return] ⚠️ Payment not found for payRequestId:', payRequestId);
