@@ -64,10 +64,71 @@ export async function POST(request: NextRequest) {
 
     if (!payment) {
       console.warn('[Return] ⚠️ Payment not found for payRequestId:', payRequestId);
-      console.warn('[Return] Possible causes:');
-      console.warn('[Return]   - save-pay-request endpoint not called');
-      console.warn('[Return]   - Payment record doesn\'t exist');
-      console.warn('[Return]   - PayGate is retrying old transaction');
+      console.warn('[Return] Attempting fallback lookup...');
+      
+      // FALLBACK: Try to find the most recent payment from the last 10 minutes
+      // This handles cases where pay_request_id was not saved for some reason
+      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+      console.log('[Return] Looking for PENDING payments created after:', tenMinutesAgo);
+      
+      const fallbackPayments = await (prisma as any).$queryRaw`
+        SELECT id, status, "transaction_ref" as "transactionRef", "subscription_id" as "subscriptionId"
+        FROM "payments"
+        WHERE status = 'PENDING' 
+          AND created_at >= ${tenMinutesAgo}
+        ORDER BY created_at DESC
+        LIMIT 1
+      `;
+      
+      const fallbackPayment = fallbackPayments.length > 0 ? fallbackPayments[0] : null;
+      
+      if (fallbackPayment) {
+        console.warn('[Return] ⚠️ FALLBACK: Found recent PENDING payment:', fallbackPayment.id);
+        console.warn('[Return] WARNING: pay_request_id was missing, using fallback lookup');
+        
+        // Use the fallback payment
+        const reference = fallbackPayment.transactionRef;
+        if (!reference) {
+          console.error('[Return] ❌ Fallback payment has no transaction reference');
+          return NextResponse.redirect(
+            new URL('/?error=invalid_transaction', request.nextUrl.origin),
+            { status: 303 }
+          );
+        }
+        
+        // Continue processing with fallback payment
+        const subscription = await prisma.subscription.findUnique({
+          where: { id: fallbackPayment.subscriptionId },
+          select: { businessId: true },
+        });
+
+        if (!subscription?.businessId) {
+          console.error('[Return] ❌ Fallback payment has no business ID');
+          return NextResponse.redirect(
+            new URL('/?error=invalid_transaction', request.nextUrl.origin),
+            { status: 303 }
+          );
+        }
+
+        // Determine success/failure and redirect accordingly
+        const isSuccess = transactionStatus === '1';
+        console.log('[Return] Fallback payment status:', isSuccess ? 'SUCCESS' : 'FAILED');
+
+        if (isSuccess) {
+          return NextResponse.redirect(
+            new URL(`/subscriptions/success?reference=${reference}&orderId=${fallbackPayment.id}`, request.nextUrl.origin),
+            { status: 303 }
+          );
+        } else {
+          return NextResponse.redirect(
+            new URL(`/?error=payment_failed&reference=${reference}`, request.nextUrl.origin),
+            { status: 303 }
+          );
+        }
+      }
+      
+      // No payment found at all
+      console.error('[Return] ❌ FALLBACK ALSO FAILED: No payment found by either method');
       return NextResponse.redirect(
         new URL('/?error=payment_not_found', request.nextUrl.origin),
         { status: 303 }

@@ -103,13 +103,32 @@ export async function POST(request: NextRequest) {
       console.log('[Initiate] Found payment:', payment.id);
 
       // Use raw SQL update due to Prisma type generation issue
-      await prisma.$executeRaw`
+      await (prisma as any).$executeRaw`
         UPDATE "payments" 
-        SET "pay_request_id" = ${payRequestId}
+        SET "pay_request_id" = ${payRequestId}, "updated_at" = NOW()
         WHERE "id" = ${payment.id}
       `;
 
-      console.log('[Initiate] ✅ Successfully saved PAY_REQUEST_ID:', payRequestId);
+      console.log('[Initiate] SQL update executed, verifying read-back...');
+
+      // ⚠️ CRITICAL: Verify the pay_request_id was actually saved
+      const verified = await (prisma as any).$queryRaw`
+        SELECT "pay_request_id" 
+        FROM "payments" 
+        WHERE "id" = ${payment.id}
+      `;
+
+      if (!verified || verified.length === 0 || !verified[0].pay_request_id) {
+        console.error('[Initiate] ❌ VERIFICATION FAILED: pay_request_id is still NULL after update');
+        console.error('[Initiate] Query result:', verified);
+        return NextResponse.json({
+          success: false,
+          message: 'CRITICAL: Failed to persist PAY_REQUEST_ID to database',
+          debug: { paymentId: payment.id, payRequestId, queryResult: verified }
+        }, { status: 500 });
+      }
+
+      console.log('[Initiate] ✅ VERIFIED: pay_request_id successfully saved:', verified[0].pay_request_id);
       console.log('[Initiate] ===== END (SUCCESS) =====');
 
       return NextResponse.json({

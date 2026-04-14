@@ -81,58 +81,37 @@ const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = 
         } else if (data.checkout?.params && data.checkout?.initiateUrl && data.checkout?.reference) {
           // Paid plan - Two-step PayGate flow per documentation
           try {
-            console.log('[Subscription] Step 1: Posting to PayGate initiate.trans');
+            const reference = data.checkout.reference;
             
-            // Step 1: POST to PayGate initiate.trans and capture response
-            const initiateResponse = await fetch(data.checkout.initiateUrl, {
+            console.log('[Subscription] Step 1: Calling backend proxy for PayGate initiate');
+            
+            // Step 1: Call backend to handle PayGate initiate.trans and save PAY_REQUEST_ID
+            // This ensures pay_request_id is saved to database BEFORE proceeding
+            const initiateResponse = await fetch('/api/subscriptions/initiate', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-              body: new URLSearchParams(data.checkout.params as Record<string, string>).toString(),
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                params: data.checkout.params,
+                reference,
+              }),
             });
 
-            const initiateText = await initiateResponse.text();
-            console.log('[Subscription] Step 2: Received from initiate.trans:', initiateText);
+            const initiateData = await initiateResponse.json();
+            console.log('[Subscription] Step 2: Backend initiate response:', initiateData);
 
-            // Parse the response: "PAYGATE_ID=...&PAY_REQUEST_ID=...&REFERENCE=...&CHECKSUM=..."
-            const params = new URLSearchParams(initiateText);
-            const payRequestId = params.get('PAY_REQUEST_ID');
-            const reference = data.checkout.reference;
-
-            if (!payRequestId) {
-              console.error('No PAY_REQUEST_ID in response:', initiateText);
-              alert('Error: PayGate did not return a request ID. Please try again.');
+            // CRITICAL: Check for success and valid payRequestId before proceeding
+            if (!initiateData.success || !initiateData.payRequestId) {
+              console.error('[Subscription] ❌ Initiate failed or no payRequestId returned');
+              console.error('[Subscription] Response:', initiateData);
+              alert(`Payment processing error: ${initiateData.message || 'Failed to initialize payment request'}\n\nPlease try again or contact support.`);
               return;
             }
 
-            console.log('[Subscription] Step 3: Extracted PAY_REQUEST_ID:', payRequestId);
-
-            // Step 1.5: CRITICAL - Save PAY_REQUEST_ID to our database IMMEDIATELY!
-            // This MUST succeed before proceeding, or return handler will fail
-            try {
-              console.log('[Subscription] Step 3.5: SAVING PAY_REQUEST_ID to database...');
-              const saveResponse = await fetch('/api/subscriptions/save-pay-request', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  payRequestId,
-                  reference,
-                }),
-              });
-              const saveData = await saveResponse.json();
-              
-              if (!saveData.success) {
-                console.error('[Subscription] ❌ FAILED to save PAY_REQUEST_ID:', saveData.message);
-                alert('Critical error: Failed to save payment request. Please contact support.');
-                return;
-              }
-              
-              console.log('[Subscription] ✅ Step 3.5: Saved PAY_REQUEST_ID to database:', saveData);
-            } catch (saveError) {
-              console.warn('[Subscription] Warning: Could not save PAY_REQUEST_ID:', saveError);
-              // Continue anyway - the callback can still work
-            }
+            const payRequestId = initiateData.payRequestId;
+            console.log('[Subscription] ✅ Step 2: Received verified PAY_REQUEST_ID:', payRequestId);
 
             // Step 2: Call our backend to calculate process.trans checksum
+            console.log('[Subscription] Step 3: Getting process parameters');
             const processResponse = await fetch('/api/subscriptions/process', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -207,32 +186,37 @@ const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = 
           } else if (data.checkout?.params && data.checkout?.initiateUrl && data.checkout?.reference) {
             // Paid plan - Two-step PayGate flow per documentation
             try {
-              console.log('[Subscription] Step 1: Posting to PayGate initiate.trans');
+              const reference = data.checkout.reference;
               
-              // Step 1: POST to PayGate initiate.trans and capture response
-              const initiateResponse = await fetch(data.checkout.initiateUrl, {
+              console.log('[Subscription] Step 1: Calling backend proxy for PayGate initiate');
+              
+              // Step 1: Call backend to handle PayGate initiate.trans and save PAY_REQUEST_ID
+              // This ensures pay_request_id is saved to database BEFORE proceeding
+              const initiateResponse = await fetch('/api/subscriptions/initiate', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams(data.checkout.params as Record<string, string>).toString(),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  params: data.checkout.params,
+                  reference,
+                }),
               });
 
-              const initiateText = await initiateResponse.text();
-              console.log('[Subscription] Step 2: Received from initiate.trans:', initiateText);
+              const initiateData = await initiateResponse.json();
+              console.log('[Subscription] Step 2: Backend initiate response:', initiateData);
 
-              // Parse the response: "PAYGATE_ID=...&PAY_REQUEST_ID=...&REFERENCE=...&CHECKSUM=..."
-              const params = new URLSearchParams(initiateText);
-              const payRequestId = params.get('PAY_REQUEST_ID');
-              const reference = data.checkout.reference;
-
-              if (!payRequestId) {
-                console.error('No PAY_REQUEST_ID in response:', initiateText);
-                alert('Error: PayGate did not return a request ID. Please try again.');
+              // CRITICAL: Check for success and valid payRequestId before proceeding
+              if (!initiateData.success || !initiateData.payRequestId) {
+                console.error('[Subscription] ❌ Initiate failed or no payRequestId returned');
+                console.error('[Subscription] Response:', initiateData);
+                alert(`Payment processing error: ${initiateData.message || 'Failed to initialize payment request'}\n\nPlease try again or contact support.`);
                 return;
               }
 
-              console.log('[Subscription] Step 3: Extracted PAY_REQUEST_ID:', payRequestId);
+              const payRequestId = initiateData.payRequestId;
+              console.log('[Subscription] ✅ Step 2: Received verified PAY_REQUEST_ID:', payRequestId);
 
               // Step 2: Call our backend to calculate process.trans checksum
+              console.log('[Subscription] Step 3: Getting process parameters');
               const processResponse = await fetch('/api/subscriptions/process', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
