@@ -113,22 +113,21 @@ class PayGateService {
   verifyReturnChecksum(
     payRequestId: string,
     reference: string,
-    checksum: string,
-    transactionStatus: string = '0'
+    checksum: string
   ): boolean {
     if (!checksum) return false;
 
-    // Return checksum: PAYGATE_ID + PAY_REQUEST_ID + TRANSACTION_STATUS + KEY
-    // Note: Does NOT include REFERENCE (PayGate only sends 3 fields in return POST: PAY_REQUEST_ID, TRANSACTION_STATUS, CHECKSUM)
+    // Per PayGate docs - Redirect checksum: PAYGATE_ID + PAY_REQUEST_ID + REFERENCE + KEY
+    // https://docs.paygate.co.za/#security-and-checksum-validation
     const checksumString =
-      this.config.merchantId + payRequestId + transactionStatus + this.config.merchantKey;
+      this.config.merchantId + payRequestId + reference + this.config.merchantKey;
     const calculated = crypto.createHash('md5').update(checksumString).digest('hex');
 
     console.log('[PayGate] Return checksum verification:', {
       expected: checksum,
       calculated,
       match: calculated === checksum,
-      source: `${this.config.merchantId}${payRequestId}${transactionStatus}[KEY]`,
+      source: `${this.config.merchantId}${payRequestId}${reference}[KEY]`,
     });
 
     return calculated === checksum;

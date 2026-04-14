@@ -178,7 +178,7 @@ export async function POST(request: NextRequest) {
     // Verify checksum authenticity (per PayGate docs)
     console.log('[Return] Verifying checksum authenticity...');
     
-    if (!payGate.verifyReturnChecksum(payRequestId, reference, checksum, transactionStatus)) {
+    if (!payGate.verifyReturnChecksum(payRequestId, reference, checksum)) {
       console.error('[Return] ❌ CHECKSUM MISMATCH - Potential tampering');
       return NextResponse.redirect(
         new URL('/?error=invalid_checksum', request.nextUrl.origin),
