@@ -182,8 +182,8 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ businessId }) => 
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-slate-800">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400"></div>
       </div>
     );
   }
@@ -191,14 +191,14 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ businessId }) => 
   const tiers = getAllTiers();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-slate-800 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Namibia Services Packages
           </h1>
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-gray-600 dark:text-gray-300">
             Choose the perfect plan to grow your business
           </p>
         </div>
@@ -208,8 +208,8 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ businessId }) => 
           {tiers.map((tier) => (
             <div
               key={tier.tier}
-              className={`relative bg-white rounded-2xl shadow-lg overflow-hidden transition-transform duration-300 hover:shadow-2xl ${
-                tier.tier === currentTier ? 'ring-2 ring-blue-600' : ''
+              className={`relative bg-white dark:bg-slate-800 rounded-2xl shadow-lg dark:shadow-slate-900 overflow-hidden transition-transform duration-300 hover:shadow-2xl dark:hover:shadow-lg ${
+                tier.tier === currentTier ? 'ring-2 ring-blue-600 dark:ring-blue-500' : ''
               } ${tier.monthlyPrice === 0 ? 'md:scale-95' : 'md:scale-100'}`}
             >
               {/* Current Plan Badge */}
@@ -228,26 +228,26 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ businessId }) => 
 
               <div className="p-8">
                 {/* Plan Name */}
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                   {tier.name}
                 </h2>
-                <p className="text-gray-600 text-sm mb-6">{tier.description}</p>
+                <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">{tier.description}</p>
 
                 {/* Price */}
                 <div className="mb-6">
                   <div className="flex items-baseline">
-                    <span className="text-4xl font-bold text-gray-900">
+                    <span className="text-4xl font-bold text-gray-900 dark:text-white">
                       {tier.monthlyPrice === 0 ? 'FREE' : `P${tier.monthlyPrice}`}
                     </span>
                     {tier.monthlyPrice > 0 && (
-                      <span className="text-gray-600 ml-2">/month</span>
+                      <span className="text-gray-600 dark:text-gray-400 ml-2">/month</span>
                     )}
                   </div>
                 </div>
 
                 {/* CTA Button */}
                 {tier.tier === currentTier ? (
-                  <button disabled className="w-full bg-gray-200 text-gray-600 py-3 rounded-lg font-semibold cursor-default mb-6">
+                  <button disabled className="w-full bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-gray-300 py-3 rounded-lg font-semibold cursor-default mb-6">
                     Active Plan
                   </button>
                 ) : (
@@ -258,10 +258,10 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ businessId }) => 
                     disabled={processingTier === tier.tier}
                     className={`w-full py-3 rounded-lg font-semibold mb-6 text-white transition-colors ${
                       processingTier === tier.tier
-                        ? 'bg-gray-400 cursor-not-allowed'
+                        ? 'bg-gray-400 dark:bg-slate-600 cursor-not-allowed'
                         : tier.monthlyPrice === 0
-                        ? 'bg-green-600 hover:bg-green-700'
-                        : 'bg-blue-600 hover:bg-blue-700'
+                        ? 'bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600'
+                        : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600'
                     }`}
                   >
                     {processingTier === tier.tier ? 'Processing...' : 'Subscribe'}
@@ -270,7 +270,7 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ businessId }) => 
 
                 {/* Features List */}
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-gray-900">Features:</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">Features:</h3>
                   <ul className="space-y-3">
                     {tier.features.map((feature, index) => (
                       <li key={index} className="flex items-start">
@@ -285,30 +285,30 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ businessId }) => 
                             clipRule="evenodd"
                           />
                         </svg>
-                        <span className="text-gray-700">{feature}</span>
+                        <span className="text-gray-700 dark:text-gray-300">{feature}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
                 {/* Limits Info */}
-                <div className="mt-6 pt-6 border-t border-gray-200">
+                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-slate-700">
                   <div className="grid grid-cols-3 gap-4 text-sm">
                     <div>
-                      <p className="text-gray-600">Max Photos</p>
-                      <p className="text-lg font-semibold text-gray-900">
+                      <p className="text-gray-600 dark:text-gray-400">Max Photos</p>
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white">
                         {tier.limits.photos}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-600">Promotions</p>
-                      <p className="text-lg font-semibold text-gray-900">
+                      <p className="text-gray-600 dark:text-gray-400">Promotions</p>
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white">
                         {tier.limits.promotions}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-600">Branches</p>
-                      <p className="text-lg font-semibold text-gray-900">
+                      <p className="text-gray-600 dark:text-gray-400">Branches</p>
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white">
                         {tier.limits.branches}
                       </p>
                     </div>
@@ -320,14 +320,14 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ businessId }) => 
         </div>
 
         {/* Info Section */}
-        <div className="max-w-3xl mx-auto mt-16 bg-white rounded-xl shadow-md p-8">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">
+        <div className="max-w-3xl mx-auto mt-16 bg-white dark:bg-slate-800 rounded-xl shadow-md dark:shadow-slate-900 p-8">
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
             Subscription Details
           </h3>
-          <ul className="space-y-4 text-gray-700">
+          <ul className="space-y-4 text-gray-700 dark:text-gray-300">
             <li className="flex items-start">
               <svg
-                className="h-5 w-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5"
+                className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0 mt-0.5"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -344,7 +344,7 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ businessId }) => 
             </li>
             <li className="flex items-start">
               <svg
-                className="h-5 w-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5"
+                className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0 mt-0.5"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -361,7 +361,7 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ businessId }) => 
             </li>
             <li className="flex items-start">
               <svg
-                className="h-5 w-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5"
+                className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0 mt-0.5"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -378,7 +378,7 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ businessId }) => 
             </li>
             <li className="flex items-start">
               <svg
-                className="h-5 w-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5"
+                className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0 mt-0.5"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >

@@ -72,26 +72,26 @@ const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-slate-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400"></div>
       </div>
     );
   }
 
   if (!subscription) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 py-12 px-4">
         <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-8 text-center">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
               No Active Subscription
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
               You're currently on the free WILD HORSES plan.
             </p>
             <Link
               href={`/business/${businessId}/subscription/plans`}
-              className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg"
+              className="inline-block bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg"
             >
               Upgrade Now
             </Link>
@@ -117,25 +117,25 @@ const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8">
           {/* Status Banner */}
           {displayStatus === 'INACTIVE' && subscription.tier !== 'WILD_HORSES' && (
-            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-yellow-800">
+            <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+              <p className="text-yellow-800 dark:text-yellow-200">
                 ⚠️ Your subscription payment is pending. Please complete the payment to activate your subscription.
               </p>
             </div>
           )}
 
           {/* Header */}
-          <div className="flex justify-between items-start mb-8 pb-8 border-b border-gray-200">
+          <div className="flex justify-between items-start mb-8 pb-8 border-b border-gray-200 dark:border-slate-700">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 Subscription Management
               </h1>
-              <p className="text-gray-600 mt-2">
+              <p className="text-gray-600 dark:text-gray-400 mt-2">
                 Manage your {display.name} subscription
               </p>
             </div>
@@ -148,28 +148,28 @@ const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({
           <div className="grid md:grid-cols-2 gap-8 mb-8">
             {/* Plan Details */}
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
                 Current Plan
               </h2>
               <div className="space-y-4">
-                <div className="bg-blue-50 rounded-lg p-6">
-                  <p className="text-sm text-gray-600 mb-1">Plan Name</p>
-                  <p className="text-2xl font-bold text-gray-900">
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Plan Name</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
                     {display.name}
                   </p>
                 </div>
 
-                <div className="bg-blue-50 rounded-lg p-6">
-                  <p className="text-sm text-gray-600 mb-1">Price</p>
-                  <p className="text-2xl font-bold text-gray-900">
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Price</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
                     {display.price}
                   </p>
                 </div>
 
                 {subscription.subscription?.renewalDate && (
-                  <div className="bg-blue-50 rounded-lg p-6">
-                    <p className="text-sm text-gray-600 mb-1">Renewal Date</p>
-                    <p className="text-lg font-semibold text-gray-900">
+                  <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Renewal Date</p>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
                       {new Date(
                         subscription.subscription.renewalDate
                       ).toLocaleDateString()}
@@ -181,7 +181,7 @@ const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({
 
             {/* Features Section */}
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
                 Included Features
               </h2>
               <ul className="space-y-3">
@@ -198,7 +198,7 @@ const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({
                         clipRule="evenodd"
                       />
                     </svg>
-                    <span className="text-gray-700">{feature}</span>
+                    <span className="text-gray-700 dark:text-gray-300">{feature}</span>
                   </li>
                 ))}
               </ul>
@@ -206,26 +206,26 @@ const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({
           </div>
 
           {/* Limits Section */}
-          <div className="bg-gray-50 rounded-lg p-6 mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+          <div className="bg-gray-50 dark:bg-slate-700 rounded-lg p-6 mb-8">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
               Account Limits
             </h2>
             <div className="grid grid-cols-3 gap-4">
-              <div className="bg-white rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-2">Maximum Photos</p>
-                <p className="text-3xl font-bold text-gray-900">
+              <div className="bg-white dark:bg-slate-800 rounded-lg p-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Maximum Photos</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">
                   {display.limits.photos}
                 </p>
               </div>
-              <div className="bg-white rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-2">Promotions</p>
-                <p className="text-3xl font-bold text-gray-900">
+              <div className="bg-white dark:bg-slate-800 rounded-lg p-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Promotions</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">
                   {display.limits.promotions}
                 </p>
               </div>
-              <div className="bg-white rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-2">Multiple Branches</p>
-                <p className="text-3xl font-bold text-gray-900">
+              <div className="bg-white dark:bg-slate-800 rounded-lg p-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Multiple Branches</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">
                   {display.limits.branches}
                 </p>
               </div>
@@ -236,7 +236,7 @@ const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({
           <div className="flex gap-4 flex-wrap">
             <Link
               href={`/business/${businessId}/subscription/plans`}
-              className="flex-1 min-w-[200px] bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition"
+              className="flex-1 min-w-[200px] bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg text-center transition"
             >
               View All Plans
             </Link>
@@ -244,7 +244,7 @@ const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({
             {displayStatus === 'INACTIVE' && subscription.tier !== 'WILD_HORSES' && (
               <Link
                 href={`/business/${businessId}/subscription/plans`}
-                className="flex-1 min-w-[200px] bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition"
+                className="flex-1 min-w-[200px] bg-yellow-600 hover:bg-yellow-700 dark:bg-yellow-700 dark:hover:bg-yellow-600 text-white font-semibold py-3 px-6 rounded-lg text-center transition"
               >
                 Complete Payment
               </Link>
@@ -253,7 +253,7 @@ const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({
             {(displayStatus === 'ACTIVE' || displayStatus === 'FREE') && subscription.tier !== 'WILD_HORSES' && (
               <button
                 onClick={() => setShowCancelConfirm(true)}
-                className="flex-1 min-w-[200px] bg-red-100 hover:bg-red-200 text-red-700 font-semibold py-3 px-6 rounded-lg transition"
+                className="flex-1 min-w-[200px] bg-red-100 dark:bg-red-900/20 hover:bg-red-200 dark:hover:bg-red-900/30 text-red-700 dark:text-red-300 font-semibold py-3 px-6 rounded-lg transition"
               >
                 Cancel Subscription
               </button>
@@ -262,26 +262,26 @@ const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({
 
           {/* Cancel Confirmation Modal */}
           {showCancelConfirm && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-8">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">
+            <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
+              <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full p-8">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
                   Cancel Subscription?
                 </h3>
-                <p className="text-gray-600 mb-6">
+                <p className="text-gray-600 dark:text-gray-400 mb-6">
                   Are you sure you want to cancel your {display.name} subscription?
                   You'll lose access to premium features.
                 </p>
                 <div className="flex gap-4">
                   <button
                     onClick={() => setShowCancelConfirm(false)}
-                    className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg transition"
+                    className="flex-1 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-gray-800 dark:text-gray-200 font-semibold py-2 px-4 rounded-lg transition"
                   >
                     Keep Subscription
                   </button>
                   <button
                     onClick={handleCancel}
                     disabled={cancelling}
-                    className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition"
+                    className="flex-1 bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 disabled:bg-gray-400 dark:disabled:bg-slate-600 text-white font-semibold py-2 px-4 rounded-lg transition"
                   >
                     {cancelling ? 'Cancelling...' : 'Cancel'}
                   </button>
@@ -292,13 +292,13 @@ const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({
         </div>
 
         {/* Help Section */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-blue-900 mb-2">
+        <div className="mt-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-300 mb-2">
             Need Help?
           </h3>
-          <p className="text-blue-800">
+          <p className="text-blue-800 dark:text-blue-200">
             Contact our support team at support@namibiaservices.com or visit our{' '}
-            <Link href="/contact" className="underline font-semibold">
+            <Link href="/contact" className="underline font-semibold hover:text-blue-700 dark:hover:text-blue-100">
               contact page
             </Link>
             .

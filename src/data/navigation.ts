@@ -43,6 +43,11 @@ export const NAVIGATION_DEMO: NavItemType[] = [
   },
   {
     id: ncNanoId(),
+    href: "/advertise",
+    name: "Advertise",
+  },
+  {
+    id: ncNanoId(),
     href: "/government-directory",
     name: "Gov Directory",
   },
