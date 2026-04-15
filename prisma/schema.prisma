@@ -539,7 +539,7 @@ model AdvertisingSubscription {
   updatedAt       DateTime  @updatedAt @map("updated_at")
   
   business        Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  package         AdvertisementPackage @relation(fields: [packageId], references: [id])
+  package         AdvertisementPackage @relation(fields: [packageId], references: [packageId])
   analytics       AdAnalytics[]
   
   @@unique([businessId, packageId])
