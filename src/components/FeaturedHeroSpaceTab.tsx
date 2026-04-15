@@ -425,13 +425,13 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
             <p className="text-neutral-600 dark:text-neutral-400">Choose the right advertising package for your business to reach customers on our platform</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
             {ADVERTISING_PACKAGES.map((pkg) => (
               <div
                 key={pkg.id}
-                className={`relative rounded-2xl overflow-hidden transition-all duration-300 shadow-lg hover:shadow-xl border cursor-pointer transform hover:scale-105 ${
+                className={`relative rounded-lg overflow-hidden transition-all duration-300 shadow-md hover:shadow-lg border cursor-pointer transform hover:scale-105 ${
                   pkg.popular
-                    ? "bg-gradient-to-br from-orange-500 to-red-600 text-white md:scale-105 md:-mt-6 border-orange-400"
+                    ? "bg-gradient-to-br from-orange-500 to-red-600 text-white md:scale-105 md:-mt-2 border-orange-400"
                     : "bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-100"
                 }`}
                 onClick={() => {
@@ -440,41 +440,41 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
                 }}
               >
                 {pkg.popular && (
-                  <div className="absolute top-0 right-0 bg-amber-400 text-neutral-900 px-4 py-1 text-sm font-semibold rounded-bl-lg z-10">
-                    Most Popular
+                  <div className="absolute top-0 right-0 bg-amber-400 text-neutral-900 px-2 py-0.5 text-xs font-semibold rounded-bl z-10">
+                    Popular
                   </div>
                 )}
 
-                <div className="p-6">
-                  <h4 className="text-xl font-bold mb-2">{pkg.name}</h4>
+                <div className="p-3">
+                  <h4 className="text-sm font-bold mb-1">{pkg.name}</h4>
                   <p 
-                    className="text-sm mb-4"
+                    className="text-xs mb-2"
                     style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.9)' } : { color: '#6b7280' }}
                   >
                     {pkg.description}
                   </p>
 
-                  <div className="mb-4">
-                    <div className="flex items-baseline gap-2 mb-2">
-                      <span className="text-3xl font-bold">N${pkg.monthlyPrice}</span>
+                  <div className="mb-3">
+                    <div className="flex items-baseline gap-1 mb-1">
+                      <span className="text-lg font-bold">N${pkg.monthlyPrice}</span>
                       <span 
-                        className="text-sm"
+                        className="text-xs"
                         style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#6b7280' }}
                       >
                         p/m
                       </span>
                     </div>
-                    <div className="text-sm font-semibold mb-2">
+                    <div className="text-xs font-semibold mb-1">
                       <span>N${pkg.yearlyPrice}</span>
                       <span 
                         style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#6b7280' }}
                       >
-                        /year
+                        /yr
                       </span>
                     </div>
                     {pkg.yearlyDiscount && (
                       <div 
-                        className="inline-block px-3 py-1 rounded-full text-xs font-bold"
+                        className="inline-block px-2 py-0.5 rounded text-xs font-bold"
                         style={pkg.popular ? { 
                           backgroundColor: 'rgba(255, 255, 255, 0.2)',
                           color: 'rgba(255, 255, 255, 1)'
@@ -488,35 +488,35 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
                     )}
                   </div>
 
-                  <div className="mb-6">
+                  <div className="mb-3">
                     {pkg.popular ? (
-                      <ButtonPrimary className="w-full bg-white text-neutral-900 hover:bg-neutral-100">
-                        Subscribe Now
+                      <ButtonPrimary className="w-full bg-white text-neutral-900 hover:bg-neutral-100 py-1 text-xs">
+                        Subscribe
                       </ButtonPrimary>
                     ) : (
                       <ButtonSecondary 
-                        className={`w-full ${pkg.popular ? 'border-white text-white' : 'border-neutral-300 dark:border-neutral-600'}`}
+                        className={`w-full py-1 text-xs ${pkg.popular ? 'border-white text-white' : 'border-neutral-300 dark:border-neutral-600'}`}
                       >
-                        Subscribe Now
+                        Subscribe
                       </ButtonSecondary>
                     )}
                   </div>
 
-                  <div className="space-y-3">
+                  <div className="space-y-1">
                     <p 
-                      className="text-sm font-semibold"
+                      className="text-xs font-semibold"
                       style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.9)' } : { color: '#6b7280' }}
                     >
-                      What's included:
+                      Includes:
                     </p>
-                    <ul className="space-y-2">
-                      {pkg.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-start gap-2">
+                    <ul className="space-y-1">
+                      {pkg.features.slice(0, 3).map((feature, idx) => (
+                        <li key={idx} className="flex items-start gap-1">
                           <CheckIcon 
-                            className="w-4 h-4 flex-shrink-0 mt-1"
+                            className="w-3 h-3 flex-shrink-0 mt-0.5"
                             style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#16a34a' }}
                           />
-                          <span className="text-sm">{feature}</span>
+                          <span className="text-xs line-clamp-1">{feature}</span>
                         </li>
                       ))}
                     </ul>
@@ -530,67 +530,67 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
         {/* Modal for advertising package subscription */}
         {showAdPackageModal && selectedAdPackage && (
           <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-neutral-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8 border border-neutral-200 dark:border-neutral-700">
-              <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-6">Subscribe to {selectedAdPackage.name}</h3>
+            <div className="bg-white dark:bg-neutral-800 rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 border border-neutral-200 dark:border-neutral-700">
+              <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100 mb-4">Subscribe to {selectedAdPackage.name}</h3>
 
               {/* Package Description */}
-              <div className="mb-6">
-                <p className="text-neutral-600 dark:text-neutral-400">{selectedAdPackage.description}</p>
+              <div className="mb-4">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">{selectedAdPackage.description}</p>
               </div>
 
               {/* Billing Cycle Selection */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-3">Select Billing Cycle</label>
-                <div className="grid grid-cols-2 gap-4">
+              <div className="mb-4">
+                <label className="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-2">Select Billing Cycle</label>
+                <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => setAdBillingCycle("MONTHLY")}
-                    className={`p-4 rounded-lg border-2 transition-colors ${
+                    className={`p-3 rounded-lg border-2 transition-colors ${
                       adBillingCycle === "MONTHLY"
                         ? "border-primary-600 bg-primary-50 dark:bg-primary-900/20"
                         : "border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800"
                     }`}
                   >
-                    <p className="font-semibold text-neutral-900 dark:text-neutral-100 mb-1">Monthly</p>
-                    <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">N${selectedAdPackage.monthlyPrice}</p>
-                    <p className="text-sm text-neutral-600 dark:text-neutral-400">1 month</p>
+                    <p className="font-semibold text-neutral-900 dark:text-neutral-100 text-sm mb-1">Monthly</p>
+                    <p className="text-lg font-bold text-primary-600 dark:text-primary-400">N${selectedAdPackage.monthlyPrice}</p>
+                    <p className="text-xs text-neutral-600 dark:text-neutral-400">1 month</p>
                   </button>
 
                   <button
                     onClick={() => setAdBillingCycle("YEARLY")}
-                    className={`p-4 rounded-lg border-2 transition-colors ${
+                    className={`p-3 rounded-lg border-2 transition-colors ${
                       adBillingCycle === "YEARLY"
                         ? "border-primary-600 bg-primary-50 dark:bg-primary-900/20"
                         : "border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800"
                     }`}
                   >
-                    <p className="font-semibold text-neutral-900 dark:text-neutral-100 mb-1">Yearly</p>
-                    <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">N${selectedAdPackage.yearlyPrice}</p>
-                    <p className="text-sm text-neutral-600 dark:text-neutral-400">12 months • Save {selectedAdPackage.yearlyDiscount}</p>
+                    <p className="font-semibold text-neutral-900 dark:text-neutral-100 text-sm mb-1">Yearly</p>
+                    <p className="text-lg font-bold text-primary-600 dark:text-primary-400">N${selectedAdPackage.yearlyPrice}</p>
+                    <p className="text-xs text-neutral-600 dark:text-neutral-400">12 months • {selectedAdPackage.yearlyDiscount}</p>
                   </button>
                 </div>
               </div>
 
               {/* Package Duration & Total */}
-              <div className="bg-neutral-50 dark:bg-neutral-700/50 rounded-xl p-4 mb-6">
+              <div className="bg-neutral-50 dark:bg-neutral-700/50 rounded-lg p-3 mb-4">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-neutral-600 dark:text-neutral-400">Package Duration:</span>
-                  <span className="font-semibold text-neutral-900 dark:text-neutral-100">{adBillingCycle === "MONTHLY" ? "1 month" : "12 months"}</span>
+                  <span className="text-xs text-neutral-600 dark:text-neutral-400">Package Duration:</span>
+                  <span className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{adBillingCycle === "MONTHLY" ? "1 month" : "12 months"}</span>
                 </div>
                 <div className="flex justify-between items-center pt-2 border-t border-neutral-200 dark:border-neutral-600">
-                  <span className="text-neutral-600 dark:text-neutral-400">Total Price:</span>
-                  <span className="text-xl font-bold text-primary-600 dark:text-primary-400">
+                  <span className="text-xs text-neutral-600 dark:text-neutral-400">Total Price:</span>
+                  <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
                     N${adBillingCycle === "MONTHLY" ? selectedAdPackage.monthlyPrice : selectedAdPackage.yearlyPrice}
                   </span>
                 </div>
               </div>
 
               {/* Features */}
-              <div className="mb-6">
-                <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">What's included:</p>
-                <ul className="space-y-2">
+              <div className="mb-4">
+                <p className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-2">What's included:</p>
+                <ul className="space-y-1">
                   {selectedAdPackage.features.map((feature: string, idx: number) => (
-                    <li key={idx} className="flex items-start gap-2 text-sm text-neutral-700 dark:text-neutral-300">
-                      <CheckIcon className="w-4 h-4 flex-shrink-0 mt-1 text-green-600 dark:text-green-400" />
+                    <li key={idx} className="flex items-start gap-1.5 text-xs text-neutral-700 dark:text-neutral-300">
+                      <CheckIcon className="w-3 h-3 flex-shrink-0 mt-0.5 text-green-600 dark:text-green-400" />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -598,19 +598,19 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
               </div>
 
               {/* Buttons */}
-              <div className="flex gap-4">
+              <div className="flex gap-2">
                 <ButtonPrimary 
                   onClick={() => {
                     setShowAdPackageModal(false);
                     setShowForm(true);
                   }} 
-                  className="flex-1 justify-center"
+                  className="flex-1 justify-center py-2 text-sm"
                 >
-                  Proceed to Payment (N${adBillingCycle === "MONTHLY" ? selectedAdPackage.monthlyPrice : selectedAdPackage.yearlyPrice})
+                  Proceed to Payment
                 </ButtonPrimary>
                 <ButtonSecondary 
                   onClick={() => setShowAdPackageModal(false)} 
-                  className="flex-1 justify-center"
+                  className="flex-1 justify-center py-2 text-sm"
                 >
                   Cancel
                 </ButtonSecondary>
