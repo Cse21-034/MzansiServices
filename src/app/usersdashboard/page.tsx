@@ -2,6 +2,7 @@
 
 import React, { FC, useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import type { DashboardUser, ReviewWithBusiness, FavoriteWithBusiness, BookingWithBusiness } from "./types";
 import type { Notification } from "@prisma/client";
@@ -130,10 +131,34 @@ const mockRecentActivity = [
 
 const UserDashboardPage: FC<UserDashboardPageProps> = ({}) => {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const { data: session, status } = useSession();
   const tabParam = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState(tabParam || "overview");
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // 🔐 Authorization check
+  useEffect(() => {
+    // Wait for session to load
+    if (status === 'loading') return;
+
+    // Check if user is authenticated
+    if (!session?.user) {
+      router.push('/login');
+      return;
+    }
+
+    // Check if user has USER role (or ADMIN can access USER routes)
+    if (!['USER', 'ADMIN'].includes(session.user?.role || '')) {
+      router.push('/unauthorized');
+      return;
+    }
+
+    // User is authorized
+    setIsAuthorized(true);
+  }, [session, status, router]);
   
   // Property listings state
   type PropertyListing = {
@@ -749,6 +774,40 @@ const UserDashboardPage: FC<UserDashboardPageProps> = ({}) => {
       </div>
     );
   };
+
+  // Show loading state while checking authorization
+  if (!isAuthorized || isLoading) {
+    return (
+      <div className="nc-UserDashboardPage bg-neutral-50 dark:bg-neutral-900 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-neutral-600 dark:text-neutral-400">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if there's an error
+  if (error) {
+    return (
+      <div className="nc-UserDashboardPage bg-neutral-50 dark:bg-neutral-900 min-h-screen flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-red-600 dark:text-red-400 text-xl">!</span>
+          </div>
+          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
+            Something went wrong
+          </h3>
+          <p className="text-neutral-600 dark:text-neutral-400 mb-6">
+            {error}
+          </p>
+          <ButtonPrimary onClick={() => router.push('/')}>
+            Return to Home
+          </ButtonPrimary>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="nc-UserDashboardPage bg-neutral-50 dark:bg-neutral-900 min-h-screen">
