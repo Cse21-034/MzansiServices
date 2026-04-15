@@ -445,7 +445,7 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
                       Includes:
                     </p>
                     <ul className="space-y-1">
-                      {pkg.features.map((feature, idx) => (
+                      {pkg.features.map((feature: string, idx: number) => (
                         <li key={idx} className="flex items-start gap-1.5">
                           <CheckIcon 
                             className="w-3 h-3 flex-shrink-0 mt-0.5"
