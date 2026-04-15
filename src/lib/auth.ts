@@ -134,13 +134,30 @@ export const authOptions: NextAuthOptions = {
       
       return token;
     },
-    async redirect({ url, baseUrl }) {
-      console.log('🔀 Redirect callback:', { url, baseUrl });
+    async redirect({ url, baseUrl, user }) {
+      console.log('🔀 Redirect callback:', { url, baseUrl, userRole: (user as any)?.role });
       
       // Allow access to solidacare paths during development
       if (url.includes('/solidacare')) {
         console.log('✅ Allowing redirect to solidacare path');
         return url;
+      }
+
+      // Redirect based on user role after login
+      if (user) {
+        const userRole = (user as any).role;
+        console.log('🔐 User role detected:', userRole);
+        
+        if (userRole === 'ADMIN') {
+          console.log('➡️ Redirecting admin to admin dashboard');
+          return `${baseUrl}/solidacare/data/add/admin`;
+        } else if (userRole === 'BUSINESS') {
+          console.log('➡️ Redirecting business to business dashboard');
+          return `${baseUrl}/business`;
+        } else if (userRole === 'USER') {
+          console.log('➡️ Redirecting user to user dashboard');
+          return `${baseUrl}/usersdashboard`;
+        }
       }
 
       // Allows relative callback URLs

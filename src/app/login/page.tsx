@@ -5,18 +5,34 @@ import Input from "@/shared/Input";
 import ButtonPrimary from "@/shared/ButtonPrimary";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { BuildingStorefrontIcon, UserIcon } from "@heroicons/react/24/outline";
+import { useEffect } from "react";
 
 export interface PageLoginProps {}
 
 const PageLogin: FC<PageLoginProps> = ({}) => {
   const router = useRouter();
+  const { data: session } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [userType, setUserType] = useState<"user" | "business">("user");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (session?.user) {
+      const role = (session.user as any)?.role;
+      if (role === 'ADMIN') {
+        router.push('/solidacare/data/add/admin');
+      } else if (role === 'BUSINESS') {
+        router.push('/business');
+      } else if (role === 'USER') {
+        router.push('/usersdashboard');
+      }
+    }
+  }, [session, router]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,8 +61,27 @@ const PageLogin: FC<PageLoginProps> = ({}) => {
       // Login successful
       console.log("✅ Login successful");
       
-      // Force a hard reload to ensure session is fully established
-      window.location.href = "/";
+      // Wait a moment for session to be established, then redirect based on role
+      setTimeout(async () => {
+        // Refresh session to get updated user data
+        const response = await fetch('/api/auth/session');
+        const updatedSession = await response.json();
+        
+        if (updatedSession?.user) {
+          const role = updatedSession.user.role;
+          if (role === 'ADMIN') {
+            router.push('/solidacare/data/add/admin');
+          } else if (role === 'BUSINESS') {
+            router.push('/business');
+          } else if (role === 'USER') {
+            router.push('/usersdashboard');
+          } else {
+            router.push('/');
+          }
+        } else {
+          router.push('/');
+        }
+      }, 500);
       
     } catch (err) {
       console.error("Login error:", err);
