@@ -66,7 +66,7 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
         const res = await fetch('/api/advertising/packages');
         if (!res.ok) throw new Error('Failed to fetch packages');
         const data = await res.json();
-        setAdPackages(data.packages || []);
+        setAdPackages(data.data || []);
         setAdPackagesError(null);
       } catch (error) {
         console.error('Error fetching ad packages:', error);
