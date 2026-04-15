@@ -43,6 +43,11 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalMessage, setModalMessage] = useState("");
+  
+  // New state for advertising package subscription
+  const [selectedAdPackage, setSelectedAdPackage] = useState<any>(null);
+  const [adBillingCycle, setAdBillingCycle] = useState<"MONTHLY" | "YEARLY">("MONTHLY");
+  const [showAdPackageModal, setShowAdPackageModal] = useState(false);
 
   const PRICING = {
     MONTHLY: { price: 100, duration: "1 month" },
@@ -412,39 +417,207 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
   // No featured space or form
   if (!showForm) {
     return (
-      <div className="text-center py-12">
-        <div className="p-4 bg-primary-100 dark:bg-primary-900/20 rounded-2xl w-fit mx-auto mb-4">
-          <SparklesIcon className="w-12 h-12 text-primary-600 dark:text-primary-400" />
-        </div>
-        <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">Feature Your Business</h3>
-        <p className="text-neutral-600 dark:text-neutral-400 mb-6 max-w-md mx-auto">
-          Get featured in the homepage carousel and reach more customers. Choose your billing cycle and upload your business image.
-        </p>
-
-        {/* Pricing Comparison */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 max-w-md mx-auto">
-          <div className="bg-white dark:bg-neutral-800 rounded-xl p-6 border border-neutral-200 dark:border-neutral-700">
-            <p className="font-semibold text-neutral-900 dark:text-neutral-100 mb-2">Monthly</p>
-            <p className="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-1">N$100</p>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">per month</p>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400">Auto-renews monthly</p>
+      <div className="space-y-12">
+        {/* Advertising Rate Cards Section */}
+        <div>
+          <div className="mb-8">
+            <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">Advertising Rate Cards</h3>
+            <p className="text-neutral-600 dark:text-neutral-400">Choose the right advertising package for your business to reach customers on our platform</p>
           </div>
 
-          <div className="bg-primary-50 dark:bg-primary-900/20 rounded-xl p-6 border border-primary-200 dark:border-primary-800">
-            <div className="flex items-center justify-between mb-2">
-              <p className="font-semibold text-neutral-900 dark:text-neutral-100">Yearly</p>
-              <span className="px-2 py-1 bg-primary-600 text-white text-xs font-bold rounded">SAVE 16%</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {ADVERTISING_PACKAGES.map((pkg) => (
+              <div
+                key={pkg.id}
+                className={`relative rounded-2xl overflow-hidden transition-all duration-300 shadow-lg hover:shadow-xl border cursor-pointer transform hover:scale-105 ${
+                  pkg.popular
+                    ? "bg-gradient-to-br from-orange-500 to-red-600 text-white md:scale-105 md:-mt-6 border-orange-400"
+                    : "bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-100"
+                }`}
+                onClick={() => {
+                  setSelectedAdPackage(pkg);
+                  setShowAdPackageModal(true);
+                }}
+              >
+                {pkg.popular && (
+                  <div className="absolute top-0 right-0 bg-amber-400 text-neutral-900 px-4 py-1 text-sm font-semibold rounded-bl-lg z-10">
+                    Most Popular
+                  </div>
+                )}
+
+                <div className="p-6">
+                  <h4 className="text-xl font-bold mb-2">{pkg.name}</h4>
+                  <p 
+                    className="text-sm mb-4"
+                    style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.9)' } : { color: '#6b7280' }}
+                  >
+                    {pkg.description}
+                  </p>
+
+                  <div className="mb-4">
+                    <div className="flex items-baseline gap-2 mb-2">
+                      <span className="text-3xl font-bold">N${pkg.monthlyPrice}</span>
+                      <span 
+                        className="text-sm"
+                        style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#6b7280' }}
+                      >
+                        p/m
+                      </span>
+                    </div>
+                    <div className="text-sm font-semibold mb-2">
+                      <span>N${pkg.yearlyPrice}</span>
+                      <span 
+                        style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#6b7280' }}
+                      >
+                        /year
+                      </span>
+                    </div>
+                    {pkg.yearlyDiscount && (
+                      <div 
+                        className="inline-block px-3 py-1 rounded-full text-xs font-bold"
+                        style={pkg.popular ? { 
+                          backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                          color: 'rgba(255, 255, 255, 1)'
+                        } : { 
+                          backgroundColor: '#fed7aa',
+                          color: '#92400e'
+                        }}
+                      >
+                        {pkg.yearlyDiscount}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mb-6">
+                    {pkg.popular ? (
+                      <ButtonPrimary className="w-full bg-white text-neutral-900 hover:bg-neutral-100">
+                        Subscribe Now
+                      </ButtonPrimary>
+                    ) : (
+                      <ButtonSecondary 
+                        className={`w-full ${pkg.popular ? 'border-white text-white' : 'border-neutral-300 dark:border-neutral-600'}`}
+                      >
+                        Subscribe Now
+                      </ButtonSecondary>
+                    )}
+                  </div>
+
+                  <div className="space-y-3">
+                    <p 
+                      className="text-sm font-semibold"
+                      style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.9)' } : { color: '#6b7280' }}
+                    >
+                      What's included:
+                    </p>
+                    <ul className="space-y-2">
+                      {pkg.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-start gap-2">
+                          <CheckIcon 
+                            className="w-4 h-4 flex-shrink-0 mt-1"
+                            style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#16a34a' }}
+                          />
+                          <span className="text-sm">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Modal for advertising package subscription */}
+        {showAdPackageModal && selectedAdPackage && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white dark:bg-neutral-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8 border border-neutral-200 dark:border-neutral-700">
+              <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-6">Subscribe to {selectedAdPackage.name}</h3>
+
+              {/* Package Description */}
+              <div className="mb-6">
+                <p className="text-neutral-600 dark:text-neutral-400">{selectedAdPackage.description}</p>
+              </div>
+
+              {/* Billing Cycle Selection */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-3">Select Billing Cycle</label>
+                <div className="grid grid-cols-2 gap-4">
+                  <button
+                    onClick={() => setAdBillingCycle("MONTHLY")}
+                    className={`p-4 rounded-lg border-2 transition-colors ${
+                      adBillingCycle === "MONTHLY"
+                        ? "border-primary-600 bg-primary-50 dark:bg-primary-900/20"
+                        : "border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800"
+                    }`}
+                  >
+                    <p className="font-semibold text-neutral-900 dark:text-neutral-100 mb-1">Monthly</p>
+                    <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">N${selectedAdPackage.monthlyPrice}</p>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400">1 month</p>
+                  </button>
+
+                  <button
+                    onClick={() => setAdBillingCycle("YEARLY")}
+                    className={`p-4 rounded-lg border-2 transition-colors ${
+                      adBillingCycle === "YEARLY"
+                        ? "border-primary-600 bg-primary-50 dark:bg-primary-900/20"
+                        : "border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800"
+                    }`}
+                  >
+                    <p className="font-semibold text-neutral-900 dark:text-neutral-100 mb-1">Yearly</p>
+                    <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">N${selectedAdPackage.yearlyPrice}</p>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400">12 months • Save {selectedAdPackage.yearlyDiscount}</p>
+                  </button>
+                </div>
+              </div>
+
+              {/* Package Duration & Total */}
+              <div className="bg-neutral-50 dark:bg-neutral-700/50 rounded-xl p-4 mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-neutral-600 dark:text-neutral-400">Package Duration:</span>
+                  <span className="font-semibold text-neutral-900 dark:text-neutral-100">{adBillingCycle === "MONTHLY" ? "1 month" : "12 months"}</span>
+                </div>
+                <div className="flex justify-between items-center pt-2 border-t border-neutral-200 dark:border-neutral-600">
+                  <span className="text-neutral-600 dark:text-neutral-400">Total Price:</span>
+                  <span className="text-xl font-bold text-primary-600 dark:text-primary-400">
+                    N${adBillingCycle === "MONTHLY" ? selectedAdPackage.monthlyPrice : selectedAdPackage.yearlyPrice}
+                  </span>
+                </div>
+              </div>
+
+              {/* Features */}
+              <div className="mb-6">
+                <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">What's included:</p>
+                <ul className="space-y-2">
+                  {selectedAdPackage.features.map((feature: string, idx: number) => (
+                    <li key={idx} className="flex items-start gap-2 text-sm text-neutral-700 dark:text-neutral-300">
+                      <CheckIcon className="w-4 h-4 flex-shrink-0 mt-1 text-green-600 dark:text-green-400" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-4">
+                <ButtonPrimary 
+                  onClick={() => {
+                    setShowAdPackageModal(false);
+                    setShowForm(true);
+                  }} 
+                  className="flex-1 justify-center"
+                >
+                  Proceed to Payment (N${adBillingCycle === "MONTHLY" ? selectedAdPackage.monthlyPrice : selectedAdPackage.yearlyPrice})
+                </ButtonPrimary>
+                <ButtonSecondary 
+                  onClick={() => setShowAdPackageModal(false)} 
+                  className="flex-1 justify-center"
+                >
+                  Cancel
+                </ButtonSecondary>
+              </div>
             </div>
-            <p className="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-1">N$1,008</p>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">per year</p>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400">Save N$192 annually</p>
           </div>
-        </div>
-
-        <ButtonPrimary onClick={() => setShowForm(true)}>
-          <SparklesIcon className="w-5 h-5 inline mr-2" />
-          Get Featured Now
-        </ButtonPrimary>
+        )}
       </div>
     );
   }
@@ -581,115 +754,6 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
       >
         <p>{modalMessage}</p>
       </Modal>
-
-      {/* Advertising Rate Cards Section */}
-      <div className="mt-16 space-y-6">
-        <div>
-          <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">Advertising Rate Cards</h3>
-          <p className="text-neutral-600 dark:text-neutral-400">Choose the right advertising package for your business to reach customers on our platform</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {ADVERTISING_PACKAGES.map((pkg) => (
-            <div
-              key={pkg.id}
-              className={`relative rounded-2xl overflow-hidden transition-all duration-300 shadow-lg hover:shadow-xl border ${
-                pkg.popular
-                  ? "bg-gradient-to-br from-orange-500 to-red-600 text-white md:scale-105 md:-mt-6 border-orange-400"
-                  : "bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-100"
-              }`}
-            >
-              {pkg.popular && (
-                <div className="absolute top-0 right-0 bg-amber-400 text-neutral-900 px-4 py-1 text-sm font-semibold rounded-bl-lg z-10">
-                  Most Popular
-                </div>
-              )}
-
-              <div className="p-6">
-                {/* Package Name */}
-                <h4 className="text-xl font-bold mb-2">{pkg.name}</h4>
-                <p 
-                  className="text-sm mb-4"
-                  style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.9)' } : { color: '#6b7280' }}
-                >
-                  {pkg.description}
-                </p>
-
-                {/* Price */}
-                <div className="mb-4">
-                  <div className="flex items-baseline gap-2 mb-2">
-                    <span className="text-3xl font-bold">N${pkg.monthlyPrice}</span>
-                    <span 
-                      className="text-sm"
-                      style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#6b7280' }}
-                    >
-                      p/m
-                    </span>
-                  </div>
-                  <div className="text-sm font-semibold mb-2">
-                    <span>N${pkg.yearlyPrice}</span>
-                    <span 
-                      style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#6b7280' }}
-                    >
-                      /year
-                    </span>
-                  </div>
-                  {pkg.yearlyDiscount && (
-                    <div 
-                      className="inline-block px-3 py-1 rounded-full text-xs font-bold"
-                      style={pkg.popular ? { 
-                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                        color: 'rgba(255, 255, 255, 1)'
-                      } : { 
-                        backgroundColor: '#fed7aa',
-                        color: '#92400e'
-                      }}
-                    >
-                      {pkg.yearlyDiscount}
-                    </div>
-                  )}
-                </div>
-
-                {/* CTA Button */}
-                <div className="mb-6">
-                  {pkg.popular ? (
-                    <ButtonPrimary className="w-full bg-white text-neutral-900 hover:bg-neutral-100">
-                      Get Started Now
-                    </ButtonPrimary>
-                  ) : (
-                    <ButtonSecondary 
-                      className={`w-full ${pkg.popular ? 'border-white text-white' : 'border-neutral-300 dark:border-neutral-600'}`}
-                    >
-                      Choose Plan
-                    </ButtonSecondary>
-                  )}
-                </div>
-
-                {/* Features List */}
-                <div className="space-y-3">
-                  <p 
-                    className="text-sm font-semibold"
-                    style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.9)' } : { color: '#6b7280' }}
-                  >
-                    What's included:
-                  </p>
-                  <ul className="space-y-2">
-                    {pkg.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <CheckIcon 
-                          className="w-4 h-4 flex-shrink-0 mt-1"
-                          style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#16a34a' }}
-                        />
-                        <span className="text-sm">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 };
