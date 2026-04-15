@@ -49,116 +49,34 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
   const [selectedAdPackage, setSelectedAdPackage] = useState<any>(null);
   const [adBillingCycle, setAdBillingCycle] = useState<"MONTHLY" | "YEARLY">("MONTHLY");
   const [showAdPackageModal, setShowAdPackageModal] = useState(false);
+  const [adPackages, setAdPackages] = useState<any[]>([]);
+  const [loadingAdPackages, setLoadingAdPackages] = useState(true);
+  const [adPackagesError, setAdPackagesError] = useState<string | null>(null);
 
   const PRICING = {
     MONTHLY: { price: 100, duration: "1 month" },
     YEARLY: { price: 1008, duration: "12 months", savings: 192 },
   };
 
-  const ADVERTISING_PACKAGES = [
-    {
-      id: 'advert1',
-      packageId: 'advert1',
-      name: "Advert 1",
-      description: "Small landscape ads with static placement",
-      monthlyPrice: 250,
-      yearlyPrice: 2400,
-      yearlyDiscount: "20% DISCOUNT",
-      features: [
-        "Placement: Home page, Under advertisements",
-        "Small landscape ads",
-        "Static placement",
-        "Perfect for service-based businesses",
-        "Affordable entry point for advertising"
-      ],
-      popular: false,
-    },
-    {
-      id: 'advert2',
-      packageId: 'advert2',
-      name: "Advert 2",
-      description: "Portrait ads with 4-second slideshow",
-      monthlyPrice: 550,
-      yearlyPrice: 5280,
-      yearlyDiscount: "20% DISCOUNT",
-      features: [
-        "Placement: Home page",
-        "Portrait format ads",
-        "4 seconds slideshow rotation",
-        "Higher visibility on home page",
-        "Ideal for retail and eCommerce"
-      ],
-      popular: false,
-    },
-    {
-      id: 'advert3',
-      packageId: 'advert3',
-      name: "Advert 3",
-      description: "Landscape ads with 7-second rotation",
-      monthlyPrice: 1000,
-      yearlyPrice: 9600,
-      yearlyDiscount: "20% DISCOUNT",
-      features: [
-        "Placement: Below category page, above & below 'Claim your listing'",
-        "Landscape format ads",
-        "7 seconds slideshow rotation",
-        "High engagement placement",
-        "Great for property and seasonal businesses"
-      ],
-      popular: false,
-    },
-    {
-      id: 'advert4',
-      packageId: 'advert4',
-      name: "Advert 4",
-      description: "Premium top category placement",
-      monthlyPrice: 1500,
-      yearlyPrice: 14400,
-      yearlyDiscount: "20% DISCOUNT",
-      features: [
-        "Placement: Top category page",
-        "Landscape format ads",
-        "10 seconds slideshow rotation",
-        "Prime real estate placement",
-        "Maximum visibility for premium brands"
-      ],
-      popular: true,
-    },
-    {
-      id: 'advert5',
-      packageId: 'advert5',
-      name: "Advert 5",
-      description: "Big landscape ads with extended rotation",
-      monthlyPrice: 2000,
-      yearlyPrice: 19200,
-      yearlyDiscount: "20% DISCOUNT",
-      features: [
-        "Placement: Below packages section",
-        "Big landscape ads",
-        "15 seconds slideshow rotation",
-        "Extended visibility window",
-        "Ideal for major announcements and promotions"
-      ],
-      popular: false,
-    },
-    {
-      id: 'promotions',
-      packageId: 'promotions',
-      name: "Promotions",
-      description: "Premium promotional campaigns with big landscape ads",
-      monthlyPrice: 2500,
-      yearlyPrice: 24000,
-      yearlyDiscount: "20% DISCOUNT",
-      features: [
-        "Placement: Promotions section",
-        "Big landscape ads",
-        "15 seconds slideshow rotation",
-        "Featured promotional placement",
-        "Best for special offers and limited-time campaigns"
-      ],
-      popular: false,
-    }
-  ];
+  // Fetch advertising packages from database
+  useEffect(() => {
+    const fetchAdPackages = async () => {
+      try {
+        setLoadingAdPackages(true);
+        const res = await fetch('/api/advertising/packages');
+        if (!res.ok) throw new Error('Failed to fetch packages');
+        const data = await res.json();
+        setAdPackages(data.packages || []);
+        setAdPackagesError(null);
+      } catch (error) {
+        console.error('Error fetching ad packages:', error);
+        setAdPackagesError(error instanceof Error ? error.message : 'Failed to load packages');
+      } finally {
+        setLoadingAdPackages(false);
+      }
+    };
+    fetchAdPackages();
+  }, []);
 
   // Fetch existing featured space
   useEffect(() => {
@@ -433,18 +351,28 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {ADVERTISING_PACKAGES.map((pkg) => (
-              <div
-                key={pkg.id}
-                className={`relative rounded-lg overflow-hidden transition-all duration-300 shadow-md hover:shadow-lg border cursor-pointer transform hover:scale-105 ${
-                  pkg.popular
-                    ? "bg-gradient-to-br from-orange-500 to-red-600 text-white md:scale-105 md:-mt-2 border-orange-400"
-                    : "bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-100"
-                }`}
-                onClick={() => {
-                  setSelectedAdPackage(pkg);
-                  setShowAdPackageModal(true);
-                }}
+            {loadingAdPackages ? (
+              <div className="col-span-full text-center py-8">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <p className="text-gray-600 dark:text-gray-400 mt-2">Loading advertising packages...</p>
+              </div>
+            ) : adPackagesError ? (
+              <div className="col-span-full bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded p-4 text-red-600 dark:text-red-400">
+                <p>Error loading packages: {adPackagesError}</p>
+              </div>
+            ) : adPackages.length === 0 ? (
+              <div className="col-span-full text-center text-gray-500 dark:text-gray-400 py-8">
+                <p>No advertising packages available</p>
+              </div>
+            ) : (
+              adPackages.map((pkg) => (
+                <div
+                  key={pkg.packageId}
+                  className="relative rounded-lg overflow-hidden transition-all duration-300 shadow-md hover:shadow-lg border cursor-pointer transform hover:scale-105 bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-100"
+                  onClick={() => {
+                    setSelectedAdPackage(pkg);
+                    setShowAdPackageModal(true);
+                  }}
               >
                 {pkg.popular && (
                   <div className="absolute top-0 right-0 bg-amber-400 text-neutral-900 px-2 py-0.5 text-xs font-semibold rounded-bl z-10">
@@ -530,7 +458,8 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
                   </div>
                 </div>
               </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 
