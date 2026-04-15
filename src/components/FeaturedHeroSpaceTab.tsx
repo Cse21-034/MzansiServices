@@ -425,7 +425,7 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
             <p className="text-neutral-600 dark:text-neutral-400">Choose the right advertising package for your business to reach customers on our platform</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {ADVERTISING_PACKAGES.map((pkg) => (
               <div
                 key={pkg.id}
@@ -445,10 +445,10 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
                   </div>
                 )}
 
-                <div className="p-3">
+                <div className="p-4 flex flex-col h-full">
                   <h4 className="text-sm font-bold mb-1">{pkg.name}</h4>
                   <p 
-                    className="text-xs mb-2"
+                    className="text-xs mb-2 line-clamp-2"
                     style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.9)' } : { color: '#6b7280' }}
                   >
                     {pkg.description}
@@ -490,19 +490,19 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
 
                   <div className="mb-3">
                     {pkg.popular ? (
-                      <ButtonPrimary className="w-full bg-white text-neutral-900 hover:bg-neutral-100 py-1 text-xs">
+                      <ButtonPrimary className="w-full bg-white text-neutral-900 hover:bg-neutral-100 py-1.5 text-xs">
                         Subscribe
                       </ButtonPrimary>
                     ) : (
                       <ButtonSecondary 
-                        className={`w-full py-1 text-xs ${pkg.popular ? 'border-white text-white' : 'border-neutral-300 dark:border-neutral-600'}`}
+                        className={`w-full py-1.5 text-xs ${pkg.popular ? 'border-white text-white' : 'border-neutral-300 dark:border-neutral-600'}`}
                       >
                         Subscribe
                       </ButtonSecondary>
                     )}
                   </div>
 
-                  <div className="space-y-1">
+                  <div className="space-y-1 flex-grow">
                     <p 
                       className="text-xs font-semibold"
                       style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.9)' } : { color: '#6b7280' }}
@@ -510,13 +510,13 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
                       Includes:
                     </p>
                     <ul className="space-y-1">
-                      {pkg.features.slice(0, 3).map((feature, idx) => (
-                        <li key={idx} className="flex items-start gap-1">
+                      {pkg.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-start gap-1.5">
                           <CheckIcon 
                             className="w-3 h-3 flex-shrink-0 mt-0.5"
                             style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#16a34a' }}
                           />
-                          <span className="text-xs line-clamp-1">{feature}</span>
+                          <span className="text-xs">{feature}</span>
                         </li>
                       ))}
                     </ul>
