@@ -105,24 +105,59 @@ export async function POST(request: NextRequest) {
     // Create transaction reference
     const reference = `AD_${businessId}_${packageId}_${Date.now()}`;
 
-    // Create advertising subscription record (initially PENDING payment)
-    const adSubscription = await prisma.advertisingSubscription.create({
-      data: {
-        businessId,
-        packageId,
-        adTitle,
-        adImageUrl,
-        destinationUrl,
-        billingCycle: billingCycle as any,
-        monthlyPrice,
-        yearlyPrice,
-        startDate: now,
-        expiryDate,
-        nextBillingDate,
-        status: 'ACTIVE', // Will remain ACTIVE (payment status tracked separately)
-        autoRenew: true,
+    // Check if business already has subscription to this package (renewal case)
+    const existingSubscription = await prisma.advertisingSubscription.findUnique({
+      where: {
+        businessId_packageId: {
+          businessId,
+          packageId,
+        },
       },
     });
+
+    let adSubscription;
+
+    if (existingSubscription) {
+      // Renewal: Update existing subscription
+      console.log(`[Purchase] Renewing existing subscription for ${businessId}/${packageId}`);
+      adSubscription = await prisma.advertisingSubscription.update({
+        where: {
+          id: existingSubscription.id,
+        },
+        data: {
+          adTitle,
+          adImageUrl,
+          destinationUrl,
+          billingCycle: billingCycle as any,
+          monthlyPrice,
+          yearlyPrice,
+          expiryDate,
+          nextBillingDate,
+          status: 'ACTIVE',
+          autoRenew: true,
+        },
+      });
+    } else {
+      // New subscription
+      console.log(`[Purchase] Creating new subscription for ${businessId}/${packageId}`);
+      adSubscription = await prisma.advertisingSubscription.create({
+        data: {
+          businessId,
+          packageId,
+          adTitle,
+          adImageUrl,
+          destinationUrl,
+          billingCycle: billingCycle as any,
+          monthlyPrice,
+          yearlyPrice,
+          startDate: now,
+          expiryDate,
+          nextBillingDate,
+          status: 'ACTIVE',
+          autoRenew: true,
+        },
+      });
+    }
 
     // Create AdPayment record to track the transaction
     const adPayment = await prisma.adPayment.create({
