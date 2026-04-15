@@ -148,16 +148,14 @@ export const authOptions: NextAuthOptions = {
         const userRole = (user as any).role;
         console.log('🔐 User role detected:', userRole);
         
-        if (userRole === 'ADMIN') {
-          console.log('➡️ Redirecting admin to admin dashboard');
-          return `${baseUrl}/solidacare/data/add/admin`;
-        } else if (userRole === 'BUSINESS') {
+        if (userRole === 'BUSINESS') {
           console.log('➡️ Redirecting business to business dashboard');
           return `${baseUrl}/business`;
         } else if (userRole === 'USER') {
           console.log('➡️ Redirecting user to user dashboard');
           return `${baseUrl}/usersdashboard`;
         }
+        // Admin users will not be auto-redirected
       }
 
       // Allows relative callback URLs

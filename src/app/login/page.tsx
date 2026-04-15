@@ -24,13 +24,12 @@ const PageLogin: FC<PageLoginProps> = ({}) => {
   useEffect(() => {
     if (session?.user) {
       const role = (session.user as any)?.role;
-      if (role === 'ADMIN') {
-        router.push('/solidacare/data/add/admin');
-      } else if (role === 'BUSINESS') {
+      if (role === 'BUSINESS') {
         router.push('/business');
       } else if (role === 'USER') {
         router.push('/usersdashboard');
       }
+      // Admin users will not be auto-redirected
     }
   }, [session, router]);
 
@@ -69,9 +68,7 @@ const PageLogin: FC<PageLoginProps> = ({}) => {
         
         if (updatedSession?.user) {
           const role = updatedSession.user.role;
-          if (role === 'ADMIN') {
-            router.push('/solidacare/data/add/admin');
-          } else if (role === 'BUSINESS') {
+          if (role === 'BUSINESS') {
             router.push('/business');
           } else if (role === 'USER') {
             router.push('/usersdashboard');
