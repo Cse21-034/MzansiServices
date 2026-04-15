@@ -166,30 +166,87 @@ export function AdUploadForm({
     return result.imageUrl;
   };
 
-  const proceedToPayment = () => {
+  const proceedToPayment = async () => {
     if (!checkoutData) return;
 
-    // Create a form to submit directly to PayGate (browser-side)
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = checkoutData.initiateUrl;
+    try {
+      setLoading(true);
+      console.log('[ProceedToPayment] Starting payment process...');
 
-    // Add all checkout params as hidden fields
-    Object.entries(checkoutData.params).forEach(([key, value]) => {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = key;
-      input.value = String(value);
-      form.appendChild(input);
-    });
+      // Step 1: Call initiate.trans via server proxy to get PAY_REQUEST_ID
+      console.log('[ProceedToPayment] Step 1: Calling /api/advertising/initiate');
+      const initiateResponse = await fetch('/api/advertising/initiate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          params: checkoutData.params,
+          reference: checkoutData.params.REFERENCE,
+        }),
+      });
 
-    document.body.appendChild(form);
-    form.submit();
+      if (!initiateResponse.ok) {
+        const data = await initiateResponse.json();
+        throw new Error(data.error || 'Failed to initiate payment');
+      }
+
+      const initiateData = await initiateResponse.json();
+      const payRequestId = initiateData.payRequestId;
+      console.log('[ProceedToPayment] ✅ Got PAY_REQUEST_ID:', payRequestId);
+
+      // Step 2: Get process.trans parameters
+      console.log('[ProceedToPayment] Step 2: Calling /api/advertising/process');
+      const processResponse = await fetch('/api/advertising/process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          payRequestId,
+          reference: checkoutData.params.REFERENCE,
+        }),
+      });
+
+      if (!processResponse.ok) {
+        const data = await processResponse.json();
+        throw new Error(data.error || 'Failed to get process parameters');
+      }
+
+      const processData = await processResponse.json();
+      console.log('[ProceedToPayment] ✅ Got process parameters');
+
+      // Step 3: Auto-submit form to PayGate's process.trans
+      console.log('[ProceedToPayment] Step 3: Submitting to process.trans');
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = processData.processUrl;
+
+      Object.entries(processData.params).forEach(([key, value]) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = String(value);
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+      console.log('[ProceedToPayment] Redirecting to PayGate...');
+      form.submit();
+    } catch (error) {
+      console.error('[ProceedToPayment] Error:', error);
+      setError(error instanceof Error ? error.message : 'Payment submission failed');
+      setLoading(false);
+    }
   };
 
   if (success && checkoutData) {
     return (
       <div className="space-y-4">
+        {/* Error Alert */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <p className="text-red-700 text-sm">{error}</p>
+          </div>
+        )}
+
         {/* Success Message */}
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
           <div className="flex items-center gap-2 text-green-700 font-semibold mb-2">
@@ -243,9 +300,17 @@ export function AdUploadForm({
         <div className="flex gap-3">
           <button
             onClick={proceedToPayment}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition"
+            disabled={loading}
+            className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition flex items-center justify-center gap-2"
           >
-            Proceed to Payment
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Processing Payment...
+              </>
+            ) : (
+              'Proceed to Payment'
+            )}
           </button>
           <button
             onClick={() => {
@@ -255,7 +320,8 @@ export function AdUploadForm({
               setImageFile(null);
               setImagePreview('');
             }}
-            className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg transition"
+            disabled={loading}
+            className="flex-1 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg transition"
           >
             Create Another
           </button>
