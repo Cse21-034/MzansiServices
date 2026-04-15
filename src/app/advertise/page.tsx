@@ -172,6 +172,8 @@ const AdvertiseWithUsPage: FC = () => {
       popular: true,
     }
   ];
+
+  const webDevelopmentPackages = [
     {
       name: "Informational Website",
       price: "P3500",
