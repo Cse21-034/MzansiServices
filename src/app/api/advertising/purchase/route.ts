@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
     // Create transaction reference
     const reference = `AD_${businessId}_${packageId}_${Date.now()}`;
 
-    // Create advertising subscription record (initially not activated)
+    // Create advertising subscription record (initially PENDING payment)
     const adSubscription = await prisma.advertisingSubscription.create({
       data: {
         businessId,
@@ -119,19 +119,20 @@ export async function POST(request: NextRequest) {
         startDate: now,
         expiryDate,
         nextBillingDate,
-        status: 'ACTIVE', // Will update to ACTIVE only after payment succeeds
+        status: 'ACTIVE', // Will remain ACTIVE (payment status tracked separately)
         autoRenew: true,
       },
     });
 
-    // Create Payment record
-    const payment = await prisma.payment.create({
+    // Create AdPayment record to track the transaction
+    const adPayment = await prisma.adPayment.create({
       data: {
-        subscriptionId: 'temp', // Temporary - we'll use this as a link
-        paymentGatewayId: reference,
-        transactionRef: reference,
+        adSubscriptionId: adSubscription.id,
         amount,
         currency: 'NAD',
+        billingCycle: billingCycle as any,
+        paymentGatewayId: reference,
+        transactionRef: reference,
         status: 'PENDING',
         paymentMethod: 'PayGate',
       },

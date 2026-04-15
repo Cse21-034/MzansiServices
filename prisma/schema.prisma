@@ -527,7 +527,6 @@ model AdvertisingSubscription {
   autoRenew       Boolean   @default(true) @map("auto_renew")
   
   // Payment tracking
-  paymentId       String?   @map("payment_id") // Link to Payment record
   lastPaymentDate DateTime? @map("last_payment_date")
   
   // Analytics
@@ -538,8 +537,10 @@ model AdvertisingSubscription {
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
   
+  // Relations
   business        Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
   package         AdvertisementPackage @relation(fields: [packageId], references: [packageId])
+  payments        AdPayment[]
   analytics       AdAnalytics[]
   
   @@unique([businessId, packageId])
@@ -572,6 +573,35 @@ model AdAnalytics {
   @@index([eventType])
   @@index([eventDate])
   @@map("ad_analytics")
+}
+
+model AdPayment {
+  id                String    @id @default(cuid())
+  adSubscriptionId  String    @map("ad_subscription_id")
+  
+  // Payment details
+  amount            Float
+  currency          String    @default("NAD")
+  billingCycle      BillingCycle @default(MONTHLY) @map("billing_cycle")
+  
+  // PayGate details
+  paymentGatewayId  String    @map("payment_gateway_id") // PayGate TRANSACTION_ID
+  payRequestId      String?   @unique @map("pay_request_id") // PayGate PAY_REQUEST_ID from initiate.trans
+  transactionRef    String?   @unique @map("transaction_ref") // PayGate REFERENCE (AD_businessId_packageId_timestamp)
+  
+  // Status
+  status            PaymentStatus @default(PENDING) @map("status")
+  paymentMethod     String?   @map("payment_method")
+  failureReason     String?   @map("failure_reason")
+  
+  // Dates
+  paidAt            DateTime? @map("paid_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  
+  adSubscription    AdvertisingSubscription @relation(fields: [adSubscriptionId], references: [id], onDelete: Cascade)
+  
+  @@map("ad_payments")
 }
 
 // Enums

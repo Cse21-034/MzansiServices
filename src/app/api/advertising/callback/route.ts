@@ -41,24 +41,25 @@ export async function POST(request: NextRequest) {
     const isSuccess = data.TRANSACTION_STATUS === '1';
     console.log('[AdCallback] Transaction result:', isSuccess ? 'SUCCESS' : 'FAILED');
 
-    // Find payment by REFERENCE
-    const payment = await prisma.payment.findUnique({
+    // Find ad payment by REFERENCE
+    const adPayment = await prisma.adPayment.findUnique({
       where: { transactionRef: data.REFERENCE },
+      include: { adSubscription: true },
     });
 
-    if (!payment) {
-      console.error('[AdCallback] ❌ Payment record not found for reference:', data.REFERENCE);
+    if (!adPayment) {
+      console.error('[AdCallback] ❌ Ad payment record not found for reference:', data.REFERENCE);
       return new NextResponse('OK');
     }
 
-    console.log('[AdCallback] ✅ Found payment:', payment.id);
+    console.log('[AdCallback] ✅ Found ad payment:', adPayment.id);
 
     if (!isSuccess) {
       console.log('[AdCallback] Payment failed - updating to FAILED status');
 
-      // Update payment to failed
-      await prisma.payment.update({
-        where: { id: payment.id },
+      // Update ad payment to failed
+      await prisma.adPayment.update({
+        where: { id: adPayment.id },
         data: {
           status: 'FAILED',
           failureReason: data.FAILURE_REASON || 'Payment declined at gateway',
@@ -66,37 +67,16 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      console.log('[AdCallback] ⚠️ Marked payment as FAILED and ad as INACTIVE');
-      
-      // Also mark advertising subscription as inactive
-      // Extract subscription ID from reference if possible (AD_{businessId}_{packageId}_{timestamp})
-      const refParts = data.REFERENCE.split('_');
-      if (refParts[0] === 'AD') {
-        const businessId = refParts[1];
-        const packageId = refParts[2];
-        
-        await prisma.advertisingSubscription.updateMany({
-          where: {
-            businessId,
-            packageId,
-            status: 'ACTIVE', // Only if still active
-            paymentId: null, // Not yet linked to successful payment
-          },
-          data: {
-            status: 'INACTIVE',
-          },
-        });
-      }
-
+      console.log('[AdCallback] ⚠️ Marked ad payment as FAILED');
       return new NextResponse('OK');
     }
 
     // Payment successful - update records
-    console.log('[AdCallback] Payment successful - updating advertising subscription...');
+    console.log('[AdCallback] Payment successful - updating ad payment...');
 
-    // Update payment to completed
-    await prisma.payment.update({
-      where: { id: payment.id },
+    // Update ad payment to completed
+    await prisma.adPayment.update({
+      where: { id: adPayment.id },
       data: {
         status: 'COMPLETED',
         paidAt: new Date(),
@@ -104,29 +84,18 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    console.log('[AdCallback] ✅ Payment marked as COMPLETED');
+    console.log('[AdCallback] ✅ Ad payment marked as COMPLETED');
 
-    // Update advertising subscription - link to payment and mark as active
-    const refParts = data.REFERENCE.split('_');
-    if (refParts[0] === 'AD') {
-      const businessId = refParts[1];
-      const packageId = refParts[2];
-      
-      await prisma.advertisingSubscription.updateMany({
-        where: {
-          businessId,
-          packageId,
-          status: 'ACTIVE', // Should already be ACTIVE from creation
-        },
-        data: {
-          paymentId: payment.id,
-          lastPaymentDate: new Date(),
-          status: 'ACTIVE', // Ensure it's active
-        },
-      });
+    // Update advertising subscription - mark as active and set last payment date
+    await prisma.advertisingSubscription.update({
+      where: { id: adPayment.adSubscription.id },
+      data: {
+        lastPaymentDate: new Date(),
+        status: 'ACTIVE', // Ensure it's active
+      },
+    });
 
-      console.log('[AdCallback] ✅ Advertising subscription activated and linked to payment');
-    }
+    console.log('[AdCallback] ✅ Advertising subscription activated and payment date updated');
 
     // Log success
     console.log('[AdCallback] ===== COMPLETE (SUCCESS) =====');
