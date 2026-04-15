@@ -146,22 +146,24 @@ export function AdUploadForm({
     }
   };
 
-  // Upload image to temporary storage
-  // TODO: Replace with Supabase/S3 upload
+  // Upload image to Supabase Storage
   const uploadImage = async (file: File): Promise<string> => {
-    // For MVP, return data URL or upload to a temporary service
-    // In production:
-    // 1. Upload to Supabase Storage: supabase.storage.from('ads').upload(...)
-    // 2. Or AWS S3: s3Client.putObject(...)
-    // 3. Get signed URL for retrieval
-    
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        resolve(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('businessId', businessId);
+
+    const response = await fetch('/api/advertising/upload-image', {
+      method: 'POST',
+      body: formData,
     });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || 'Failed to upload image');
+    }
+
+    const result = await response.json();
+    return result.imageUrl;
   };
 
   const proceedToPayment = () => {
