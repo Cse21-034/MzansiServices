@@ -28,14 +28,27 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.email) {
+    // Get session with error handling
+    let session;
+    try {
+      session = await getServerSession(authOptions);
+    } catch (sessionError) {
+      console.error('[UploadImage] Session error:', sessionError);
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: 'Session processing error' },
         { status: 401 }
       );
     }
+
+    if (!session?.user?.email) {
+      console.log('[UploadImage] No authenticated session');
+      return NextResponse.json(
+        { error: 'Unauthorized - please log in' },
+        { status: 401 }
+      );
+    }
+
+    console.log('[UploadImage] Authenticated:', session.user.email);
 
     const formData = await request.formData();
     const file = formData.get('file') as File;
