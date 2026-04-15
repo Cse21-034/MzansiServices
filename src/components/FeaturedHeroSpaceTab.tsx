@@ -1,7 +1,7 @@
 "use client";
 
 import React, { FC, useState, useEffect } from "react";
-import { SparklesIcon, PhotoIcon, CalendarIcon, CurrencyDollarIcon, CheckCircleIcon, ClockIcon } from "@heroicons/react/24/outline";
+import { SparklesIcon, PhotoIcon, CalendarIcon, CurrencyDollarIcon, CheckCircleIcon, ClockIcon, CheckIcon } from "@heroicons/react/24/outline";
 import ButtonPrimary from "@/shared/ButtonPrimary";
 import ButtonSecondary from "@/shared/ButtonSecondary";
 import Input from "@/shared/Input";
@@ -48,6 +48,105 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
     MONTHLY: { price: 100, duration: "1 month" },
     YEARLY: { price: 1008, duration: "12 months", savings: 192 },
   };
+
+  const ADVERTISING_PACKAGES = [
+    {
+      id: 'advert1',
+      name: "Advert 1",
+      description: "Small landscape ads with static placement",
+      monthlyPrice: 250,
+      yearlyPrice: 2400,
+      yearlyDiscount: "20% DISCOUNT",
+      features: [
+        "Placement: Home page, Under advertisements",
+        "Small landscape ads",
+        "Static placement",
+        "Perfect for service-based businesses",
+        "Affordable entry point for advertising"
+      ],
+      popular: false,
+    },
+    {
+      id: 'advert2',
+      name: "Advert 2",
+      description: "Portrait ads with 4-second slideshow",
+      monthlyPrice: 550,
+      yearlyPrice: 5280,
+      yearlyDiscount: "20% DISCOUNT",
+      features: [
+        "Placement: Home page",
+        "Portrait format ads",
+        "4 seconds slideshow rotation",
+        "Higher visibility on home page",
+        "Ideal for retail and eCommerce"
+      ],
+      popular: false,
+    },
+    {
+      id: 'advert3',
+      name: "Advert 3",
+      description: "Landscape ads with 7-second rotation",
+      monthlyPrice: 1000,
+      yearlyPrice: 9600,
+      yearlyDiscount: "20% DISCOUNT",
+      features: [
+        "Placement: Below category page, above & below 'Claim your listing'",
+        "Landscape format ads",
+        "7 seconds slideshow rotation",
+        "High engagement placement",
+        "Great for property and seasonal businesses"
+      ],
+      popular: false,
+    },
+    {
+      id: 'advert4',
+      name: "Advert 4",
+      description: "Premium top category placement",
+      monthlyPrice: 1500,
+      yearlyPrice: 14400,
+      yearlyDiscount: "20% DISCOUNT",
+      features: [
+        "Placement: Top category page",
+        "Landscape format ads",
+        "10 seconds slideshow rotation",
+        "Prime real estate placement",
+        "Maximum visibility for premium brands"
+      ],
+      popular: true,
+    },
+    {
+      id: 'advert5',
+      name: "Advert 5",
+      description: "Big landscape ads with extended rotation",
+      monthlyPrice: 2000,
+      yearlyPrice: 19200,
+      yearlyDiscount: "20% DISCOUNT",
+      features: [
+        "Placement: Below packages section",
+        "Big landscape ads",
+        "15 seconds slideshow rotation",
+        "Extended visibility window",
+        "Ideal for major announcements and promotions"
+      ],
+      popular: false,
+    },
+    {
+      id: 'promotions',
+      name: "Promotions",
+      description: "Premium promotional campaigns with big landscape ads",
+      monthlyPrice: 2500,
+      yearlyPrice: 24000,
+      yearlyDiscount: "20% DISCOUNT",
+      features: [
+        "Placement: Promotions section",
+        "Big landscape ads",
+        "15 seconds slideshow rotation",
+        "Featured promotional placement",
+        "Best for special offers and limited-time campaigns"
+      ],
+      popular: false,
+    }
+  ];
 
   // Fetch existing featured space
   useEffect(() => {
@@ -482,6 +581,115 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
       >
         <p>{modalMessage}</p>
       </Modal>
+
+      {/* Advertising Rate Cards Section */}
+      <div className="mt-16 space-y-6">
+        <div>
+          <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">Advertising Rate Cards</h3>
+          <p className="text-neutral-600 dark:text-neutral-400">Choose the right advertising package for your business to reach customers on our platform</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {ADVERTISING_PACKAGES.map((pkg) => (
+            <div
+              key={pkg.id}
+              className={`relative rounded-2xl overflow-hidden transition-all duration-300 shadow-lg hover:shadow-xl border ${
+                pkg.popular
+                  ? "bg-gradient-to-br from-orange-500 to-red-600 text-white md:scale-105 md:-mt-6 border-orange-400"
+                  : "bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-100"
+              }`}
+            >
+              {pkg.popular && (
+                <div className="absolute top-0 right-0 bg-amber-400 text-neutral-900 px-4 py-1 text-sm font-semibold rounded-bl-lg z-10">
+                  Most Popular
+                </div>
+              )}
+
+              <div className="p-6">
+                {/* Package Name */}
+                <h4 className="text-xl font-bold mb-2">{pkg.name}</h4>
+                <p 
+                  className="text-sm mb-4"
+                  style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.9)' } : { color: '#6b7280' }}
+                >
+                  {pkg.description}
+                </p>
+
+                {/* Price */}
+                <div className="mb-4">
+                  <div className="flex items-baseline gap-2 mb-2">
+                    <span className="text-3xl font-bold">N${pkg.monthlyPrice}</span>
+                    <span 
+                      className="text-sm"
+                      style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#6b7280' }}
+                    >
+                      p/m
+                    </span>
+                  </div>
+                  <div className="text-sm font-semibold mb-2">
+                    <span>N${pkg.yearlyPrice}</span>
+                    <span 
+                      style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#6b7280' }}
+                    >
+                      /year
+                    </span>
+                  </div>
+                  {pkg.yearlyDiscount && (
+                    <div 
+                      className="inline-block px-3 py-1 rounded-full text-xs font-bold"
+                      style={pkg.popular ? { 
+                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        color: 'rgba(255, 255, 255, 1)'
+                      } : { 
+                        backgroundColor: '#fed7aa',
+                        color: '#92400e'
+                      }}
+                    >
+                      {pkg.yearlyDiscount}
+                    </div>
+                  )}
+                </div>
+
+                {/* CTA Button */}
+                <div className="mb-6">
+                  {pkg.popular ? (
+                    <ButtonPrimary className="w-full bg-white text-neutral-900 hover:bg-neutral-100">
+                      Get Started Now
+                    </ButtonPrimary>
+                  ) : (
+                    <ButtonSecondary 
+                      className={`w-full ${pkg.popular ? 'border-white text-white' : 'border-neutral-300 dark:border-neutral-600'}`}
+                    >
+                      Choose Plan
+                    </ButtonSecondary>
+                  )}
+                </div>
+
+                {/* Features List */}
+                <div className="space-y-3">
+                  <p 
+                    className="text-sm font-semibold"
+                    style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.9)' } : { color: '#6b7280' }}
+                  >
+                    What's included:
+                  </p>
+                  <ul className="space-y-2">
+                    {pkg.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <CheckIcon 
+                          className="w-4 h-4 flex-shrink-0 mt-1"
+                          style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#16a34a' }}
+                        />
+                        <span className="text-sm">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
