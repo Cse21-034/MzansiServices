@@ -18,43 +18,101 @@ const AdvertiseWithUsPage: FC = () => {
   // Data from the PDF organized by categories
   const valueAddedPackages = [
     {
-      name: "Package 1",
-      price: "N$100–500",
+      name: "Advert 1",
+      price: "N$250",
+      yearPrice: "N$2400",
       period: "p/m",
-      description: "Basic membership with essential features",
+      yearPeriod: "/year",
+      discount: "20% DISCOUNT",
+      description: "Small landscape ads with static placement",
       features: [
-        "Free membership on the online directory",
-        "Free business advertisement",
-        "Unlimited photos under business profile",
-        "eCommerce portal for online transactions",
-        "2 free products listings",
-        "Unlimited photos under product listing",
-        "Business domain",
-        "Business emails (1-5)",
-        "Cloud storage under business name (at least 30GB per user)",
-        "Microsoft Office licenses per user for up to devices",
-        "Intranet for your company",
-        "Free training for up to 3 users"
+        "Placement: Home page, Under advertisements",
+        "Small landscape ads",
+        "Static placement",
+        "Perfect for service-based businesses",
+        "Affordable entry point for advertising"
       ],
     },
     {
-      name: "Package 2",
-      price: "N$1000",
+      name: "Advert 2",
+      price: "N$550",
+      yearPrice: "N$5280",
       period: "p/m",
-      description: "Enhanced package with social media features",
+      yearPeriod: "/year",
+      discount: "20% DISCOUNT",
+      description: "Portrait ads with 4-second slideshow",
       features: [
-        "All items under Package 1",
-        "Cloud storage under business name (up to 1TB per user)",
-        "WhatsApp for Business connected to social media",
-        "Social Media Business Pages (2 platforms of choice)",
-        "Revamp if pages already exist",
-        "1 cover photo design per page",
-        "1 profile picture design per page",
-        "2 flyer designs per page per month",
-        "1 limited paid/boosted social media marketing advert*",
-        "*Ts & Cs apply"
+        "Placement: Home page",
+        "Portrait format ads",
+        "4 seconds slideshow rotation",
+        "Higher visibility on home page",
+        "Ideal for retail and eCommerce"
+      ],
+    },
+    {
+      name: "Advert 3",
+      price: "N$1000",
+      yearPrice: "N$9600",
+      period: "p/m",
+      yearPeriod: "/year",
+      discount: "20% DISCOUNT",
+      description: "Landscape ads with 7-second rotation",
+      features: [
+        "Placement: Below category page, above & below 'Claim your listing'",
+        "Landscape format ads",
+        "7 seconds slideshow rotation",
+        "High engagement placement",
+        "Great for property and seasonal businesses"
+      ],
+    },
+    {
+      name: "Advert 4",
+      price: "N$1500",
+      yearPrice: "N$14400",
+      period: "p/m",
+      yearPeriod: "/year",
+      discount: "20% DISCOUNT",
+      description: "Premium top category placement",
+      features: [
+        "Placement: Top category page",
+        "Landscape format ads",
+        "10 seconds slideshow rotation",
+        "Prime real estate placement",
+        "Maximum visibility for premium brands"
       ],
       popular: true,
+    },
+    {
+      name: "Advert 5",
+      price: "N$2000",
+      yearPrice: "N$19200",
+      period: "p/m",
+      yearPeriod: "/year",
+      discount: "20% DISCOUNT",
+      description: "Big landscape ads with extended rotation",
+      features: [
+        "Placement: Below packages section",
+        "Big landscape ads",
+        "15 seconds slideshow rotation",
+        "Extended visibility window",
+        "Ideal for major announcements and promotions"
+      ],
+    },
+    {
+      name: "Promotions",
+      price: "N$2500",
+      yearPrice: "N$24000",
+      period: "p/m",
+      yearPeriod: "/year",
+      discount: "20% DISCOUNT",
+      description: "Premium promotional campaigns with big landscape ads",
+      features: [
+        "Placement: Promotions section",
+        "Big landscape ads",
+        "15 seconds slideshow rotation",
+        "Featured promotional placement",
+        "Best for special offers and limited-time campaigns"
+      ],
     }
   ];
 
@@ -322,13 +380,39 @@ const AdvertiseWithUsPage: FC = () => {
 
                 {/* Price */}
                 <div className="mb-4">
-                  <span className="text-3xl font-bold">{pkg.price}</span>
-                  <span 
-                    className="ml-2"
-                    style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#6b7280' }}
-                  >
-                    {pkg.period}
-                  </span>
+                  <div className="flex items-baseline gap-2 mb-2">
+                    <span className="text-3xl font-bold">{pkg.price}</span>
+                    <span 
+                      className="text-sm"
+                      style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#6b7280' }}
+                    >
+                      {pkg.period}
+                    </span>
+                  </div>
+                  {pkg.yearPrice && (
+                    <div className="text-sm font-semibold mb-2">
+                      <span>{pkg.yearPrice}</span>
+                      <span 
+                        style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#6b7280' }}
+                      >
+                        {pkg.yearPeriod}
+                      </span>
+                    </div>
+                  )}
+                  {pkg.discount && (
+                    <div 
+                      className="inline-block px-3 py-1 rounded-full text-xs font-bold"
+                      style={pkg.popular ? { 
+                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        color: 'rgba(255, 255, 255, 1)'
+                      } : { 
+                        backgroundColor: `${color}20`,
+                        color: color
+                      }}
+                    >
+                      {pkg.discount}
+                    </div>
+                  )}
                 </div>
 
                 {/* Payment Plan (if exists) */}
@@ -417,10 +501,10 @@ const AdvertiseWithUsPage: FC = () => {
       </div>
 
       <div className="container">
-        {/* Value Added Services */}
+        {/* Advertising Rate Cards */}
         <ServiceSection
-          title="Value Added Services"
-          description="Comprehensive business solutions to enhance your online presence"
+          title="Advertising Rate Cards"
+          description="Choose the right advertising package for your business to reach customers on our platform"
           packages={valueAddedPackages}
           icon={BuildingStorefrontIcon}
           colorType="primary"
