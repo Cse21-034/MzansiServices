@@ -488,8 +488,9 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
                 packagePrice={adBillingCycle === 'MONTHLY' ? selectedAdPackage.monthlyPrice : selectedAdPackage.yearlyPrice}
                 billingCycle={adBillingCycle}
                 onSuccess={() => {
-                  // Optionally close modal and show success message
-                  setShowAdPackageModal(false);
+                  // Don't close modal - let user see success screen and proceed to payment
+                  // Modal will close after payment is redirected to PayGate
+                  console.log('Ad created successfully, awaiting payment...');
                 }}
                 onError={(error) => {
                   console.error('Ad creation error:', error);
