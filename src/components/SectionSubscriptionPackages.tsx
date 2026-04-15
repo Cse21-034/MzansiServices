@@ -25,12 +25,58 @@ const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = 
   const [showBusinessSelector, setShowBusinessSelector] = useState(false);
   const [selectedPlanTier, setSelectedPlanTier] = useState<string | null>(null);
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('MONTHLY');
+  const [shouldShowSection, setShouldShowSection] = useState(true);
 
   useEffect(() => {
     if (businessId) {
       fetchSubscriptionStatus();
     }
   }, [businessId]);
+
+  // 🔐 Check visibility based on user role and subscription status
+  useEffect(() => {
+    const checkVisibility = async () => {
+      // Show section for anonymous users (no session)
+      if (!session?.user) {
+        setShouldShowSection(true);
+        return;
+      }
+
+      // Hide section for USER role logged in users
+      if (session.user.role === 'USER') {
+        setShouldShowSection(false);
+        return;
+      }
+
+      // For BUSINESS owners, check if they have active subscription
+      if (session.user.role === 'BUSINESS') {
+        try {
+          // Fetch user's businesses and their subscription status
+          const response = await fetch('/api/user/businesses');
+          const data = await response.json();
+
+          if (data.businesses && Array.isArray(data.businesses)) {
+            // Check if any business has active (non-free) subscription
+            const hasActiveSubscription = data.businesses.some((biz: any) => 
+              biz.subscription?.plan?.tier && biz.subscription.plan.tier !== 'WILD_HORSES'
+            );
+
+            // Show only if NO active subscription (i.e., in free mode)
+            setShouldShowSection(!hasActiveSubscription);
+          } else {
+            // If can't fetch, show the section
+            setShouldShowSection(true);
+          }
+        } catch (error) {
+          console.error('Error checking business subscription:', error);
+          // If error, show the section
+          setShouldShowSection(true);
+        }
+      }
+    };
+
+    checkVisibility();
+  }, [session]);
 
   const fetchSubscriptionStatus = async () => {
     try {
@@ -275,6 +321,11 @@ const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = 
   };
 
   const tiers = getAllTiers();
+
+  // Hide section if conditions not met
+  if (!shouldShowSection) {
+    return null;
+  }
 
   return (
     <div className="relative pt-4">
