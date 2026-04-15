@@ -192,7 +192,6 @@ const UserDashboardPage: FC<UserDashboardPageProps> = ({}) => {
       notifications: Notification[];
     };
   } | null>(null);
-  const { data: session } = useSession();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
