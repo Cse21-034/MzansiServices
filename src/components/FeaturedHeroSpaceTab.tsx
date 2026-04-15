@@ -7,6 +7,7 @@ import ButtonSecondary from "@/shared/ButtonSecondary";
 import Input from "@/shared/Input";
 import Textarea from "@/shared/Textarea";
 import Modal from "@/shared/Modal";
+import { AdUploadForm } from "@/components/AdUploadForm";
 
 interface FeaturedSpace {
   id: string;
@@ -530,91 +531,35 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
         {/* Modal for advertising package subscription */}
         {showAdPackageModal && selectedAdPackage && (
           <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-neutral-800 rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 border border-neutral-200 dark:border-neutral-700">
-              <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100 mb-4">Subscribe to {selectedAdPackage.name}</h3>
-
-              {/* Package Description */}
-              <div className="mb-4">
-                <p className="text-sm text-neutral-600 dark:text-neutral-400">{selectedAdPackage.description}</p>
-              </div>
-
-              {/* Billing Cycle Selection */}
-              <div className="mb-4">
-                <label className="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-2">Select Billing Cycle</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => setAdBillingCycle("MONTHLY")}
-                    className={`p-3 rounded-lg border-2 transition-colors ${
-                      adBillingCycle === "MONTHLY"
-                        ? "border-primary-600 bg-primary-50 dark:bg-primary-900/20"
-                        : "border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800"
-                    }`}
-                  >
-                    <p className="font-semibold text-neutral-900 dark:text-neutral-100 text-sm mb-1">Monthly</p>
-                    <p className="text-lg font-bold text-primary-600 dark:text-primary-400">N${selectedAdPackage.monthlyPrice}</p>
-                    <p className="text-xs text-neutral-600 dark:text-neutral-400">1 month</p>
-                  </button>
-
-                  <button
-                    onClick={() => setAdBillingCycle("YEARLY")}
-                    className={`p-3 rounded-lg border-2 transition-colors ${
-                      adBillingCycle === "YEARLY"
-                        ? "border-primary-600 bg-primary-50 dark:bg-primary-900/20"
-                        : "border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800"
-                    }`}
-                  >
-                    <p className="font-semibold text-neutral-900 dark:text-neutral-100 text-sm mb-1">Yearly</p>
-                    <p className="text-lg font-bold text-primary-600 dark:text-primary-400">N${selectedAdPackage.yearlyPrice}</p>
-                    <p className="text-xs text-neutral-600 dark:text-neutral-400">12 months • {selectedAdPackage.yearlyDiscount}</p>
-                  </button>
-                </div>
-              </div>
-
-              {/* Package Duration & Total */}
-              <div className="bg-neutral-50 dark:bg-neutral-700/50 rounded-lg p-3 mb-4">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-xs text-neutral-600 dark:text-neutral-400">Package Duration:</span>
-                  <span className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{adBillingCycle === "MONTHLY" ? "1 month" : "12 months"}</span>
-                </div>
-                <div className="flex justify-between items-center pt-2 border-t border-neutral-200 dark:border-neutral-600">
-                  <span className="text-xs text-neutral-600 dark:text-neutral-400">Total Price:</span>
-                  <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
-                    N${adBillingCycle === "MONTHLY" ? selectedAdPackage.monthlyPrice : selectedAdPackage.yearlyPrice}
-                  </span>
-                </div>
-              </div>
-
-              {/* Features */}
-              <div className="mb-4">
-                <p className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-2">What's included:</p>
-                <ul className="space-y-1">
-                  {selectedAdPackage.features.map((feature: string, idx: number) => (
-                    <li key={idx} className="flex items-start gap-1.5 text-xs text-neutral-700 dark:text-neutral-300">
-                      <CheckIcon className="w-3 h-3 flex-shrink-0 mt-0.5 text-green-600 dark:text-green-400" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex gap-2">
-                <ButtonPrimary 
-                  onClick={() => {
-                    setShowAdPackageModal(false);
-                    setShowForm(true);
-                  }} 
-                  className="flex-1 justify-center py-2 text-sm"
+            <div className="bg-white dark:bg-neutral-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 border border-neutral-200 dark:border-neutral-700">
+              {/* Close Button */}
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
+                  Subscribe to {selectedAdPackage.name}
+                </h3>
+                <button
+                  onClick={() => setShowAdPackageModal(false)}
+                  className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
                 >
-                  Proceed to Payment
-                </ButtonPrimary>
-                <ButtonSecondary 
-                  onClick={() => setShowAdPackageModal(false)} 
-                  className="flex-1 justify-center py-2 text-sm"
-                >
-                  Cancel
-                </ButtonSecondary>
+                  ✕
+                </button>
               </div>
+
+              {/* Ad Upload Form */}
+              <AdUploadForm
+                businessId={businessId}
+                packageId={selectedAdPackage.id}
+                packageName={selectedAdPackage.name}
+                packagePrice={adBillingCycle === 'MONTHLY' ? selectedAdPackage.monthlyPrice : selectedAdPackage.yearlyPrice}
+                billingCycle={adBillingCycle}
+                onSuccess={() => {
+                  // Optionally close modal and show success message
+                  setShowAdPackageModal(false);
+                }}
+                onError={(error) => {
+                  console.error('Ad creation error:', error);
+                }}
+              />
             </div>
           </div>
         )}
