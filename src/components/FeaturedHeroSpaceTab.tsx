@@ -548,7 +548,7 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
               {/* Ad Upload Form */}
               <AdUploadForm
                 businessId={businessId}
-                packageId={selectedAdPackage.id}
+                packageId={selectedAdPackage.packageId}
                 packageName={selectedAdPackage.name}
                 packagePrice={adBillingCycle === 'MONTHLY' ? selectedAdPackage.monthlyPrice : selectedAdPackage.yearlyPrice}
                 billingCycle={adBillingCycle}
