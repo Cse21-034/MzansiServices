@@ -116,7 +116,62 @@ const AdvertiseWithUsPage: FC = () => {
     }
   ];
 
-  const webDevelopmentPackages = [
+  // Namibia Services Packages - Subscription Tiers
+  const namibiaServicesPackages = [
+    {
+      name: "WILD HORSES",
+      price: "Free",
+      period: "",
+      description: "Establish your business presence quickly.",
+      features: [
+        "Free business listing",
+        "Business profile",
+        "Appears in searches",
+        "1 photo upload",
+        "Reviews display",
+        "No promotions",
+      ],
+      popular: false,
+    },
+    {
+      name: "DESERT ELEPHANTS",
+      price: "N$100",
+      yearPrice: "N$1020",
+      period: "p/m",
+      yearPeriod: "/year",
+      discount: "16% DISCOUNT",
+      description: "Boost visibility and build customer trust.",
+      features: [
+        "Enhanced business profile",
+        "Photo uploads (up to 10)",
+        "Higher search ranking",
+        "Customer reviews display",
+        "Promotions and updates board",
+        "Social media links",
+        "Priority support",
+      ],
+      popular: false,
+    },
+    {
+      name: "DESERT LIONS",
+      price: "N$200",
+      yearPrice: "N$1920",
+      period: "p/m",
+      yearPeriod: "/year",
+      discount: "20% DISCOUNT",
+      description: "Unlock powerful tools for rapid growth.",
+      features: [
+        "Top search placement",
+        "Featured business badge",
+        "Video introduction",
+        "Expanded photo gallery (up to 50 photos)",
+        "Multiple branch listings (up to 5)",
+        "WhatsApp chatbot integration",
+        "Dedicated support",
+      ],
+      popular: true,
+    }
+  ];
     {
       name: "Informational Website",
       price: "P3500",
@@ -510,7 +565,17 @@ const AdvertiseWithUsPage: FC = () => {
           colorType="primary"
         />
 
-        {/* Web Development */}
+        {/* Namibia Services Packages */}
+        <ServiceSection
+          title="Namibia Services Packages"
+          description="Choose the perfect plan for your business and unlock powerful features"
+          packages={namibiaServicesPackages}
+          icon={BuildingStorefrontIcon}
+          colorType="emerald"
+        />
+
+        {/* Web Development - COMMENTED OUT */}
+        {/* 
         <ServiceSection
           title="Web Development"
           description="Professional websites tailored to your business needs"
@@ -518,8 +583,10 @@ const AdvertiseWithUsPage: FC = () => {
           icon={ComputerDesktopIcon}
           colorType="emerald"
         />
+        */}
 
-        {/* Branding Suite/Graphic Design */}
+        {/* Branding Suite/Graphic Design - COMMENTED OUT */}
+        {/* 
         <ServiceSection
           title="Branding Suite / Graphic Design"
           description="Complete branding solutions to establish your business identity"
@@ -527,8 +594,10 @@ const AdvertiseWithUsPage: FC = () => {
           icon={PaintBrushIcon}
           colorType="amber"
         />
+        */}
 
-        {/* Social Media Marketing */}
+        {/* Social Media Marketing - COMMENTED OUT */}
+        {/* 
         <ServiceSection
           title="Social Media Marketing"
           description="Boost your social media presence with our expert management"
@@ -536,6 +605,7 @@ const AdvertiseWithUsPage: FC = () => {
           icon={MegaphoneIcon}
           colorType="rose"
         />
+        */}
       </div>
 
       {/* Note about pricing */}
