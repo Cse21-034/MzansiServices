@@ -58,6 +58,7 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
   const ADVERTISING_PACKAGES = [
     {
       id: 'advert1',
+      packageId: 'advert1',
       name: "Advert 1",
       description: "Small landscape ads with static placement",
       monthlyPrice: 250,
@@ -74,6 +75,7 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
     },
     {
       id: 'advert2',
+      packageId: 'advert2',
       name: "Advert 2",
       description: "Portrait ads with 4-second slideshow",
       monthlyPrice: 550,
@@ -90,6 +92,7 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
     },
     {
       id: 'advert3',
+      packageId: 'advert3',
       name: "Advert 3",
       description: "Landscape ads with 7-second rotation",
       monthlyPrice: 1000,
@@ -106,6 +109,7 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
     },
     {
       id: 'advert4',
+      packageId: 'advert4',
       name: "Advert 4",
       description: "Premium top category placement",
       monthlyPrice: 1500,
@@ -122,6 +126,7 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
     },
     {
       id: 'advert5',
+      packageId: 'advert5',
       name: "Advert 5",
       description: "Big landscape ads with extended rotation",
       monthlyPrice: 2000,
@@ -138,6 +143,7 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
     },
     {
       id: 'promotions',
+      packageId: 'promotions',
       name: "Promotions",
       description: "Premium promotional campaigns with big landscape ads",
       monthlyPrice: 2500,
