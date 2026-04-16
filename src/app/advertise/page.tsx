@@ -546,7 +546,7 @@ const AdvertiseWithUsPage: FC = () => {
       {/* Header */}
       <div className="container text-center mb-16">
         <h1 className="text-4xl lg:text-5xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">
-          Namibia Services
+          Mzansi Services
         </h1>
         <h2 className="text-2xl lg:text-3xl font-semibold mb-2" style={{ color: brandColors.primary }}>
           Beyond Excellence
