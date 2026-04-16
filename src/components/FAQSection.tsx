@@ -63,7 +63,7 @@ const faqData: FAQItem[] = [
     {
         question: "Is it possible to pay once-off annually versus monthly?",
         answer: "Yes, arrangements can be made and the payment options are available on the Mzansi Services™ platform. The once-off annual payment would grant you eligibility for a discount."
-    }
+    },
     {
         question: "Are there more payment options?",
         answer: "You can use your conventional VISA bank card, Mastercard, or local payment methods. We also accept EFT and direct deposits."
