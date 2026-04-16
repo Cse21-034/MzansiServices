@@ -8,6 +8,7 @@ import Input from "@/shared/Input";
 import Textarea from "@/shared/Textarea";
 import Modal from "@/shared/Modal";
 import { AdUploadForm } from "@/components/AdUploadForm";
+import { AdAnalyticsDashboard } from "@/components/AdAnalyticsDashboard";
 
 interface FeaturedSpace {
   id: string;
@@ -52,6 +53,12 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
   const [adPackages, setAdPackages] = useState<any[]>([]);
   const [loadingAdPackages, setLoadingAdPackages] = useState(true);
   const [adPackagesError, setAdPackagesError] = useState<string | null>(null);
+  
+  // State for user's subscribed ads
+  const [subscriptions, setSubscriptions] = useState<any[]>([]);
+  const [loadingSubscriptions, setLoadingSubscriptions] = useState(true);
+  const [subscriptionsError, setSubscriptionsError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"available" | "my-ads">("available");
 
   const PRICING = {
     MONTHLY: { price: 100, duration: "1 month" },
@@ -77,6 +84,28 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
     };
     fetchAdPackages();
   }, []);
+
+  // Fetch user's subscribed ads
+  useEffect(() => {
+    const fetchSubscriptions = async () => {
+      try {
+        setLoadingSubscriptions(true);
+        const res = await fetch(`/api/advertising/subscriptions?businessId=${businessId}`);
+        if (!res.ok) throw new Error('Failed to fetch subscriptions');
+        const data = await res.json();
+        setSubscriptions(data.data || []);
+        setSubscriptionsError(null);
+      } catch (error) {
+        console.error('Error fetching subscriptions:', error);
+        setSubscriptionsError(error instanceof Error ? error.message : 'Failed to load subscriptions');
+      } finally {
+        setLoadingSubscriptions(false);
+      }
+    };
+    if (businessId) {
+      fetchSubscriptions();
+    }
+  }, [businessId]);
 
   // Fetch existing featured space
   useEffect(() => {
@@ -343,125 +372,223 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
   if (!showForm) {
     return (
       <div className="space-y-12">
-        {/* Advertising Rate Cards Section */}
-        <div>
-          <div className="mb-8">
-            <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">Advertising Rate Cards</h3>
-            <p className="text-neutral-600 dark:text-neutral-400">Choose the right advertising package for your business to reach customers on our platform</p>
-          </div>
+        {/* Tabs for Available Packages and My Ads */}
+        <div className="flex gap-4 border-b border-neutral-200 dark:border-neutral-700">
+          <button
+            onClick={() => setActiveTab("available")}
+            className={`px-4 py-3 font-medium transition-colors ${
+              activeTab === "available"
+                ? "border-b-2 border-primary-600 text-primary-600 dark:text-primary-400"
+                : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+            }`}
+          >
+            Available Packages
+          </button>
+          <button
+            onClick={() => setActiveTab("my-ads")}
+            className={`px-4 py-3 font-medium transition-colors relative ${
+              activeTab === "my-ads"
+                ? "border-b-2 border-primary-600 text-primary-600 dark:text-primary-400"
+                : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+            }`}
+          >
+            My Subscribed Ads
+            {subscriptions.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-primary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {subscriptions.length}
+              </span>
+            )}
+          </button>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {loadingAdPackages ? (
-              <div className="col-span-full text-center py-8">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <p className="text-gray-600 dark:text-gray-400 mt-2">Loading advertising packages...</p>
-              </div>
-            ) : adPackagesError ? (
-              <div className="col-span-full bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded p-4 text-red-600 dark:text-red-400">
-                <p>Error loading packages: {adPackagesError}</p>
-              </div>
-            ) : adPackages.length === 0 ? (
-              <div className="col-span-full text-center text-gray-500 dark:text-gray-400 py-8">
-                <p>No advertising packages available</p>
-              </div>
-            ) : (
-              adPackages.map((pkg) => (
-                <div
-                  key={pkg.packageId}
-                  className="relative rounded-lg overflow-hidden transition-all duration-300 shadow-md hover:shadow-lg border cursor-pointer transform hover:scale-105 bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-100"
-                  onClick={() => {
-                    setSelectedAdPackage(pkg);
-                    setShowAdPackageModal(true);
-                  }}
-              >
-                {pkg.popular && (
-                  <div className="absolute top-0 right-0 bg-amber-400 text-neutral-900 px-2 py-0.5 text-xs font-semibold rounded-bl z-10">
-                    Popular
-                  </div>
-                )}
+        {/* Available Packages Tab */}
+        {activeTab === "available" && (
+          <div>
+            <div className="mb-8">
+              <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">Advertising Rate Cards</h3>
+              <p className="text-neutral-600 dark:text-neutral-400">Choose the right advertising package for your business to reach customers on our platform</p>
+            </div>
 
-                <div className="p-4 flex flex-col h-full">
-                  <h4 className="text-sm font-bold mb-1">{pkg.name}</h4>
-                  <p 
-                    className="text-xs mb-2 line-clamp-2"
-                    style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.9)' } : { color: '#6b7280' }}
-                  >
-                    {pkg.description}
-                  </p>
-
-                  <div className="mb-3">
-                    <div className="flex items-baseline gap-1 mb-1">
-                      <span className="text-lg font-bold">N${pkg.monthlyPrice}</span>
-                      <span 
-                        className="text-xs"
-                        style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#6b7280' }}
-                      >
-                        p/m
-                      </span>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {loadingAdPackages ? (
+                <div className="col-span-full text-center py-8">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  <p className="text-gray-600 dark:text-gray-400 mt-2">Loading advertising packages...</p>
+                </div>
+              ) : adPackagesError ? (
+                <div className="col-span-full bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded p-4 text-red-600 dark:text-red-400">
+                  <p>Error loading packages: {adPackagesError}</p>
+                </div>
+              ) : adPackages.length === 0 ? (
+                <div className="col-span-full text-center text-gray-500 dark:text-gray-400 py-8">
+                  <p>No advertising packages available</p>
+                </div>
+              ) : (
+                adPackages.map((pkg) => (
+                  <div
+                    key={pkg.packageId}
+                    className="relative rounded-lg overflow-hidden transition-all duration-300 shadow-md hover:shadow-lg border cursor-pointer transform hover:scale-105 bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-100"
+                    onClick={() => {
+                      setSelectedAdPackage(pkg);
+                      setShowAdPackageModal(true);
+                    }}
+                >
+                  {pkg.popular && (
+                    <div className="absolute top-0 right-0 bg-amber-400 text-neutral-900 px-2 py-0.5 text-xs font-semibold rounded-bl z-10">
+                      Popular
                     </div>
-                    <div className="text-xs font-semibold mb-1">
-                      <span>N${pkg.yearlyPrice}</span>
-                      <span 
-                        style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#6b7280' }}
-                      >
-                        /yr
-                      </span>
-                    </div>
-                    {pkg.yearlyDiscount && (
-                      <div 
-                        className="inline-block px-2 py-0.5 rounded text-xs font-bold"
-                        style={pkg.popular ? { 
-                          backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                          color: 'rgba(255, 255, 255, 1)'
-                        } : { 
-                          backgroundColor: '#fed7aa',
-                          color: '#92400e'
-                        }}
-                      >
-                        {pkg.yearlyDiscount}
-                      </div>
-                    )}
-                  </div>
+                  )}
 
-                  <div className="mb-3">
-                    {pkg.popular ? (
-                      <ButtonPrimary className="w-full bg-white text-neutral-900 hover:bg-neutral-100 py-1.5 text-xs">
-                        Subscribe
-                      </ButtonPrimary>
-                    ) : (
-                      <ButtonSecondary 
-                        className={`w-full py-1.5 text-xs ${pkg.popular ? 'border-white text-white' : 'border-neutral-300 dark:border-neutral-600'}`}
-                      >
-                        Subscribe
-                      </ButtonSecondary>
-                    )}
-                  </div>
-
-                  <div className="space-y-1 flex-grow">
+                  <div className="p-4 flex flex-col h-full">
+                    <h4 className="text-sm font-bold mb-1">{pkg.name}</h4>
                     <p 
-                      className="text-xs font-semibold"
+                      className="text-xs mb-2 line-clamp-2"
                       style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.9)' } : { color: '#6b7280' }}
                     >
-                      Includes:
+                      {pkg.description}
                     </p>
-                    <ul className="space-y-1">
-                      {pkg.features.map((feature: string, idx: number) => (
-                        <li key={idx} className="flex items-start gap-1.5">
-                          <CheckIcon 
-                            className="w-3 h-3 flex-shrink-0 mt-0.5"
-                            style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#16a34a' }}
-                          />
-                          <span className="text-xs">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
+
+                    <div className="mb-3">
+                      <div className="flex items-baseline gap-1 mb-1">
+                        <span className="text-lg font-bold">N${pkg.monthlyPrice}</span>
+                        <span 
+                          className="text-xs"
+                          style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#6b7280' }}
+                        >
+                          p/m
+                        </span>
+                      </div>
+                      <div className="text-xs font-semibold mb-1">
+                        <span>N${pkg.yearlyPrice}</span>
+                        <span 
+                          style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#6b7280' }}
+                        >
+                          /yr
+                        </span>
+                      </div>
+                      {pkg.yearlyDiscount && (
+                        <div 
+                          className="inline-block px-2 py-0.5 rounded text-xs font-bold"
+                          style={pkg.popular ? { 
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                            color: 'rgba(255, 255, 255, 1)'
+                          } : { 
+                            backgroundColor: '#fed7aa',
+                            color: '#92400e'
+                          }}
+                        >
+                          {pkg.yearlyDiscount}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mb-3">
+                      {pkg.popular ? (
+                        <ButtonPrimary className="w-full bg-white text-neutral-900 hover:bg-neutral-100 py-1.5 text-xs">
+                          Subscribe
+                        </ButtonPrimary>
+                      ) : (
+                        <ButtonSecondary 
+                          className={`w-full py-1.5 text-xs ${pkg.popular ? 'border-white text-white' : 'border-neutral-300 dark:border-neutral-600'}`}
+                        >
+                          Subscribe
+                        </ButtonSecondary>
+                      )}
+                    </div>
+
+                    <div className="space-y-1 flex-grow">
+                      <p 
+                        className="text-xs font-semibold"
+                        style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.9)' } : { color: '#6b7280' }}
+                      >
+                        Includes:
+                      </p>
+                      <ul className="space-y-1">
+                        {pkg.features.map((feature: string, idx: number) => (
+                          <li key={idx} className="flex items-start gap-1.5">
+                            <CheckIcon 
+                              className="w-3 h-3 flex-shrink-0 mt-0.5"
+                              style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#16a34a' }}
+                            />
+                            <span className="text-xs">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* My Subscribed Ads Tab */}
+        {activeTab === "my-ads" && (
+          <div className="space-y-6">
+            <div className="mb-8">
+              <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">My Subscribed Ads</h3>
+              <p className="text-neutral-600 dark:text-neutral-400">View and manage your active advertising subscriptions and analytics</p>
+            </div>
+
+            {loadingSubscriptions ? (
+              <div className="text-center py-12">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <p className="text-gray-600 dark:text-gray-400 mt-4">Loading your subscribed ads...</p>
               </div>
-              ))
+            ) : subscriptionsError ? (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-red-600 dark:text-red-400">
+                <p>Error loading subscriptions: {subscriptionsError}</p>
+              </div>
+            ) : subscriptions.length === 0 ? (
+              <div className="bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-8 text-center">
+                <p className="text-neutral-600 dark:text-neutral-400 mb-4">You haven't subscribed to any advertising packages yet.</p>
+                <ButtonPrimary onClick={() => setActiveTab("available")} className="inline-block">
+                  Browse Advertising Packages
+                </ButtonPrimary>
+              </div>
+            ) : (
+              <div className="space-y-8">
+                {subscriptions.map((subscription) => (
+                  <div
+                    key={subscription.id}
+                    className="bg-white dark:bg-neutral-800 rounded-xl p-6 border border-neutral-200 dark:border-neutral-700 space-y-4"
+                  >
+                    {/* Subscription Header */}
+                    <div className="flex items-start justify-between mb-6">
+                      <div>
+                        <h4 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
+                          {subscription.adTitle}
+                        </h4>
+                        <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+                          Package: <span className="font-semibold">{subscription.package.name}</span>
+                        </p>
+                        <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+                          Status: <span className={`font-semibold ${subscription.isActive ? 'text-green-600' : 'text-red-600'}`}>
+                            {subscription.isActive ? 'Active' : 'Expired'}
+                          </span>
+                        </p>
+                        {subscription.expiryDate && (
+                          <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+                            Expires: <span className="font-semibold">{new Date(subscription.expiryDate).toLocaleDateString()}</span>
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Analytics Dashboard */}
+                    <div className="border-t border-neutral-200 dark:border-neutral-700 pt-6">
+                      <AdAnalyticsDashboard
+                        businessId={businessId}
+                        subscriptionId={subscription.id}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
-        </div>
+        )}
 
         {/* Modal for advertising package subscription */}
         {showAdPackageModal && selectedAdPackage && (
