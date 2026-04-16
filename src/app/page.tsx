@@ -92,7 +92,7 @@ async function PageHome() {
         <SectionSliderNewCategories
           categories={businessCategories}
           heading="Explore Business Categories"
-          subHeading="Find local businesses across Namibia"
+          subHeading="Find local businesses across South Africa"
           categoryCardType="card4"
         />
 

@@ -22,7 +22,7 @@ const SectionContact: FC<SectionContactProps> = ({ className = "" }) => {
               <h2 className="font-semibold text-4xl mb-6">Get In Touch 📞</h2>
               <span className="block text-neutral-500 dark:text-neutral-400 text-lg mb-8">
                 Have questions about listing your business or need support? 
-                We're here to help you grow in Namibia's business community.
+                We're here to help you grow in South Africa's business community.
               </span>
               
               <ul className="space-y-4 mb-8">
@@ -60,7 +60,7 @@ const SectionContact: FC<SectionContactProps> = ({ className = "" }) => {
                   </div>
                   <div className="flex items-center space-x-3 text-neutral-600 dark:text-neutral-400">
                     <i className="las la-map-marker text-lg text-burgundy-600"></i>
-                    <span>Windhoek, Namibia</span>
+                    <span>Johannesburg, South Africa</span>
                   </div>
                 </div>
               </div>

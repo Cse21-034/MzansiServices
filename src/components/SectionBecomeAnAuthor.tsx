@@ -48,7 +48,7 @@ const SectionClaimListing: FC<SectionClaimListingProps> = ({
           Claim Your Business Listing
         </h2>
         <span className="block mt-6 text-neutral-500 dark:text-neutral-400">
-          Take control of your business profile! Verify ownership and unlock powerful tools to manage your online presence, respond to reviews, update information, and attract more customers in Namibia.
+          Take control of your business profile! Verify ownership and unlock powerful tools to manage your online presence, respond to reviews, update information, and attract more customers in South Africa.
         </span>
 
         <div className="mt-8 space-y-4">
