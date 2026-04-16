@@ -51,10 +51,18 @@ export function AdAnalyticsDashboard({ businessId, subscriptionId }: AdAnalytics
 
       const data = await res.json();
       if (data.success) {
-        setAnalytics(data.data.subscription);
+        // Merge subscription data with stats
+        const analyticsData = {
+          ...data.data.subscription,
+          impressions: data.data.stats?.impressions || 0,
+          clicks: data.data.stats?.clicks || 0,
+          ctr: data.data.stats?.ctr || 0,
+          analytics: data.data.recentEvents || [],
+        };
+        setAnalytics(analyticsData);
         
         // Process events for chart data
-        processChartData(data.data.recentEvents);
+        processChartData(data.data.recentEvents || []);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -160,7 +168,7 @@ export function AdAnalyticsDashboard({ businessId, subscriptionId }: AdAnalytics
             <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">Impressions</h3>
           </div>
           <p className="text-3xl font-bold text-gray-900 dark:text-white">
-            {analytics.impressions.toLocaleString()}
+            {(analytics.impressions || 0).toLocaleString()}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Total views</p>
         </div>
@@ -174,7 +182,7 @@ export function AdAnalyticsDashboard({ businessId, subscriptionId }: AdAnalytics
             <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">Clicks</h3>
           </div>
           <p className="text-3xl font-bold text-gray-900 dark:text-white">
-            {analytics.clicks.toLocaleString()}
+            {(analytics.clicks || 0).toLocaleString()}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Total clickthrus</p>
         </div>
@@ -188,7 +196,7 @@ export function AdAnalyticsDashboard({ businessId, subscriptionId }: AdAnalytics
             <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">CTR</h3>
           </div>
           <p className="text-3xl font-bold text-gray-900 dark:text-white">
-            {analytics.ctr.toFixed(2)}%
+            {((analytics.ctr || 0).toFixed(2))}%
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Click-through rate</p>
         </div>
@@ -202,7 +210,7 @@ export function AdAnalyticsDashboard({ businessId, subscriptionId }: AdAnalytics
             <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">Engagement</h3>
           </div>
           <p className="text-3xl font-bold text-gray-900 dark:text-white">
-            {((analytics.clicks / Math.max(analytics.impressions, 1)) * 100).toFixed(1)}%
+            {(((analytics.clicks || 0) / Math.max((analytics.impressions || 0), 1)) * 100).toFixed(1)}%
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Engagement ratio</p>
         </div>
@@ -290,7 +298,7 @@ export function AdAnalyticsDashboard({ businessId, subscriptionId }: AdAnalytics
               </tr>
             </thead>
             <tbody>
-              {analytics.analytics.slice(0, 10).map((event) => (
+              {(analytics.analytics || []).slice(0, 10).map((event) => (
                 <tr
                   key={event.id}
                   className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50"
