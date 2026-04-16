@@ -196,7 +196,7 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ businessId }) => 
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Namibia Services Packages
+            Mzansi Services Packages
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300">
             Choose the perfect plan to grow your business
@@ -237,7 +237,7 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ businessId }) => 
                 <div className="mb-6">
                   <div className="flex items-baseline">
                     <span className="text-4xl font-bold text-gray-900 dark:text-white">
-                      {tier.monthlyPrice === 0 ? 'FREE' : `R${tier.monthlyPrice}`}
+                      {tier.monthlyPrice === 0 ? 'FREE' : `R$${tier.monthlyPrice}`}
                     </span>
                     {tier.monthlyPrice > 0 && (
                       <span className="text-gray-600 dark:text-gray-400 ml-2">/month</span>

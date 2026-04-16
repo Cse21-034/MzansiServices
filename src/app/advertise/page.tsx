@@ -116,7 +116,7 @@ const AdvertiseWithUsPage: FC = () => {
     }
   ];
 
-  // Namibia Services Packages - Subscription Tiers
+  // Mzansi Services Packages - Subscription Tiers
   const namibiaServicesPackages = [
     {
       name: "WILD HORSES",
@@ -567,9 +567,9 @@ const AdvertiseWithUsPage: FC = () => {
           colorType="primary"
         />
 
-        {/* Namibia Services Packages */}
+        {/* Mzansi Services Packages */}
         <ServiceSection
-          title="Namibia Services Packages"
+          title="Mzansi Services Packages"
           description="Choose the perfect plan for your business and unlock powerful features"
           packages={namibiaServicesPackages}
           icon={BuildingStorefrontIcon}

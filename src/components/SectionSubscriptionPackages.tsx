@@ -332,7 +332,7 @@ const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = 
       {/* Heading */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <Heading isCenter desc="Choose the perfect plan for your business and unlock powerful features">
-          Namibia Services Packages
+          Mzansi Services Packages
         </Heading>
       </div>
 
@@ -437,8 +437,8 @@ const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = 
                       {tier.monthlyPrice === 0 
                         ? 'FREE' 
                         : billingCycle === 'YEARLY'
-                        ? `N$${getYearlyPrice(tier.tier as any)}`
-                        : `N$${tier.monthlyPrice}`
+                        ? `R$${getYearlyPrice(tier.tier as any)}`
+                        : `R$${tier.monthlyPrice}`
                       }
                     </span>
                     {tier.monthlyPrice > 0 && (
@@ -455,7 +455,7 @@ const SectionSubscriptionPackages: React.FC<SectionSubscriptionPackagesProps> = 
                   </div>
                   {billingCycle === 'YEARLY' && tier.monthlyPrice > 0 && (
                     <p className={`text-sm mt-2 ${isPremium ? 'text-orange-100' : 'text-green-600 dark:text-green-400'} font-medium`}>
-                      Save N$${getYearlySavings(tier.tier as any)} per year
+                      Save R$${getYearlySavings(tier.tier as any)} per year
                     </p>
                   )}
                 </div>
