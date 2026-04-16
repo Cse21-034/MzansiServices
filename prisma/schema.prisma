@@ -108,7 +108,7 @@ model Business {
   address         String?
   city            String
   region          String?
-  country         String        @default("Namibia")
+  country         String        @default("South Africa")
   latitude        Float?
   longitude       Float?
   

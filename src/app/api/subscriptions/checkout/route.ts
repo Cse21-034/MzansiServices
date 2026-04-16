@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
       const params = payGate.buildInitiateParams({
         reference,
         amount: amountInCents,
-        currency: 'NAD',
+        currency: 'ZAR',
         email: business.email,
         returnUrl: `${origin}/api/subscriptions/return`,
         notifyUrl: `${origin}/api/subscriptions/callback`,
@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
           subscriptionId: subscription.id,
           paymentGatewayId: '', // Will be filled in by callback with TRANSACTION_ID
           amount,
-          currency: 'NAD',
+          currency: 'ZAR',
           status: 'PENDING',
           transactionRef: reference, // PayGate reference: NS_SUB_${businessId}_${timestamp}
         },

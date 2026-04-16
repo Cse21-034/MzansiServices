@@ -8,7 +8,7 @@ import ButtonClose from "@/shared/ButtonClose";
 import Checkbox from "@/shared/Checkbox";
 import Pagination from "@/shared/Pagination";
 import TabFilters from "./TabFilters";
-const logoMobile = "/images/namibia-logo/squarelogo.PNG";
+const logoMobile = "/images/mzansi-logo/squarelogo.PNG";
 import Heading2 from "@/shared/Heading2";
 import StayCard2 from "@/components/StayCard2";
 import { useSearchParams, useRouter } from "next/navigation";

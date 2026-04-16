@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
         subscriptionId: 'featured_space', // You might want to track this differently
         paymentGatewayId: reference,
         amount: (body.AMOUNT ? parseInt(body.AMOUNT) : 0) / 100,
-        currency: body.CURRENCY || 'NAD',
+        currency: body.CURRENCY || 'ZAR',
         status: 'COMPLETED',
         transactionRef: body.TRANSACTION_ID || reference,
         paidAt: new Date(),

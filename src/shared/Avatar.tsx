@@ -21,7 +21,7 @@ const Avatar: FC<AvatarProps> = ({
   hasCheckedClass = "w-4 h-4 -top-0.5 -right-0.5",
 }) => {
   // Use logo as fallback if no image
-  const url = imgUrl || "/images/namibia-logo/squarelogo.PNG";
+  const url = imgUrl || "/images/mzansi-logo/squarelogo.PNG";
   const name = userName || "John Doe";
   
   const _setBgColor = (name: string) => {
@@ -47,7 +47,7 @@ const Avatar: FC<AvatarProps> = ({
         />
       ) : (
         // Show initials only if not using logo fallback
-        url !== "/images/namibia-logo/squarelogo.PNG" && (
+        url !== "/images/mzansi-logo/squarelogo.PNG" && (
           <span className="wil-avatar__name z-10">
             {name[0]}
           </span>

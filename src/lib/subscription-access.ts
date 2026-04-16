@@ -10,7 +10,7 @@ export const SUBSCRIPTION_TIERS = {
     name: 'WILD HORSES',
     tier: 'WILD_HORSES' as SubscriptionTier,
     monthlyPrice: 0,
-    currency: 'NAD',
+    currency: 'ZAR',
     yearlyDiscountPercentage: 15,
     description: 'Establish your business presence quickly.',
     features: [
@@ -37,7 +37,7 @@ export const SUBSCRIPTION_TIERS = {
     name: 'DESERT ELEPHANTS',
     tier: 'DESERT_ELEPHANTS' as SubscriptionTier,
     monthlyPrice: 100,
-    currency: 'NAD',
+    currency: 'ZAR',
     yearlyDiscountPercentage: 16,
     description: 'Boost visibility and build customer trust.',
     features: [
@@ -68,7 +68,7 @@ export const SUBSCRIPTION_TIERS = {
     name: 'DESERT LIONS',
     tier: 'DESERT_LIONS' as SubscriptionTier,
     monthlyPrice: 200,
-    currency: 'NAD',
+    currency: 'ZAR',
     yearlyDiscountPercentage: 20,
     description: 'Unlock powerful tools for rapid growth.',
     features: [
@@ -480,7 +480,7 @@ export const FEATURED_HERO_SPACE_PRICING = {
   MONTHLY: {
     billingCycle: 'MONTHLY' as const,
     monthlyPrice: 100,
-    currency: 'NAD',
+    currency: 'ZAR',
     description: 'Feature your business in the hero carousel for 1 month',
     durationDays: 30,
   },
@@ -488,7 +488,7 @@ export const FEATURED_HERO_SPACE_PRICING = {
     billingCycle: 'YEARLY' as const,
     monthlyPrice: 1200,
     yearlyCost: 1008, // 20% discount applied: 1200 * 0.9 = 1080, but using 1008 for 16% discount
-    currency: 'NAD',
+    currency: 'ZAR',
     description: 'Feature your business in the hero carousel for 1 year with savings',
     durationDays: 365,
     discountPercentage: 16,

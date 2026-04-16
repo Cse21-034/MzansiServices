@@ -31,7 +31,7 @@ const CarCardH: FC<CarCardHProps> = ({ className = "", data = DEMO_DATA }) => {
     featuredImage,
   } = data;
   // Use logo as placeholder if no image
-  const displayImage = featuredImage || "/images/namibia-logo/squarelogo.PNG";
+  const displayImage = featuredImage || "/images/mzansi-logo/squarelogo.PNG";
 
   const renderSliderGallery = () => {
     return (

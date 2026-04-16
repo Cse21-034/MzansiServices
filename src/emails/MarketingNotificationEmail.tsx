@@ -34,7 +34,7 @@ export const MarketingNotificationEmail = ({
         <Section style={{ textAlign: 'center', marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
             <Img
-              src={`${process.env.NEXT_PUBLIC_APP_URL || 'https://namibiaservices.com'}/images/namibia-logo/logo-mobile.png`}
+              src={`${process.env.NEXT_PUBLIC_APP_URL || 'https://namibiaservices.com'}/images/mzansi-logo/logo-mobile.png`}
               alt="Namibia Services Logo"
               width="40"
               height="40"

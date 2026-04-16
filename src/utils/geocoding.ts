@@ -10,7 +10,7 @@ interface GeocodingResult {
 }
 
 /**
- * Geocode an address in Namibia to get latitude and longitude
+ * Geocode an address in South Africa to get latitude and longitude
  * @param address Full address string
  * @param city City/town name
  * @returns Coordinates or null if geocoding fails
@@ -21,20 +21,20 @@ export async function geocodeAddress(
 ): Promise<GeocodingResult | null> {
     try {
         // Build search query with address, city, and country
-        const searchQuery = `${address}, ${city}, Namibia`;
+        const searchQuery = `${address}, ${city}, South Africa`;
 
         // Use OpenStreetMap Nominatim API (free, no API key needed)
         const url = `https://nominatim.openstreetmap.org/search?` +
             `q=${encodeURIComponent(searchQuery)}` +
             `&format=json` +
             `&limit=1` +
-            `&countrycodes=na`; // Restrict to Namibia
+            `&countrycodes=za`; // Restrict to South Africa
 
         console.log('🌍 Geocoding address:', searchQuery);
 
         const response = await fetch(url, {
             headers: {
-                'User-Agent': 'NamibiaServices/1.0' // Required by Nominatim
+                'User-Agent': 'MzansiServices/1.0' // Required by Nominatim
             }
         });
 
@@ -67,32 +67,32 @@ export async function geocodeAddress(
 }
 
 /**
- * Get default coordinates for Namibia cities
+ * Get default coordinates for South Africa cities
  * Fallback if geocoding fails
  */
 export function getDefaultCoordinates(city: string): { latitude: number; longitude: number } {
     const coordinates: { [key: string]: { latitude: number; longitude: number } } = {
-        // Major cities
-        'windhoek': { latitude: -22.5597, longitude: 17.0832 },
-        'francistown': { latitude: -21.1700, longitude: 27.5086 },
-        'maun': { latitude: -19.9833, longitude: 23.4167 },
-        'kasane': { latitude: -17.8167, longitude: 25.1500 },
-        'serowe': { latitude: -22.3833, longitude: 26.7167 },
-        'selibe phikwe': { latitude: -21.9667, longitude: 27.8333 },
-        'lobatse': { latitude: -25.2167, longitude: 25.6833 },
-        'palapye': { latitude: -22.5500, longitude: 27.1333 },
-        'molepolole': { latitude: -24.4000, longitude: 25.4833 },
-        'kanye': { latitude: -24.9833, longitude: 25.3333 },
-        'mochudi': { latitude: -24.4167, longitude: 25.9833 },
-        'mahalapye': { latitude: -23.1000, longitude: 26.8167 },
-        'mogoditshane': { latitude: -24.6167, longitude: 25.8667 },
-        'jwaneng': { latitude: -24.6000, longitude: 24.7000 },
-        'orapa': { latitude: -21.3000, longitude: 25.3667 },
-        'letlhakane': { latitude: -21.4167, longitude: 25.5833 },
-        'tonota': { latitude: -21.4333, longitude: 27.0667 },
-        'tutume': { latitude: -20.9833, longitude: 27.1500 },
-        'ramotswa': { latitude: -24.8667, longitude: 25.8667 },
-        'tlokweng': { latitude: -24.6500, longitude: 25.9833 },
+        // Major cities - South Africa
+        'johannesburg': { latitude: -26.2023, longitude: 28.0436 },
+        'pretoria': { latitude: -25.7479, longitude: 28.2293 },
+        'cape town': { latitude: -33.9249, longitude: 18.4241 },
+        'durban': { latitude: -29.8587, longitude: 31.0218 },
+        'bloemfontein': { latitude: -29.1186, longitude: 25.5184 },
+        'port elizabeth': { latitude: -33.9841, longitude: 25.6053 },
+        'polokwane': { latitude: -23.9001, longitude: 29.4181 },
+        'nelspruit': { latitude: -25.4833, longitude: 30.9667 },
+        'kimberley': { latitude: -28.7383, longitude: 24.8628 },
+        'mahikeng': { latitude: -25.8552, longitude: 25.6406 },
+        'east london': { latitude: -33.0136, longitude: 27.9111 },
+        'pietermaritzburg': { latitude: -29.6084, longitude: 30.3963 },
+        'soweto': { latitude: -26.2643, longitude: 27.8537 },
+        'sandton': { latitude: -26.1088, longitude: 28.0545 },
+        'stellenbosch': { latitude: -33.9364, longitude: 18.8639 },
+        'paarl': { latitude: -33.7915, longitude: 18.9693 },
+        'richards bay': { latitude: -28.7832, longitude: 32.0377 },
+        'upington': { latitude: -28.4500, longitude: 21.2667 },
+        'rustenburg': { latitude: -25.6789, longitude: 27.2500 },
+        'klerksdorp': { latitude: -26.8633, longitude: 26.6614 },
     };
 
     const cityKey = city.toLowerCase().trim();

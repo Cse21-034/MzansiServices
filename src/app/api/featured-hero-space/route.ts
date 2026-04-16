@@ -180,7 +180,7 @@ export async function POST(req: NextRequest) {
       params = payGate.buildInitiateParams({
         reference,
         amount: amount * 100, // Convert to cents
-        currency: 'NAD',
+        currency: 'ZAR',
         email: business.email,
         returnUrl: `${origin}/business/${businessId}/featured-hero/success?reference=${reference}`,
         notifyUrl: `${origin}/api/featured-hero-space/callback`,

@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Pagination from "@/shared/Pagination";
 import StayCard2 from "@/components/StayCard2";
 import BusinessSidebarFilters from "@/components/BusinessSidebarFilters";
-const logoMobile = "/images/namibia-logo/squarelogo.PNG";
+const logoMobile = "/images/mzansi-logo/squarelogo.PNG";
 
 // Define the real business data interface
 export interface BusinessDataType {

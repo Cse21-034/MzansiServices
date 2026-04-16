@@ -63,7 +63,7 @@ const HeroSearchForm2Mobile = () => {
     return (
       <div className="flex items-center w-full">
         <div className="flex-shrink-0 mr-2">
-          <Image src="/images/namibia-logo/squarelogo.PNG" alt="Logo" width={56} height={56} className="rounded-full" />
+          <Image src="/images/mzansi-logo/squarelogo.PNG" alt="Logo" width={56} height={56} className="rounded-full" />
         </div>
         <button
           onClick={openModal}

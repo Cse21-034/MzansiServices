@@ -68,7 +68,7 @@ export default withAuth(
         const isAuthorized = (
           (pathname.startsWith('/usersdashboard') && (token.role === 'USER' || token.role === 'ADMIN')) ||
           (pathname.startsWith('/business') && (token.role === 'BUSINESS' || token.role === 'ADMIN')) ||
-          (pathname.startsWith('/namibiaservices') && token.role === 'ADMIN') ||
+          (pathname.startsWith('/mzansiservices') && token.role === 'ADMIN') ||
           pathname.startsWith('/api/') // Allow API routes
         );
 
@@ -85,7 +85,7 @@ function getDashboardPath(role: string): string {
     case 'BUSINESS':
       return '/business';
     case 'ADMIN':
-      return '/namibiaservices';
+      return '/mzansiservices';
     case 'USER':
       return '/usersdashboard';
     default:
@@ -99,7 +99,7 @@ export const config = {
   matcher: [
     '/usersdashboard/:path*',
     '/business/:path*',
-    '/namibiaservices/:path*',
+    '/mzansiservices/:path*',
     '/api/user/:path*',
   ],
 };

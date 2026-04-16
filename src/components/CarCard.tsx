@@ -35,7 +35,7 @@ const CarCard: FC<CarCardProps> = ({
     gearshift,
   } = data;
   // Use logo as placeholder if no image
-  const displayImage = featuredImage || "/images/namibia-logo/squarelogo.PNG";
+  const displayImage = featuredImage || "/images/mzansi-logo/squarelogo.PNG";
 
   const renderSliderGallery = () => {
     return (

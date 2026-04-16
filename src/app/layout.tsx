@@ -19,7 +19,7 @@ export const metadata = {
   title: "Namibia Services - Online Booking Management",
   description: "Book and manage services in Namibia with ease",
   icons: {
-    icon: "/images/namibia-logo/fulllogo1.PNG",
+    icon: "/images/mzansi-logo/fulllogo1.PNG",
   },
 };
 

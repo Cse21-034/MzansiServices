@@ -17,7 +17,7 @@ import MembershipsList from "@/components/MembershipsList";
 import FeaturedHeroSpaceTab from "@/components/FeaturedHeroSpaceTab";
 import SubscriptionManagement from "@/app/subscription/SubscriptionManagement";
 import SubscriptionPlans from "@/app/subscription/SubscriptionPlans";
-const defaultBusinessImage = "/images/namibia-logo/squarelogo.PNG";
+const defaultBusinessImage = "/images/mzansi-logo/squarelogo.PNG";
 import {
   BuildingStorefrontIcon,
   PhotoIcon,

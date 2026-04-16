@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
       data: {
         adSubscriptionId: adSubscription.id,
         amount,
-        currency: 'NAD',
+        currency: 'ZAR',
         billingCycle: billingCycle as any,
         paymentGatewayId: reference,
         transactionRef: reference,
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
       const params = payGate.buildInitiateParams({
         reference,
         amount: Math.round(amount * 100), // Convert to cents
-        currency: 'NAD',
+        currency: 'ZAR',
         email: business.email,
         returnUrl: `${origin}/business/${businessId}/ads/success?reference=${reference}&adId=${adSubscription.id}`,
         notifyUrl: `${origin}/api/advertising/callback`,

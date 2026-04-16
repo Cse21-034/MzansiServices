@@ -45,8 +45,8 @@ export const headerCurrency = [
     icon: CurrencyBangladeshiIcon,
   },
   {
-    id: "NAD",
-    name: "NAD",
+    id: "ZAR",
+    name: "ZAR",
     href: "##",
     icon: CurrencyPoundIcon,
   },
