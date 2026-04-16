@@ -129,8 +129,9 @@ const LocationInput: FC<LocationInputProps> = ({
   };
 
   const renderSearchValue = () => {
-    // Filter locations based on input value
-    const filteredLocations = NAMIBIA_LOCATIONS.filter(location =>
+    // Filter locations based on input value - search through popular and recent locations
+    const allLocations = [...popularLocations, ...recentLocations];
+    const filteredLocations = allLocations.filter(location =>
       location.toLowerCase().includes(value.toLowerCase())
     );
 
