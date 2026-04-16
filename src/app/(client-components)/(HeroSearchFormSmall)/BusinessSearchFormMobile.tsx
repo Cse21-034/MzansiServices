@@ -62,7 +62,7 @@ const BusinessSearchFormMobile = () => {
           >
             <span className="text-neutral-400">Where? (Optional)</span>
             <span className="text-left flex-1 ml-2">
-              {locationInput || "Anywhere in Namibia"}
+              {locationInput || "Anywhere in South Africa"}
             </span>
           </button>
         ) : (

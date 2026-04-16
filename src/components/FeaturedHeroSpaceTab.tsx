@@ -450,7 +450,7 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
 
                     <div className="mb-3">
                       <div className="flex items-baseline gap-1 mb-1">
-                        <span className="text-lg font-bold">N${pkg.monthlyPrice}</span>
+                        <span className="text-lg font-bold">R${pkg.monthlyPrice}</span>
                         <span 
                           className="text-xs"
                           style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#6b7280' }}
@@ -459,7 +459,7 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
                         </span>
                       </div>
                       <div className="text-xs font-semibold mb-1">
-                        <span>N${pkg.yearlyPrice}</span>
+                        <span>R${pkg.yearlyPrice}</span>
                         <span 
                           style={pkg.popular ? { color: 'rgba(255, 255, 255, 0.8)' } : { color: '#6b7280' }}
                         >
@@ -717,11 +717,11 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
                   {cycle === "MONTHLY" ? "Monthly" : "Yearly"}
                 </p>
                 <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                  N${PRICING[cycle as "MONTHLY" | "YEARLY"].price}
+                  R${PRICING[cycle as "MONTHLY" | "YEARLY"].price}
                 </p>
                 <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
                   {PRICING[cycle as "MONTHLY" | "YEARLY"].duration}
-                  {cycle === "YEARLY" && ` • Save N$${PRICING.YEARLY.savings}`}
+                  {cycle === "YEARLY" && ` • Save R$${PRICING.YEARLY.savings}`}
                 </p>
               </button>
             ))}
@@ -736,7 +736,7 @@ const FeaturedHeroSpaceTab: FC<FeaturedHeroSpaceTabProps> = ({ businessId }) => 
           </div>
           <div className="flex justify-between items-center pt-2 border-t border-neutral-200 dark:border-neutral-600">
             <span className="text-neutral-600 dark:text-neutral-400">Total Price:</span>
-            <span className="text-xl font-bold text-primary-600 dark:text-primary-400">N${PRICING[billingCycle].price}</span>
+            <span className="text-xl font-bold text-primary-600 dark:text-primary-400">R${PRICING[billingCycle].price}</span>
           </div>
         </div>
 

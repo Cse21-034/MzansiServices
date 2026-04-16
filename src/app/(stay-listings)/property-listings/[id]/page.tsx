@@ -72,7 +72,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                 {property.pricePerNight && (
                   <div className="p-4 bg-gray-50 dark:bg-neutral-700 rounded-lg">
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Price</p>
-                    <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">N${property.pricePerNight}</p>
+                    <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">R${property.pricePerNight}</p>
                   </div>
                 )}
                 <div className="p-4 bg-gray-50 dark:bg-neutral-700 rounded-lg">
@@ -113,7 +113,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               {property.pricePerNight && (
                 <div className="mb-6">
                   <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                    N${property.pricePerNight}
+                    R${property.pricePerNight}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">per night</p>
                 </div>

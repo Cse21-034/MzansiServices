@@ -49,7 +49,7 @@ const PageAddListing2: FC<PageAddListing2Props> = () => {
             <option value="">Select country</option>
             <option value="Botswana">Botswana</option>
             <option value="South Africa">South Africa</option>
-            <option value="Namibia">Namibia</option>
+            <option value="South Africa">South Africa</option>
             <option value="Zimbabwe">Zimbabwe</option>
           </Select>
         </FormItem>

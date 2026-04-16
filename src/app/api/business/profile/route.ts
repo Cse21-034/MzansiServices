@@ -207,7 +207,7 @@ export async function PUT(req: Request) {
       website,
       address: sanitizedAddress, // Use sanitized address
       city: city || "Windhoek", // Update city field
-      country: country || "Namibia", // Update country field
+      country: country || "South Africa", // Update country field
       latitude: finalLatitude, // Save geocoded latitude
       longitude: finalLongitude, // Save geocoded longitude
       establishedYear: establishedYear ? parseInt(establishedYear) : null,
@@ -284,7 +284,7 @@ export async function PUT(req: Request) {
           status: "DRAFT",
           slug: name.toLowerCase().replace(/\s+/g, '-') + '-' + Math.random().toString(36).substring(2, 7),
           city: city || "Windhoek", // Default city
-          country: country || "Namibia",
+          country: country || "South Africa",
           latitude: finalLatitude, // Add latitude for new business
           longitude: finalLongitude // Add longitude for new business
         },

@@ -86,7 +86,7 @@ const PropertyCard: FC<PropertyCardProps> = ({ property }) => {
             {property.pricePerNight && (
               <div className="text-right">
                 <p className="text-lg font-bold text-primary-600 dark:text-primary-400">
-                  N${property.pricePerNight}
+                  R${property.pricePerNight}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-500">/night</p>
               </div>

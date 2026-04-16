@@ -81,7 +81,7 @@ const formatLocation = (city?: string, country?: string): string => {
   
   // If city or country is still "[object Object]", replace with empty
   cityStr = cityStr.replace(/\[object Object\]/g, '').trim() || 'Unknown City';
-  countryStr = countryStr.replace(/\[object Object\]/g, '').trim() || 'Namibia';
+  countryStr = countryStr.replace(/\[object Object\]/g, '').trim() || 'South Africa';
 
   return `${cityStr}, ${countryStr}`;
 };

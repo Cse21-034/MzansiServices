@@ -16,7 +16,7 @@ const LocationInput: FC<Props> = ({
   onChange = () => {},
   className = "",
   defaultValue = "",
-  headingText = "Where in Namibia?",
+  headingText = "Where in South Africa?",
 }) => {
   const [value, setValue] = useState("");
   const containerRef = useRef(null);

@@ -53,7 +53,7 @@ const LocationSearchInput: FC<LocationSearchInputProps> = ({
           const { latitude, longitude } = position.coords;
           console.log(`📍 Got user coordinates: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
           
-          // Find the nearest Namibian city to user's coordinates
+          // Find the nearest South African city to user's coordinates
           const nearestCity = findNearestCity(latitude, longitude);
           
           if (!nearestCity) {
@@ -168,7 +168,7 @@ const LocationSearchInput: FC<LocationSearchInputProps> = ({
                     Popular Cities
                   </h3>
                   <div className="grid grid-cols-2 gap-2">
-                    {["Windhoek", "Walvis Bay", "Swakopmund", "Oshakati"].map((city) => (
+                    {["Johannesburg", "Cape Town", "Durban", "Pretoria"].map((city) => (
                       <button
                         key={city}
                         onClick={() => {

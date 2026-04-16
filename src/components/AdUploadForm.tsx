@@ -291,7 +291,7 @@ export function AdUploadForm({
             </div>
             <div className="flex justify-between border-t pt-2 mt-2">
               <span>Total Amount:</span>
-              <span className="font-bold text-lg">N${packagePrice.toFixed(2)}</span>
+              <span className="font-bold text-lg">R${packagePrice.toFixed(2)}</span>
             </div>
           </div>
         </div>

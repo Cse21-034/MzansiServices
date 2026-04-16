@@ -15,7 +15,7 @@ const Heading2: React.FC<Heading2Props> = ({
   heading = "Businesses Across Namibia",
   subHeading,
   resultsCount = 0,
-  location = "Namibia",
+  location = "South Africa",
   category = "All Categories",
 }) => {
   return (

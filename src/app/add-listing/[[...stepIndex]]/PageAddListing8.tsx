@@ -33,7 +33,7 @@ const PageAddListing8: FC<PageAddListing8Props> = () => {
             <option value="ZAR">ZAR (South African Rand)</option>
             <option value="EUR">EUR (Euro)</option>
             <option value="GBP">GBP (British Pound)</option>
-            <option value="NAD">NAD (Namibian Dollar)</option>
+            <option value="ZAR">ZAR (South African Rand)</option>
           </Select>
         </FormItem>
         <FormItem label="Base price (Monday - Thursday)">

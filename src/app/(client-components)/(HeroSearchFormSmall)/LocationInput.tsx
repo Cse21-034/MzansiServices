@@ -35,24 +35,24 @@ const LocationInput: FC<LocationInputProps> = ({
   const [value, setValue] = useState("");
   const [showPopover, setShowPopover] = useState(autoFocus);
 
-  // Namibia location suggestions
+  // South Africa location suggestions
   const popularLocations = [
-    "Windhoek",
-    "Walvis Bay",
-    "Swakopmund",
-    "Oshakati",
-    "Rundu",
-    "Katima Mulilo",
-    "Otjiwarongo",
-    "Keetmanshoop",
-    "Rehoboth",
-    "Okahandja"
+    "Johannesburg",
+    "Cape Town",
+    "Durban",
+    "Pretoria",
+    "Port Elizabeth",
+    "Bellville",
+    "Sandton",
+    "Centurion",
+    "Witbank",
+    "Polokwane"
   ];
   const recentLocations = [
-    "Windhoek CBD",
-    "Windhoek Airport",
-    "Katutura",
-    "Eros",
+    "Johannesburg CBD",
+    "Sandton",
+    "Cape Town Central",
+    "Durban Beachfront",
     "Khomas"
   ];
 
@@ -155,7 +155,7 @@ const LocationInput: FC<LocationInputProps> = ({
           </div>
         ) : (
           <div className="px-4 sm:px-6 py-4 text-neutral-500 dark:text-neutral-400">
-            No locations found for "{value}". Try searching for "Windhoek", "Walvis Bay", "Swakopmund", etc.
+            No locations found for "{value}". Try searching for "Johannesburg", "Cape Town", "Durban", etc.
           </div>
         )}
       </>

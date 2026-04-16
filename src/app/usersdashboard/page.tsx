@@ -78,9 +78,9 @@ const mockFavorites = [
   },
   {
     id: 2,
-    business: "Fresh Farms Namibia",
+    business: "Fresh Farms South Africa",
     category: "Agriculture",
-    location: "Rundu",
+    location: "Durban",
     rating: 4.2,
     reviews: 45,
     isOpen: true,

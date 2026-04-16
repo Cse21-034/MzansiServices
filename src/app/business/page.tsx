@@ -62,22 +62,22 @@ interface Option {
 }
 
 const NAMIBIA_LOCATIONS = [
-  { value: "Windhoek", label: "Windhoek" },
-  { value: "Walvis Bay", label: "Walvis Bay" },
-  { value: "Swakopmund", label: "Swakopmund" },
-  { value: "Oshakati", label: "Oshakati" },
-  { value: "Rundu", label: "Rundu" },
-  { value: "Katima Mulilo", label: "Katima Mulilo" },
-  { value: "Otjiwarongo", label: "Otjiwarongo" },
-  { value: "Keetmanshoop", label: "Keetmanshoop" },
-  { value: "Rehoboth", label: "Rehoboth" },
-  { value: "Gobabis", label: "Gobabis" },
-  { value: "Mariental", label: "Mariental" },
-  { value: "Tsumeb", label: "Tsumeb" },
-  { value: "Ondangwa", label: "Ondangwa" },
-  { value: "Ongwediva", label: "Ongwediva" },
-  { value: "Eenhana", label: "Eenhana" },
-  { value: "Okahandja", label: "Okahandja" },
+  { value: "Johannesburg", label: "Johannesburg" },
+  { value: "Cape Town", label: "Cape Town" },
+  { value: "Durban", label: "Durban" },
+  { value: "Pretoria", label: "Pretoria" },
+  { value: "Port Elizabeth", label: "Port Elizabeth" },
+  { value: "Bellville", label: "Bellville" },
+  { value: "Sandton", label: "Sandton" },
+  { value: "Midrand", label: "Midrand" },
+  { value: "Centurion", label: "Centurion" },
+  { value: "Boksburg", label: "Boksburg" },
+  { value: "Witbank", label: "Witbank" },
+  { value: "Polokwane", label: "Polokwane" },
+  { value: "Pietermaritzburg", label: "Pietermaritzburg" },
+  { value: "Stellenbosch", label: "Stellenbosch" },
+  { value: "Paarl", label: "Paarl" },
+  { value: "Randburg", label: "Randburg" },
   { value: "Omaruru", label: "Omaruru" },
   { value: "Usakos", label: "Usakos" },
   { value: "Karibib", label: "Karibib" },
@@ -164,7 +164,7 @@ export interface BusinessDashboardPageProps { }
 
 const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
   const [activeTab, setActiveTab] = useState("overview");
-  const [country, setCountry] = useState<string>("Namibia");
+  const [country, setCountry] = useState<string>("South Africa");
   const [city, setCity] = useState<Option | null>(null);
   const [streetName, setStreetName] = useState("");
   const [plotNumber, setPlotNumber] = useState("");
@@ -212,7 +212,7 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
     website: "",
     address: "",
     establishedYear: "",
-    country: "Namibia",
+    country: "South Africa",
     city: "",
     streetName: "",
     plotNumber: "",
@@ -259,7 +259,7 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
         });
 
         // Parse address and separate fields
-        setCountry(data.country || "Namibia");
+        setCountry(data.country || "South Africa");
         setCity(data.city ? { value: data.city, label: data.city } : null);
         setStreetName(data.streetName || "");
         setPlotNumber(data.plotNumber || "");
@@ -283,7 +283,7 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
             createdAt: new Date(photo.createdAt)
           })),
           establishedYear: data.establishedYear ? data.establishedYear.toString() : "",
-          country: data.country || "Namibia",
+          country: data.country || "South Africa",
           city: data.city || "",
           streetName: data.streetName || "",
           plotNumber: data.plotNumber || "",
@@ -399,7 +399,7 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
 
       // Construct the full address from separate fields
       const cityStr = city?.value || '';
-      const countryStr = country || 'Namibia';
+      const countryStr = country || 'South Africa';
       
       // Build address: Unit/Shop, Plot Number, Street Name, City, Country
       const addressParts = [];
@@ -883,7 +883,7 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
                   className="w-full"
                   disabled
                 >
-                  <option value="Namibia">Namibia</option>
+                  <option value="South Africa">South Africa</option>
                 </Select>
               </div>
 
@@ -951,7 +951,7 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
                   latitude={latitude}
                   longitude={longitude}
                   address={[plotNumber, streetName].filter(Boolean).join(", ")}
-                  city={city?.value || "Windhoek"}
+                  city={city?.value || "Johannesburg"}
                   onCoordinatesChange={(lat, lng) => {
                     setLatitude(lat);
                     setLongitude(lng);
@@ -1235,7 +1235,7 @@ const BusinessDashboardPage: FC<BusinessDashboardPageProps> = ({ }) => {
                         )}
                         {listing.pricePerNight !== undefined && (
                           <div className="flex items-center gap-1">
-                            <span className="font-medium">NAD {listing.pricePerNight}/night</span>
+                            <span className="font-medium">ZAR {listing.pricePerNight}/night</span>
                           </div>
                         )}
                         {listing.city && (

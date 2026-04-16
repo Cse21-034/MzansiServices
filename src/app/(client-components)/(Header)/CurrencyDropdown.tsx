@@ -14,17 +14,11 @@ import { Fragment } from "react";
 
 export const headerCurrency = [
   {
-    id: "BWP",
-    name: "BWP",
-    href: "##",
-    icon: BanknotesIcon,
-    active: true,
-  },
-  {
     id: "ZAR",
     name: "ZAR",
     href: "##",
     icon: CurrencyDollarIcon,
+    active: true,
   },
   {
     id: "USD",
@@ -43,12 +37,6 @@ export const headerCurrency = [
     name: "ZMW",
     href: "##",
     icon: CurrencyBangladeshiIcon,
-  },
-  {
-    id: "ZAR",
-    name: "ZAR",
-    href: "##",
-    icon: CurrencyPoundIcon,
   },
   {
     id: "MZN",
