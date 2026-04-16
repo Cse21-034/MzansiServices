@@ -49,7 +49,7 @@ export default function GovernmentDirectoryPage() {
                         Government Directory
                     </h1>
                     <p className="text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto">
-                        Find contact information for government ministries, parastatals, agencies, and local authorities in Namibia
+                        Find contact information for government ministries, parastatals, agencies, and local authorities in South Africa
                     </p>
                 </div>
 
@@ -138,7 +138,7 @@ export default function GovernmentDirectoryPage() {
                         About This Directory
                     </h3>
                     <p className="text-burgundy-800 dark:text-burgundy-200">
-                        This directory provides comprehensive contact information for government institutions in Namibia.
+                        This directory provides comprehensive contact information for government institutions in South Africa.
                         Click on any entry to view full details including addresses, phone numbers, emails, and websites.
                     </p>
                 </div>
