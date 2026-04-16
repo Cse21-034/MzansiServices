@@ -57,9 +57,9 @@ const LocationSearchInput: FC<LocationSearchInputProps> = ({
           const nearestCity = findNearestCity(latitude, longitude);
           
           if (!nearestCity) {
-            // User is outside Namibia
-            alert("⚠️ Our services are only available in Namibia. Please select a location within Namibia to continue searching.");
-            console.warn("User is outside Namibia - no service available");
+            // User is outside South Africa
+            alert("⚠️ Our services are only available in Mzansi (South Africa). Please select a location within South Africa to continue searching.");
+            console.warn("User is outside South Africa - no service available");
             return;
           }
           
@@ -71,8 +71,8 @@ const LocationSearchInput: FC<LocationSearchInputProps> = ({
         },
         (error) => {
           console.error("Error getting location:", error);
-          // Fallback to Windhoek if location access is denied
-          const fallbackCity = "Windhoek";
+          // Fallback to Johannesburg if location access is denied
+          const fallbackCity = "Johannesburg";
           setInternalLocation(fallbackCity);
           setSearchQuery(fallbackCity);
           onLocationChange(fallbackCity);
@@ -98,7 +98,7 @@ const LocationSearchInput: FC<LocationSearchInputProps> = ({
             {internalLocation || "Any location"}
           </span>
           <span className="block mt-1 text-sm text-neutral-400 leading-none font-light">
-            {"Search anywhere in Namibia"}
+            {"Search anywhere in Mzansi"}
           </span>
         </div>
       </>
@@ -140,7 +140,7 @@ const LocationSearchInput: FC<LocationSearchInputProps> = ({
                   <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Search cities and areas in Namibia..."
+                    placeholder="Search cities and areas in Mzansi..."
                     value={searchQuery}
                     onChange={handleInputChange} // Use the new handler
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-white"

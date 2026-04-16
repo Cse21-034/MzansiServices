@@ -19,7 +19,8 @@ export const metadata = {
   title: "Mzansi Services - Online Booking Management",
   description: "Book and manage services in South Africa with ease",
   icons: {
-    icon: "/images/mzansi-logo/fulllogo1.PNG",
+    icon: "/images/mzansi-logo/squarelogo.PNG",
+    apple: "/images/mzansi-logo/squarelogo.PNG",
   },
 };
 
