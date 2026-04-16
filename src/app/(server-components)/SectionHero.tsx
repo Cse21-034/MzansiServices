@@ -21,7 +21,7 @@ const SectionHero: FC<SectionHeroProps> = ({ className = "" }) => {
             Connect with verified local businesses
           </h2>
           <span className="text-base md:text-lg text-neutral-500 dark:text-neutral-400">
-            Discover the best businesses across Namibia - from restaurants and shops to professional services and tourism operators.
+            Discover the best businesses across Mzansi - from restaurants and shops to professional services and tourism operators.
           </span>
 
         </div>
@@ -36,7 +36,7 @@ const SectionHero: FC<SectionHeroProps> = ({ className = "" }) => {
                 <Image
                   className="object-cover"
                   src={image1}
-                  alt="Namibia business 1"
+                  alt="South Africa business 1"
                   fill
                   priority
                 />
@@ -46,7 +46,7 @@ const SectionHero: FC<SectionHeroProps> = ({ className = "" }) => {
                 <Image
                   className="object-cover"
                   src={image2}
-                  alt="Namibia business 2"
+                  alt="South Africa business 2"
                   fill
                   priority
                 />
