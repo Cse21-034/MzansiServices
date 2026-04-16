@@ -7,7 +7,7 @@ import ClearDataButton from "./ClearDataButton";
 import { useRef } from "react";
 import useOutsideAlerter from "@/hooks/useOutsideAlerter";
 import { MapPinIcon } from "@heroicons/react/24/outline";
-import { NAMIBIA_LOCATIONS } from "@/data/namibiaLocations";
+
 
 export interface LocationInputProps {
   onInputDone?: (value: string) => void;
@@ -24,7 +24,7 @@ const LocationInput: FC<LocationInputProps> = ({
   autoFocus = false,
   onInputDone,
   onChange = () => {},
-  placeHolder = "Where in Namibia?",
+  placeHolder = "Where in South Africa?",
   desc = "Search for a city or area",
   className = "nc-flex-1.5",
   divHideVerticalLineClass = "left-10 -right-0.5",

@@ -19,8 +19,8 @@ const AdvertiseWithUsPage: FC = () => {
   const valueAddedPackages = [
     {
       name: "Advert 1",
-      price: "N$250",
-      yearPrice: "N$2400",
+      price: "R$150",
+      yearPrice: "R$1440",
       period: "p/m",
       yearPeriod: "/year",
       discount: "20% DISCOUNT",
@@ -35,8 +35,8 @@ const AdvertiseWithUsPage: FC = () => {
     },
     {
       name: "Advert 2",
-      price: "N$550",
-      yearPrice: "N$5280",
+      price: "R$350",
+      yearPrice: "R$3360",
       period: "p/m",
       yearPeriod: "/year",
       discount: "20% DISCOUNT",
@@ -51,8 +51,8 @@ const AdvertiseWithUsPage: FC = () => {
     },
     {
       name: "Advert 3",
-      price: "N$1000",
-      yearPrice: "N$9600",
+      price: "R$600",
+      yearPrice: "R$5760",
       period: "p/m",
       yearPeriod: "/year",
       discount: "20% DISCOUNT",
@@ -67,8 +67,8 @@ const AdvertiseWithUsPage: FC = () => {
     },
     {
       name: "Advert 4",
-      price: "N$1500",
-      yearPrice: "N$14400",
+      price: "R$900",
+      yearPrice: "R$8640",
       period: "p/m",
       yearPeriod: "/year",
       discount: "20% DISCOUNT",
@@ -84,8 +84,8 @@ const AdvertiseWithUsPage: FC = () => {
     },
     {
       name: "Advert 5",
-      price: "N$2000",
-      yearPrice: "N$19200",
+      price: "R$1200",
+      yearPrice: "R$11520",
       period: "p/m",
       yearPeriod: "/year",
       discount: "20% DISCOUNT",
@@ -100,8 +100,8 @@ const AdvertiseWithUsPage: FC = () => {
     },
     {
       name: "Promotions",
-      price: "N$2500",
-      yearPrice: "N$24000",
+      price: "R$1500",
+      yearPrice: "R$14400",
       period: "p/m",
       yearPeriod: "/year",
       discount: "20% DISCOUNT",
@@ -135,8 +135,8 @@ const AdvertiseWithUsPage: FC = () => {
     },
     {
       name: "DESERT ELEPHANTS",
-      price: "N$100",
-      yearPrice: "N$1020",
+      price: "R$60",
+      yearPrice: "R$612",
       period: "p/m",
       yearPeriod: "/year",
       discount: "16% DISCOUNT",
@@ -154,8 +154,8 @@ const AdvertiseWithUsPage: FC = () => {
     },
     {
       name: "DESERT LIONS",
-      price: "N$200",
-      yearPrice: "N$1920",
+      price: "R$120",
+      yearPrice: "R$1152",
       period: "p/m",
       yearPeriod: "/year",
       discount: "20% DISCOUNT",
@@ -176,12 +176,12 @@ const AdvertiseWithUsPage: FC = () => {
   const webDevelopmentPackages = [
     {
       name: "Informational Website",
-      price: "P3500",
+      price: "R$2000",
       period: "one-time",
       description: "Basic business information website",
       paymentPlan: {
-        deposit: "BWP1500",
-        monthly: "BWP550",
+        deposit: "R$800",
+        monthly: "R$300",
         duration: "6 months"
       },
       features: [
@@ -197,12 +197,12 @@ const AdvertiseWithUsPage: FC = () => {
     },
     {
       name: "CRM Website",
-      price: "P4500",
+      price: "R$2500",
       period: "one-time",
       description: "Customer Relationship Management website",
       paymentPlan: {
-        deposit: "BWP1500",
-        monthly: "BWP600",
+        deposit: "R$800",
+        monthly: "R$350",
         duration: "6 months"
       },
       features: [
@@ -220,8 +220,8 @@ const AdvertiseWithUsPage: FC = () => {
       period: "one-time",
       description: "Complete online store solution",
       paymentPlan: {
-        deposit: "BWP2500",
-        monthly: "BWP1600",
+        deposit: "R$1500",
+        monthly: "R$900",
         duration: "6 months"
       },
       features: [
@@ -239,7 +239,7 @@ const AdvertiseWithUsPage: FC = () => {
   const brandingPackages = [
     {
       name: "Package 1",
-      price: "P9500",
+      price: "R$5500",
       period: "one-time",
       description: "Basic branding essentials",
       features: [
@@ -251,7 +251,7 @@ const AdvertiseWithUsPage: FC = () => {
     },
     {
       name: "Package 2",
-      price: "P1,900",
+      price: "R$1100",
       period: "one-time",
       description: "Enhanced branding package",
       features: [
@@ -266,7 +266,7 @@ const AdvertiseWithUsPage: FC = () => {
     },
     {
       name: "Package 3",
-      price: "P2,400",
+      price: "R$1400",
       period: "one-time",
       description: "Comprehensive branding suite",
       features: [
@@ -284,7 +284,7 @@ const AdvertiseWithUsPage: FC = () => {
     },
     {
       name: "Package 4",
-      price: "P5,000",
+      price: "R$2900",
       period: "one-time",
       description: "Complete branding with printing",
       features: [
@@ -307,7 +307,7 @@ const AdvertiseWithUsPage: FC = () => {
   const socialMediaPackages = [
     {
       name: "Package 1",
-      price: "P650",
+      price: "R$350",
       period: "one-time",
       description: "Basic Facebook setup",
       features: ["Create Facebook page"],
@@ -315,7 +315,7 @@ const AdvertiseWithUsPage: FC = () => {
     },
     {
       name: "Package 2",
-      price: "P1,200",
+      price: "R$700",
       period: "p/m",
       description: "Facebook management",
       features: [
@@ -330,7 +330,7 @@ const AdvertiseWithUsPage: FC = () => {
     },
     {
       name: "Package 3",
-      price: "P2,300",
+      price: "R$1300",
       period: "p/m",
       description: "Facebook & Instagram management",
       features: [
@@ -347,7 +347,7 @@ const AdvertiseWithUsPage: FC = () => {
     },
     {
       name: "Package 4",
-      price: "P3,500",
+      price: "R$2000",
       period: "p/m",
       description: "Multi-platform management",
       features: [

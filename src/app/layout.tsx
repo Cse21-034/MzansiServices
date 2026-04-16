@@ -16,8 +16,8 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-  title: "Namibia Services - Online Booking Management",
-  description: "Book and manage services in Namibia with ease",
+  title: "Mzansi Services - Online Booking Management",
+  description: "Book and manage services in South Africa with ease",
   icons: {
     icon: "/images/mzansi-logo/fulllogo1.PNG",
   },

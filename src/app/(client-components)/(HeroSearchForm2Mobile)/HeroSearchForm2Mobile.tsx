@@ -151,13 +151,13 @@ const HeroSearchForm2Mobile = () => {
                                 {/* Location Search */}
                                 <div>
                                   <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
-                                    Where in Namibia?
+                                    Where in South Africa?
                                   </label>
                                   <div className="relative">
                                     <MapPinIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
                                     <input
                                       type="text"
-                                      placeholder="e.g., Windhoek, Walvis Bay, Swakopmund"
+                                      placeholder="e.g., Johannesburg, Cape Town, Durban"
                                       value={searchParams.location}
                                       onChange={(e) => setSearchParams({ ...searchParams, location: e.target.value })}
                                       className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-white"
