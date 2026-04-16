@@ -27,7 +27,7 @@ const AdRotation = () => {
       id: 3,
       image: adImg3, // Replace with actual ad image
       link: "https://example-advertiser-3.com",
-      alt: "Namibia Business Network",
+      alt: "Mzansi Business Network",
     }
   ];
 

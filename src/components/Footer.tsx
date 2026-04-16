@@ -29,7 +29,7 @@ const Footer: React.FC = () => {
     ]),
     {
       id: "2",
-      title: "Explore Namibia",
+      title: "Explore South Africa",
       menus: [
         { href: "/categories", label: "Business Categories" },
       ],
@@ -79,7 +79,7 @@ const Footer: React.FC = () => {
         <div className="container border-t border-neutral-200 dark:border-neutral-800 mt-8 pt-6 sm:mt-10 sm:pt-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
             <div className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400">
-              <p>&copy; {new Date().getFullYear()} Namibia Services. All rights reserved.</p>
+              <p>&copy; {new Date().getFullYear()} Mzansi Services. All rights reserved.</p>
             </div>
             <div className="text-xs sm:text-sm">
               <p className="text-neutral-600 dark:text-neutral-400 font-medium">

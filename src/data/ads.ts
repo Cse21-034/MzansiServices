@@ -32,10 +32,10 @@ export const ADS_LIST: AdConfig[] = [
   },
   {
     id: 'ad-3',
-    title: 'Namibia Business Network',
+    title: 'Mzansi Business Network',
     image: '/images/ads3.jpg',
     link: 'https://example-advertiser-3.com',
-    alt: 'Namibia Business Network',
+    alt: 'Mzansi Business Network',
     type: 'banner',
     priority: 3,
   },
